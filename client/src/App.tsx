@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage.tsx';
+import DashboardPage from './components/DashboardPage.tsx';
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
 
         {/* 3. Future Dashboard Route (Example) */}
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </Router>
   );
