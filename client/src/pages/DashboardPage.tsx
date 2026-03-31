@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import Sidebar from './Sidebar';
-import Topbar from './Topbar';
-import Dashboard from './Dashboard';
-import TodoList from './TodoList';
+import Sidebar from '../layouts/Sidebar';
+import Topbar from '../layouts/Topbar';
+import Dashboard from '../components/Dashboard';
+import TodoList from '../components/TodoList';
 
 export default function DashboardPage() {
   const [activeNav, setActiveNav] = useState('Dashboard');
