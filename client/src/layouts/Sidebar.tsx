@@ -21,9 +21,7 @@ export default function Sidebar({ activeNav, setActiveNav }: SidebarProps) {
       
       {/* Logo */}
       <div className="flex items-center px-6 border-b border-[#e2e8f0] min-h-[58px]">
-        <svg viewBox="0 0 24 24" className="h-7 w-auto text-[#aa3bff]" fill="currentColor">
-          <path d="M12 2L2 7h20L12 2zM2 9v2h20V9H2zm2 4v7h3v-7H4zm6 0v7h4v-7h-4zm7 0v7h3v-7h-3zM2 22v2h20v-2H2z" />
-        </svg>
+        <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
       </div>
 
       {/* Nav */}

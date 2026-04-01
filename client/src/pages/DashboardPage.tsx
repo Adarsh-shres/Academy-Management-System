@@ -11,6 +11,8 @@ export default function DashboardPage() {
     const path = location.pathname;
     if (path.includes('student')) return 'Students';
     if (path.includes('course')) return 'Courses';
+    if (path.includes('teacher')) return 'Teachers';
+    if (path.includes('userrole')) return 'User Roles';
     return 'Dashboard';
   };
 
@@ -18,7 +20,9 @@ export default function DashboardPage() {
     if (navName === 'Dashboard') navigate('/dashboard');
     else if (navName === 'Students') navigate('/students');
     else if (navName === 'Courses') navigate('/courses');
-    else navigate('/under-construction');
+    else if (navName === 'Teachers') navigate('/teachers');
+    else if (navName === 'User Roles') navigate('/userroles');
+    else navigate('/under-development');
   };
 
   return (
