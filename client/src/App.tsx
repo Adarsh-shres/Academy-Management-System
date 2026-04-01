@@ -4,15 +4,16 @@ import DashboardPage from './pages/DashboardPage.tsx';
 import LandingPage from './pages/LandingPage.tsx';
 import Dashboard from './components/Dashboard.tsx';
 import StudentsPage from './pages/StudentsPage.tsx';
+import RegisterStudentForm from './components/RegisterStudentForm.tsx';
 import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
-import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
+import CoursesPage from './pages/CoursesPage.tsx';
 
-function UnderConstruction({ title }: { title: string }) {
+function UnderDevelopment() {
   return (
     <div className="p-[26px_28px_40px]">
-      <h2 className="text-2xl font-bold font-sans text-[#0d3349]">{title} Content</h2>
-      <p className="mt-4 text-[#64748b]">Under Construction</p>
+      <h2 className="text-2xl font-bold font-sans text-[#0d3349]">Under Development</h2>
+      <p className="mt-4 text-[#64748b]">This page is currently being developed.</p>
     </div>
   );
 }
@@ -27,20 +28,17 @@ function App() {
         {/* 2. The Login Route */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* 3. App Layout Route */}
+        {/* 3. Dashboard Layout Routes */}
         <Route element={<DashboardPage />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentsPage />} />
-          <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/students/:id" element={<StudentDetailsPage />} />
-          <Route path="/register-students" element={<RegisterStudentsPage />} />
-          
-          {/* Other Sidebar items */}
-          <Route path="/user-roles" element={<UnderConstruction title="User Roles" />} />
-          <Route path="/teachers" element={<UnderConstruction title="Teachers" />} />
-          <Route path="/courses" element={<UnderConstruction title="Courses" />} />
-          <Route path="/schedule" element={<UnderConstruction title="Schedule" />} />
-          <Route path="/settings" element={<UnderConstruction title="Settings" />} />
+          <Route path="/register-students" element={<RegisterStudentForm />} />
+          <Route path="/all-students" element={<AllStudentsPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/teachers" element={<UnderDevelopment />} />
+          <Route path="/userroles" element={<UnderDevelopment />} />
+          <Route path="/under-development" element={<UnderDevelopment />} />
         </Route>
       </Routes>
     </Router>
