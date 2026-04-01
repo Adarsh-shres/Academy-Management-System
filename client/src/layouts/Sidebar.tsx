@@ -20,8 +20,9 @@ export default function Sidebar({ activeNav, setActiveNav }: SidebarProps) {
     <aside className="fixed top-0 left-0 bottom-0 w-[210px] bg-white border-r border-[#e2e8f0] flex flex-col z-[100] transition-all duration-200">
       
       {/* Logo */}
-      <div className="flex items-center px-6 border-b border-[#e2e8f0] min-h-[58px]">
-        <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
+      <div className="flex items-center justify-center gap-2 px-4 border-b border-[#e2e8f0] min-h-[58px]">
+        <img src="/image - Edited.png" alt="Yogify Logo" className="h-10 w-10 object-contain" style={{ mixBlendMode: 'multiply' }} />
+        <span className="font-extrabold text-[#111827] text-lg tracking-wide uppercase">YOGIFY</span>
       </div>
 
       {/* Nav */}
