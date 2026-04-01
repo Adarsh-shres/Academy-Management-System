@@ -1,8 +1,7 @@
-
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   activeNav: string;
-  setActiveNav: (nav: string) => void;
 }
 
 const NAV_ITEMS = [
@@ -15,7 +14,9 @@ const NAV_ITEMS = [
   { name: 'Settings', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg> },
 ];
 
-export default function Sidebar({ activeNav, setActiveNav }: SidebarProps) {
+export default function Sidebar({ activeNav }: SidebarProps) {
+  const navigate = useNavigate();
+
   return (
     <aside className="fixed top-0 left-0 bottom-0 w-[210px] bg-white border-r border-[#e2e8f0] flex flex-col z-[100] transition-all duration-200">
       
@@ -31,7 +32,7 @@ export default function Sidebar({ activeNav, setActiveNav }: SidebarProps) {
           return (
             <button
               key={item.name}
-              onClick={() => setActiveNav(item.name)}
+              onClick={() => navigate('/' + item.name.toLowerCase().replace(/\s+/g, '-'))}
               className={`w-full flex items-center gap-2.5 p-[10px_16px] text-[13.5px] font-medium cursor-pointer border-l-[3px] transition-all duration-200 text-left
                 ${isActive 
                   ? 'text-[#006496] bg-[#e6f7f9] border-[#006496] font-semibold' 
