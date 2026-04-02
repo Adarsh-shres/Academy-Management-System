@@ -45,6 +45,13 @@ export default function SchedulePage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Schedule</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Manage and view your hourly class schedule.</p>
         </div>
+        <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Create Schedule
+        </button>
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col">
