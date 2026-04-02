@@ -165,9 +165,9 @@ export default function TeachersPage() {
 
       {selectedTeacher ? (
         /* ── DETAIL PANEL ── */
-        <>
+        <div key={selectedTeacher.id} className="contents">
           {/* Back + Page Title */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 animate-fade-up" style={{ animationDelay: '0ms' }}>
             <button
               onClick={() => setSelectedTeacher(null)}
               className="w-10 h-10 flex items-center justify-center bg-white border border-[#e2e8f0] rounded-lg hover:bg-[#f8fafc] transition-colors text-[#64748b] cursor-pointer shadow-sm"
@@ -181,7 +181,7 @@ export default function TeachersPage() {
           </div>
 
           {/* ── Header Card ── */}
-          <div className="bg-white border border-[#e2e8f0] rounded-2xl p-6 md:p-8 shadow-sm">
+          <div className="bg-white border border-[#e2e8f0] rounded-2xl p-6 md:p-8 shadow-sm animate-fade-up" style={{ animationDelay: '75ms' }}>
             <div className="flex flex-col sm:flex-row gap-6">
               {/* Avatar */}
               <div className="flex flex-col items-center gap-3 shrink-0">
@@ -214,7 +214,7 @@ export default function TeachersPage() {
           </div>
 
           {/* ── Stats Row ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[18px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[18px] animate-fade-up" style={{ animationDelay: '150ms' }}>
             <StatCard
               icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>}
               label="Total Classes"
@@ -248,7 +248,7 @@ export default function TeachersPage() {
           </div>
 
           {/* ── Two-Column: Schedule + Activity ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 animate-fade-up" style={{ animationDelay: '225ms' }}>
             {/* Class Schedule Table */}
             <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
               <div className="flex items-center justify-between p-5 border-b border-[#e2e8f0]">
@@ -309,7 +309,7 @@ export default function TeachersPage() {
           </div>
 
           {/* ── Quick Actions Bar ── */}
-          <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-sm">
+          <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-sm animate-fade-up" style={{ animationDelay: '300ms' }}>
             <h3 className="font-sans text-[15px] font-bold text-[#0d3349] mb-4">Quick Actions</h3>
             <div className="flex flex-wrap gap-3">
               <QuickActionBtn icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>} label="Take Attendance" primary />
@@ -318,7 +318,7 @@ export default function TeachersPage() {
               <QuickActionBtn icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>} label="View Reports" />
             </div>
           </div>
-        </>
+        </div>
       ) : (
         /* ── LIST VIEW (Default) ── */
         <>
