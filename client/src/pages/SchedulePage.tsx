@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 
+const dummySchedule = [
+  { id: 1, time: '08:00 AM', course: 'Web Development', level: 'Beginner', instructor: 'Dr. John Doe', room: 'Room 101' },
+  { id: 2, time: '09:00 AM', course: 'Algorithms', level: 'Intermediate', instructor: 'Prof. Jane Smith', room: 'Room 102' },
+  { id: 3, time: '10:00 AM', course: 'Break', level: '-', instructor: '-', room: '-' },
+  { id: 4, time: '11:00 AM', course: 'Java', level: 'Advanced', instructor: 'Dr. Alan Turing', room: 'Room 205' },
+  { id: 5, time: '12:00 PM', course: 'Lunch Break', level: '-', instructor: '-', room: '-' },
+  { id: 6, time: '01:00 PM', course: 'Python', level: 'Beginner', instructor: 'Dr. Guido Rossum', room: 'Room 303' },
+  { id: 7, time: '02:00 PM', course: 'Collaborative Dev', level: 'Intermediate', instructor: 'Prof. Linus Torvalds', room: 'Room 404' },
+];
+
 export default function SchedulePage() {
   const [dayView, setDayView] = useState<'Today' | 'Tomorrow'>('Today');
   const [classFilter, setClassFilter] = useState('All');
@@ -21,6 +31,13 @@ export default function SchedulePage() {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
+  const filteredSchedule = dummySchedule.filter(item => {
+    if (item.course === 'Break' || item.course === 'Lunch Break') return true;
+    if (classFilter !== 'All' && item.course !== classFilter) return false;
+    if (levelFilter !== 'All' && item.level !== levelFilter) return false;
+    return true;
+  });
+
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -33,7 +50,6 @@ export default function SchedulePage() {
       <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col">
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-[#e2e8f0] gap-4">
-          
           {/* Day View Toggle */}
           <div className="flex bg-[#f1f5f9] rounded-lg p-1 gap-1">
             <button 
@@ -60,8 +76,8 @@ export default function SchedulePage() {
               </button>
               
               {isClassFilterOpen && (
-                <div className="absolute top-[110%] right-0 w-40 bg-white border border-[#e2e8f0] rounded-xl shadow-lg z-10 flex flex-col overflow-hidden py-1">
-                  {['All', 'Web Development', 'Algorithms', 'Java', 'Python'].map(c => (
+                <div className="absolute top-[110%] right-0 w-48 bg-white border border-[#e2e8f0] rounded-xl shadow-lg z-10 flex flex-col overflow-hidden py-1">
+                  {['All', 'Web Development', 'Algorithms', 'Java', 'Python', 'Collaborative Dev'].map(c => (
                     <button key={c} onClick={() => { setClassFilter(c); setIsClassFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${classFilter === c ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>{c}</button>
                   ))}
                 </div>
@@ -86,6 +102,51 @@ export default function SchedulePage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider whitespace-nowrap">Time</th>
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course</th>
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Level</th>
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Instructor</th>
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Room</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredSchedule.length > 0 ? (
+                filteredSchedule.map((item) => (
+                  <tr key={item.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors">
+                    <td className="py-3 px-6 text-[13px] font-semibold text-[#006496] whitespace-nowrap">{item.time}</td>
+                    <td className="py-3 px-6 text-[13px] font-medium text-[#1e293b]">
+                      {item.course}
+                      {(item.course === 'Break' || item.course === 'Lunch Break') && (
+                        <span className="ml-2 inline-flex items-center justify-center bg-[#f1f5f9] text-[#64748b] text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Break</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">
+                      {item.level !== '-' ? (
+                        <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                          item.level === 'Beginner' ? 'bg-[#dbeafe] text-[#1d4ed8]' : 
+                          item.level === 'Intermediate' ? 'bg-[#fef3c7] text-[#b45309]' : 
+                          'bg-[#fee2e2] text-[#b91c1c]'
+                        }`}>{item.level}</span>
+                      ) : '-'}
+                    </td>
+                    <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">{item.instructor}</td>
+                    <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">{item.room}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-10 text-center text-[13px] text-[#64748b]">No classes scheduled matching your criteria.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
