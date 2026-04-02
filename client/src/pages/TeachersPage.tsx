@@ -143,7 +143,7 @@ export default function TeachersPage() {
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8 pb-10">
+    <div className="flex flex-col gap-6 md:gap-8 p-[26px_28px_40px] flex-1">
       
       {/* ── Breadcrumb ── */}
       <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#006496] tracking-widest uppercase mb-[-12px]">
