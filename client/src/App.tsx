@@ -9,6 +9,7 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
 import SchedulePage from './pages/SchedulePage.tsx';
+import TeachersPage from './pages/TeachersPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -38,7 +39,7 @@ function App() {
           <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
-          <Route path="/teachers" element={<UnderDevelopment />} />
+          <Route path="/teachers" element={<TeachersPage />} />
           <Route path="/userroles" element={<UnderDevelopment />} />
           <Route path="/under-development" element={<UnderDevelopment />} />
         </Route>
