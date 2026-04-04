@@ -24,7 +24,14 @@ const initialCourses: Course[] = [
 
 export default function CoursesPage() {
   const [view, setView] = useState<'overview' | 'list'>('overview');
-  const [schedule, setSchedule] = useState('Mon/Wed/Fri');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
+
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
 
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [filterStatus, setFilterStatus] = useState<'All' | CourseStatus>('All');
@@ -66,7 +73,9 @@ export default function CoursesPage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Course Curriculum</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Conduct and create your courses.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer">
+        <button 
+          onClick={() => setIsNewCourseModalOpen(true)}
+          className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -75,9 +84,9 @@ export default function CoursesPage() {
         </button>
       </div>
 
-      {/* Main Content Split */}
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left Column (Stats + Form) */}
+      {/* Main Content Layout */}
+      <div className="flex flex-col gap-8">
+        {/* Left Column (Stats + Active Curriculum) */}
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           {/* Stats */}
           <div className="flex flex-col sm:flex-row gap-6">
@@ -99,60 +108,25 @@ export default function CoursesPage() {
             </div>
           </div>
 
-          {/* Initialize Course Form */}
-          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
-            <h3 className="text-[16px] font-bold text-[#0d3349] mb-5">Initialize Course</h3>
-            <form className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
-                <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+          {/* Center Main Content: Active Curriculum */}
+          <div className="flex flex-col gap-5 mt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-[18px] font-bold text-[#0d3349] leading-tight">Active Curriculum</h3>
+                <p className="text-[14px] text-[#64748b]">Currently running programs and their status.</p>
               </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
-                </div>
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
-                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5 mt-1">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Primary Schedule</label>
-                <div className="flex bg-[#e2e8f0]/40 rounded-lg p-1 gap-1 w-full max-w-[400px]">
-                  <button type="button" onClick={() => setSchedule('Mon/Wed/Fri')} className={`flex-1 rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer ${schedule === 'Mon/Wed/Fri' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>Mon/Wed/Fri</button>
-                  <button type="button" onClick={() => setSchedule('Tue/Thu')} className={`flex-1 rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer ${schedule === 'Tue/Thu' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>Tue/Thu</button>
-                  <button type="button" onClick={() => setSchedule('Weekend')} className={`flex-1 rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer ${schedule === 'Weekend' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>Weekend</button>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5 mt-2">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Description</label>
-                <textarea rows={4} className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
-              </div>
-
-              <button type="button" className="mt-4 bg-[#006496] hover:bg-[#004e75] text-white text-[14px] font-semibold px-6 py-3 rounded-lg transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
-                Create and Activate Course
+              <button 
+                onClick={() => setView('list')}
+                className="text-[13px] font-semibold text-[#006496] hover:text-[#004e75] transition-all cursor-pointer underline-offset-2 hover:underline">
+                View All Courses
               </button>
-            </form>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <CurriculumCard title="Collaborative Development" tag="STARTER" tagColor="bg-[#ccfbf1] text-[#0f766e]" />
+              <CurriculumCard title="Full stack Development" tag="CORE" tagColor="bg-[#dbeafe] text-[#1d4ed8]" />
+            </div>
           </div>
-        </div>
-
-        {/* Right Column: Active Curriculum */}
-        <div className="w-full lg:w-[320px] xl:w-[360px] flex flex-col gap-3">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[15px] font-bold text-[#0d3349] leading-tight">Active<br/>Curriculum</h3>
-            <button 
-              onClick={() => setView('list')}
-              className="text-[12px] font-semibold text-[#64748b] hover:text-[#006496] transition-all cursor-pointer underline-offset-2 hover:underline">
-              View All
-            </button>
-          </div>
-          
-          <CurriculumCard title="Collaborative Development" tag="STARTER" tagColor="bg-[#ccfbf1] text-[#0f766e]" />
-          <CurriculumCard title="Full stack Development" tag="CORE" tagColor="bg-[#dbeafe] text-[#1d4ed8]" />
         </div>
       </div>
     </div>
@@ -304,5 +278,70 @@ export default function CoursesPage() {
     </div>
   );
 
-  return view === 'overview' ? renderOverview() : renderList();
+  return (
+    <>
+      {view === 'overview' ? renderOverview() : renderList()}
+
+      {/* New Course Modal Overlay */}
+      {isNewCourseModalOpen && (
+        <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsNewCourseModalOpen(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-[18px] font-bold text-[#0d3349]">Initialize Course</h3>
+              <button onClick={() => setIsNewCourseModalOpen(false)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
+                <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
+                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
+                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-1">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Primary Schedule</label>
+                <div className="flex flex-wrap gap-2 w-full mt-1">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <button 
+                      key={day}
+                      type="button" 
+                      onClick={() => toggleDay(day)} 
+                      className={`flex-1 min-w-[40px] rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer border ${selectedDays.includes(day) ? 'bg-[#006496] font-semibold text-white border-[#006496] shadow-sm' : 'bg-white font-medium text-[#64748b] border-[#e2e8f0] hover:border-[#cbd5e1] hover:text-[#0d3349] hover:bg-[#f8fafc]'}`}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Description</label>
+                <textarea rows={4} className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button type="button" onClick={() => setIsNewCourseModalOpen(false)} className="flex-1 bg-white border border-[#cbd5e1] hover:bg-[#f8fafc] text-[#475569] text-[14px] font-semibold px-6 py-3 rounded-lg transition-all active:scale-[0.98] w-full cursor-pointer">
+                  Cancel
+                </button>
+                <button type="button" className="flex-[2] bg-[#006496] hover:bg-[#004e75] text-white text-[14px] font-semibold px-6 py-3 rounded-lg transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
+                  Create and Activate Course
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
