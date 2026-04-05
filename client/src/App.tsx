@@ -9,6 +9,7 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
+import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -23,13 +24,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 1. The Landing Route */}
         <Route path="/" element={<LandingPage />} />
-
-        {/* 2. The Login Route */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* 3. Dashboard Layout Routes */}
         <Route element={<DashboardPage />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentsPage />} />
@@ -41,6 +38,8 @@ function App() {
           <Route path="/userroles" element={<UnderDevelopment />} />
           <Route path="/under-development" element={<UnderDevelopment />} />
         </Route>
+
+        <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
       </Routes>
     </Router>
   );
