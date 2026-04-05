@@ -18,12 +18,12 @@ export default function AllStudentsPage() {
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">All Students</h1>
+          <h1 className="text-[28px] font-extrabold text-[#4b3f68] tracking-tight">All Students</h1>
           <p className="text-[14px] text-[#64748b] mt-1">A comprehensive list of all enrolled students</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col mt-4">
+      <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col mt-4">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[14px] text-[#1e293b]">
             <thead className="bg-[#f8fafc] text-[13px] font-semibold text-[#64748b] uppercase tracking-wide border-b border-[#e2e8f0]">
@@ -39,16 +39,16 @@ export default function AllStudentsPage() {
               {students.length > 0 ? (
                 students.map((student) => (
                   <tr key={student.id} className="hover:bg-[#f8fafc] transition-colors">
-                    <td className="px-6 py-4 font-medium text-[#0d3349]">{student.name}</td>
+                    <td className="px-6 py-4 font-medium text-[#4b3f68]">{student.name}</td>
                     <td className="px-6 py-4">
-                      <span className="bg-[#e6f7f9] text-[#006496] px-2.5 py-1 rounded-md text-[12px] font-bold mr-2">
+                      <span className="bg-[#f3eff7] text-[#6a5182] px-2.5 py-1 rounded-md text-[12px] font-bold mr-2">
                         {student.department}
                       </span>
                       <span className="text-[#64748b] text-[13px]">{student.course}</span>
                     </td>
                     <td className="px-6 py-4 text-[#64748b]">{student.email}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex min-w-[80px] justify-center px-2.5 py-1 rounded-full text-[12px] font-bold ${
+                      <span className={`inline-flex min-w-[80px] justify-center px-2.5 py-1 rounded-sm text-[12px] font-bold ${
                         student.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
                       }`}>
                         {student.isActive ? 'Active' : 'Deactivated'}
@@ -58,7 +58,7 @@ export default function AllStudentsPage() {
                       <div className="flex items-center gap-3">
                         <button 
                           onClick={() => navigate(`/students/${student.id}`)}
-                          className="text-[#006496] hover:text-[#004e75] font-semibold text-[13px] hover:underline"
+                          className="text-[#6a5182] hover:text-[#004e75] font-semibold text-[13px] hover:underline"
                         >
                           Details
                         </button>

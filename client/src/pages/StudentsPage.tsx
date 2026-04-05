@@ -14,7 +14,7 @@ export default function StudentsPage() {
         </div>
         <button
           onClick={() => navigate('/register-students')}
-          className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px">
+          className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -41,16 +41,16 @@ export default function StudentsPage() {
       </div>
 
       {/* Recent Students List (Placeholder) */}
-      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 shadow-sm flex flex-col mt-4">
+      <div className="bg-white rounded-sm border border-[#e2e8f0] p-5 shadow-sm flex flex-col mt-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[14px] font-bold text-[#0d3349] uppercase tracking-wide">Recent Students</h3>
+          <h3 className="text-[14px] font-bold text-[#4b3f68] uppercase tracking-wide">Recent Students</h3>
           <span 
             onClick={() => navigate('/all-students')}
-            className="text-[12px] font-semibold text-[#006496] cursor-pointer hover:underline transition-all">
+            className="text-[12px] font-semibold text-[#6a5182] cursor-pointer hover:underline transition-all">
             View All
           </span>
         </div>
-        <div className="text-[14px] text-[#64748b] py-8 text-center bg-[#f8fafc] rounded-xl border border-dashed border-[#cbd5e1]">
+        <div className="text-[14px] text-[#64748b] py-8 text-center bg-[#f8fafc] rounded-sm border border-dashed border-[#cbd5e1]">
           No recent students registered yet.
         </div>
       </div>

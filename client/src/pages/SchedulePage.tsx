@@ -45,7 +45,7 @@ export default function SchedulePage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Schedule</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Manage and view your hourly class schedule.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer">
+        <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -54,19 +54,19 @@ export default function SchedulePage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col">
+      <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col">
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-[#e2e8f0] gap-4">
           {/* Day View Toggle */}
-          <div className="flex bg-[#f1f5f9] rounded-lg p-1 gap-1">
+          <div className="flex bg-[#f1f5f9] rounded-sm p-1 gap-1">
             <button 
               onClick={() => setDayView('Today')} 
-              className={`px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${dayView === 'Today' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>
+              className={`px-4 py-1.5 rounded-sm text-[13px] transition-all cursor-pointer ${dayView === 'Today' ? 'bg-white font-semibold text-[#4b3f68] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>
               Today
             </button>
             <button 
               onClick={() => setDayView('Tomorrow')} 
-              className={`px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${dayView === 'Tomorrow' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>
+              className={`px-4 py-1.5 rounded-sm text-[13px] transition-all cursor-pointer ${dayView === 'Tomorrow' ? 'bg-white font-semibold text-[#4b3f68] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>
               Tomorrow
             </button>
           </div>
@@ -77,15 +77,15 @@ export default function SchedulePage() {
             <div className="relative">
               <button 
                 onClick={() => { setIsClassFilterOpen(!isClassFilterOpen); setIsLevelFilterOpen(false); }}
-                className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] hover:text-[#0d3349] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+                className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 Class: {classFilter}
               </button>
               
               {isClassFilterOpen && (
-                <div className="absolute top-[110%] right-0 w-48 bg-white border border-[#e2e8f0] rounded-xl shadow-lg z-10 flex flex-col overflow-hidden py-1">
+                <div className="absolute top-[110%] right-0 w-48 bg-white border border-[#e2e8f0] rounded-sm shadow-lg z-10 flex flex-col overflow-hidden py-1">
                   {['All', 'Web Development', 'Algorithms', 'Java', 'Python', 'Collaborative Dev'].map(c => (
-                    <button key={c} onClick={() => { setClassFilter(c); setIsClassFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${classFilter === c ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>{c}</button>
+                    <button key={c} onClick={() => { setClassFilter(c); setIsClassFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${classFilter === c ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>{c}</button>
                   ))}
                 </div>
               )}
@@ -95,15 +95,15 @@ export default function SchedulePage() {
             <div className="relative">
               <button 
                 onClick={() => { setIsLevelFilterOpen(!isLevelFilterOpen); setIsClassFilterOpen(false); }}
-                className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] hover:text-[#0d3349] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+                className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 Level: {levelFilter}
               </button>
 
               {isLevelFilterOpen && (
-                <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-xl shadow-lg z-10 flex flex-col overflow-hidden py-1">
+                <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-sm shadow-lg z-10 flex flex-col overflow-hidden py-1">
                   {['All', 'Beginner', 'Intermediate', 'Advanced'].map(l => (
-                    <button key={l} onClick={() => { setLevelFilter(l); setIsLevelFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${levelFilter === l ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>{l}</button>
+                    <button key={l} onClick={() => { setLevelFilter(l); setIsLevelFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${levelFilter === l ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>{l}</button>
                   ))}
                 </div>
               )}
@@ -148,7 +148,7 @@ export default function SchedulePage() {
                     <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">{item.room}</td>
                     <td className="py-3 px-6 text-right">
                       <div className="flex items-center justify-end gap-3 text-[#94a3b8]">
-                        <button className="hover:text-[#006496] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
+                        <button className="hover:text-[#6a5182] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </button>
                       </div>

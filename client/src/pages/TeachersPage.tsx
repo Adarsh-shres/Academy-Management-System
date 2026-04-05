@@ -144,25 +144,6 @@ export default function TeachersPage() {
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 p-[26px_28px_40px] flex-1">
-      
-      {/* ── Breadcrumb ── */}
-      <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#006496] tracking-widest uppercase mb-[-12px]">
-        <span>Institutional Overview</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-        <span 
-          className={selectedTeacher ? "cursor-pointer hover:underline" : ""} 
-          onClick={() => setSelectedTeacher(null)}
-        >
-          Teachers
-        </span>
-        {selectedTeacher && (
-           <>
-             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-             <span className="text-[#64748b]">{selectedTeacher.name}</span>
-           </>
-        )}
-      </div>
-
       {selectedTeacher ? (
         /* ── DETAIL PANEL ── */
         <div key={selectedTeacher.id} className="contents">
@@ -170,7 +151,7 @@ export default function TeachersPage() {
           <div className="flex items-center gap-4 animate-fade-up" style={{ animationDelay: '0ms' }}>
             <button
               onClick={() => setSelectedTeacher(null)}
-              className="w-10 h-10 flex items-center justify-center bg-white border border-[#e2e8f0] rounded-lg hover:bg-[#f8fafc] transition-colors text-[#64748b] cursor-pointer shadow-sm"
+              className="w-10 h-10 flex items-center justify-center bg-[#f3eff7] border border-[#e2d9ed] rounded-sm hover:bg-[#6a5182] hover:text-white transition-colors text-[#6a5182] cursor-pointer shadow-sm"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             </button>
@@ -199,7 +180,7 @@ export default function TeachersPage() {
                     <h2 className="font-sans text-[22px] font-extrabold text-[#0d3349] tracking-tight leading-tight">{selectedTeacher.name}</h2>
                     <p className="text-[13px] text-[#64748b] mt-1">{selectedTeacher.subject}</p>
                   </div>
-                  <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
+                  <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Edit Profile
                   </button>
@@ -234,7 +215,7 @@ export default function TeachersPage() {
               isAccent
               subContent={
                 selectedTeacher.avgAttendance >= 85
-                  ? <span className="text-[10.5px] font-bold text-[#006496] bg-[#e6f7f9] px-[9px] py-0.5 rounded-full tracking-wide">Above Target</span>
+                  ? <span className="text-[10.5px] font-bold text-[#6a5182] bg-[#f3eff7] px-[9px] py-0.5 rounded-sm tracking-wide">Above Target</span>
                   : <span className="text-[10.5px] font-bold text-[#92400e] bg-[#fef3c7] px-[9px] py-0.5 rounded-full tracking-wide">Below Target</span>
               }
             />
@@ -250,10 +231,10 @@ export default function TeachersPage() {
           {/* ── Two-Column: Schedule + Activity ── */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 animate-fade-up" style={{ animationDelay: '225ms' }}>
             {/* Class Schedule Table */}
-            <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-[#e2e8f0] rounded-sm overflow-hidden shadow-sm">
               <div className="flex items-center justify-between p-5 border-b border-[#e2e8f0]">
                 <h3 className="font-sans text-[15px] font-bold text-[#0d3349]">Class Schedule</h3>
-                <button className="bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] hover:text-[#0d3349] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+                <button className="bg-[#f3eff7] hover:bg-[#6a5182] text-[#6a5182] hover:text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
                   This Week
                 </button>
               </div>
@@ -287,7 +268,7 @@ export default function TeachersPage() {
             <div className="bg-white border border-[#e2e8f0] rounded-2xl p-[22px] flex flex-col shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-sans text-[15px] font-bold text-[#0d3349]">Recent Activity</h3>
-                <span className="text-[12px] font-semibold text-[#006496] cursor-pointer hover:underline transition-all">View All</span>
+                <span className="text-[12px] font-semibold text-[#6a5182] cursor-pointer hover:underline transition-all">View All</span>
               </div>
               <div className="flex flex-col gap-0 flex-1">
                 {selectedTeacher.activities.map((act) => (
@@ -328,7 +309,7 @@ export default function TeachersPage() {
               <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Teachers</h1>
               <p className="text-[14px] text-[#64748b] mt-1">Manage and view faculty members</p>
             </div>
-            <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
+            <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add Teacher
             </button>
@@ -385,7 +366,7 @@ export default function TeachersPage() {
 
                   {/* Name + Subject */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[#0d3349] group-hover:text-[#006496] transition-colors truncate">{teacher.name}</p>
+                    <p className="text-[14px] font-semibold text-[#0d3349] group-hover:text-[#6a5182] transition-colors truncate">{teacher.name}</p>
                     <p className="text-[12px] text-[#64748b] mt-0.5 truncate">{teacher.subject}</p>
                   </div>
 
@@ -402,7 +383,7 @@ export default function TeachersPage() {
                   {/* Chevron */}
                   <svg
                     width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                    className="text-[#cbd5e1] group-hover:text-[#006496] transition-colors shrink-0"
+                    className="text-[#cbd5e1] group-hover:text-[#6a5182] transition-colors shrink-0"
                   >
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
@@ -429,12 +410,12 @@ function DetailField({ label, value }: { label: string; value: string }) {
 
 function QuickActionBtn({ icon, label, primary }: { icon: React.ReactNode; label: string; primary?: boolean }) {
   return primary ? (
-    <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
+    <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
       {icon}
       {label}
     </button>
   ) : (
-    <button className="flex items-center gap-2 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] text-[#475569] hover:text-[#0d3349] text-[13px] font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer">
+    <button className="flex items-center gap-2 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] text-[#6a5182] hover:text-white text-[13px] font-semibold px-4 py-2.5 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
       {icon}
       {label}
     </button>

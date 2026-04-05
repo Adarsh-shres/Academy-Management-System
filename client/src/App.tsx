@@ -5,12 +5,12 @@ import LandingPage from './pages/LandingPage.tsx';
 
 import Dashboard from './components/Dashboard.tsx';
 import StudentsPage from './pages/StudentsPage.tsx';
-import RegisterStudentForm from './components/RegisterStudentForm.tsx';
 import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
 import SchedulePage from './pages/SchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
+import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -36,13 +36,15 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentsPage />} />
           <Route path="/students/:id" element={<StudentDetailsPage />} />
-          <Route path="/register-students" element={<RegisterStudentForm />} />
+          <Route path="/register-students" element={<RegisterStudentsPage />} />
           <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/teachers" element={<TeachersPage />} />
+          <Route path="/user-roles" element={<UnderDevelopment />} />
           <Route path="/userroles" element={<UnderDevelopment />} />
           <Route path="/under-development" element={<UnderDevelopment />} />
+          <Route path="*" element={<UnderDevelopment />} />
         </Route>
       </Routes>
     </Router>

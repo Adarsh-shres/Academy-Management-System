@@ -12,14 +12,14 @@ export default function TodoList() {
   };
 
   return (
-    <aside className="w-[300px] border-l border-[#e2e8f0] bg-white hidden xl:flex flex-col shrink-0 min-h-[calc(100vh-58px)] shadow-sm">
-      <div className="p-5 tracking-tight border-b border-[#e2e8f0] flex items-center justify-between">
-        <h2 className="font-sans text-[15px] font-bold text-[#0d3349]">My Tasks</h2>
-        <span className="bg-[#e6f7f9] text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">
+    <aside className="w-full rounded-sm border border-[#e6dfef] bg-white shadow-[0_14px_40px_rgba(57,31,86,0.08)] overflow-hidden flex flex-col sticky top-[82px]">
+      <div className="p-5 tracking-tight border-b border-[#eee8f4] flex items-center justify-between bg-[#fbf8fe]">
+        <h2 className="font-sans text-[15px] font-extrabold text-[#4b3f68]">My Tasks</h2>
+        <span className="bg-[#f3eff7] text-primary text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-[0.08em]">
           {todos.filter(t => !t.done).length} left
         </span>
       </div>
-      <div className="p-5 flex-1 bg-[#f8fcfd]">
+      <div className="p-5 flex-1 bg-white">
         <ul className="space-y-3">
           {todos.map(todo => (
             <li key={todo.id} className="flex items-start gap-3 group">
@@ -40,7 +40,7 @@ export default function TodoList() {
             </li>
           ))}
         </ul>
-        <button className="mt-5 text-[#006496] font-bold text-[12px] flex items-center gap-1.5 hover:opacity-75 transition-opacity px-1">
+        <button className="mt-5 text-[#6a5182] font-bold text-[12px] flex items-center gap-1.5 hover:opacity-75 transition-opacity px-1">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add New Task
         </button>

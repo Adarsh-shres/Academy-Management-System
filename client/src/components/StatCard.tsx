@@ -11,24 +11,24 @@ interface StatCardProps {
 
 export default function StatCard({ icon, label, value, subContent, linkText, isAccent }: StatCardProps) {
   return (
-    <div className={`bg-white border border-[#e2e8f0] rounded-2xl p-[22px_22px_20px] relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md
-      ${isAccent ? 'border-t-[3px] border-t-primary' : ''}
+    <div className={`relative overflow-hidden rounded-sm border border-[#e7dff0] bg-white p-[22px_22px_20px] shadow-[0_10px_28px_rgba(57,31,86,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(57,31,86,0.1)]
+      ${isAccent ? 'ring-1 ring-[#e0d6ef]' : ''}
     `}>
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f5effa] via-transparent to-transparent pointer-events-none"></div>
       
-      <div className="w-[38px] h-[38px] bg-[#e6f7f9] rounded-[10px] flex items-center justify-center text-primary mb-[14px]">
+      <div className="relative w-[38px] h-[38px] bg-[#f3eff7] rounded-[8px] flex items-center justify-center text-primary mb-[14px]">
         {icon}
       </div>
       
-      <div className="text-[10.5px] font-bold text-[#64748b] uppercase tracking-[0.07em] mb-1.5">
+      <div className="relative text-[10.5px] font-bold text-[#778196] uppercase tracking-[0.08em] mb-1.5">
         {label}
       </div>
       
-      <div className="font-sans text-[34px] font-extrabold text-[#0d3349] leading-none mb-[7px] tracking-tight">
+      <div className="relative font-sans text-[34px] font-extrabold text-[#4b3f68] leading-none mb-[7px] tracking-tight">
         {value}
       </div>
       
-      <div className="text-[12px] text-[#64748b] flex items-center gap-1 flex-wrap">
+      <div className="relative text-[12px] text-[#64748b] flex items-center gap-1 flex-wrap pb-5">
         {subContent}
       </div>
       
@@ -37,6 +37,10 @@ export default function StatCard({ icon, label, value, subContent, linkText, isA
           {linkText}
         </div>
       )}
+
+      <div className="relative mt-3 h-[4px] rounded-full bg-[#efe8f5] overflow-hidden">
+        <div className={`h-full rounded-full ${isAccent ? 'w-[72%]' : 'w-[58%]'} bg-gradient-to-r from-[#6a5182] to-[#8b6ca8]`}></div>
+      </div>
     </div>
   );
 }

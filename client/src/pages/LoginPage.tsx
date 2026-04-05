@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
             <div>
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-brand-blue text-white font-semibold rounded-custom shadow-md hover:bg-blue-800 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2"
+                className="w-full px-6 py-3 bg-brand-blue text-white font-semibold rounded-none shadow-md hover:bg-primary transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Sign In to Dashboard
               </button>

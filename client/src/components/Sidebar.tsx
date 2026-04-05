@@ -35,8 +35,8 @@ export default function Sidebar({ activeNav }: SidebarProps) {
               onClick={() => navigate('/' + item.name.toLowerCase().replace(/\s+/g, '-'))}
               className={`w-full flex items-center gap-2.5 p-[10px_16px] text-[13.5px] font-medium cursor-pointer border-l-[3px] transition-all duration-200 text-left
                 ${isActive 
-                  ? 'text-[#006496] bg-[#e6f7f9] border-[#006496] font-semibold' 
-                  : 'text-[#64748b] border-transparent hover:text-[#006496] hover:bg-[#f0fbfc]'
+                  ? 'text-[#6a5182] bg-[#f3eff7] border-[#6a5182] font-semibold' 
+                  : 'text-[#64748b] border-transparent hover:text-[#6a5182] hover:bg-[#f8f6fb]'
                 }
               `}
             >

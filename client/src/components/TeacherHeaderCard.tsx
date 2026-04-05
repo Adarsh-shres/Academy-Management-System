@@ -24,12 +24,12 @@ export default function TeacherHeaderCard({
   onEdit,
 }: TeacherHeaderCardProps) {
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-2xl p-6 md:p-8 shadow-sm">
+    <div className="bg-white border border-[#e2e8f0] rounded-sm p-6 md:p-8 shadow-sm">
       <div className="flex flex-col sm:flex-row gap-6">
 
         {/* Profile Photo */}
         <div className="flex flex-col items-center gap-3 shrink-0">
-          <div className="w-[120px] h-[150px] bg-[#f1f5f9] border border-[#e2e8f0] rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-[120px] h-[150px] bg-[#f1f5f9] border border-[#e2e8f0] rounded-sm flex items-center justify-center overflow-hidden shrink-0">
             {photo ? (
               <img src={photo} alt={fullName} className="w-full h-full object-cover" />
             ) : (
@@ -57,7 +57,7 @@ export default function TeacherHeaderCard({
             </div>
             <button
               onClick={onEdit}
-              className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
+              className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
