@@ -1,4 +1,4 @@
-import { MoreVertical, Filter } from 'lucide-react';
+import { MoreVertical } from './icons';
 
 interface DueItem {
   id: string;
@@ -24,20 +24,16 @@ export default function TeacherWhatsDue() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e2e8f0] flex flex-col w-full">
-      <div className="p-5 border-b border-[#e2e8f0] flex items-center justify-between">
-        <h3 className="text-[16px] font-bold text-[#0d3349]">What's Due</h3>
-        
-        <button className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
-          <Filter size={14} />
-          All Courses
-        </button>
+    <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+      <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
+        <h3 className="text-[16px] font-bold text-[#4b3f68]">What's Due</h3>
+        <span className="text-[12px] font-semibold text-[#7c8697]">Upcoming tasks</span>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+            <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
               <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course/Topic</th>
               <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Due Date</th>
               <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Submission Rate</th>
@@ -47,17 +43,17 @@ export default function TeacherWhatsDue() {
           </thead>
           <tbody>
             {MOCK_DUE.map(item => (
-              <tr key={item.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors group">
-                <td className="py-3 px-6 text-[13px] font-semibold text-[#1e293b] whitespace-pre-wrap">{item.courseTopic}</td>
+              <tr key={item.id} className="border-b border-[#e7dff0] last:border-0 hover:bg-[#fbf8fe] transition-colors group">
+                <td className="py-3 px-6 text-[13px] font-semibold text-[#4b3f68] whitespace-pre-wrap">{item.courseTopic}</td>
                 <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">{item.dueDate}</td>
-                <td className="py-3 px-6 text-[13px] font-bold text-[#006496]">{item.submissionRate}</td>
+                <td className="py-3 px-6 text-[13px] font-bold text-primary">{item.submissionRate}</td>
                 <td className="py-3 px-6">
-                  <span className={`inline-block px-2.5 py-1 text-[11px] font-bold rounded-lg whitespace-nowrap ${getBadgeClass(item.status)}`}>
+                  <span className={`inline-block px-2.5 py-1 text-[11px] font-bold rounded-sm whitespace-nowrap ${getBadgeClass(item.status)}`}>
                     {item.status}
                   </span>
                 </td>
                 <td className="py-3 px-6 text-right">
-                  <button className="text-[#94a3b8] hover:text-[#006496] transition-colors p-1 rounded-md cursor-pointer inline-flex items-center justify-center">
+                  <button className="text-[#94a3b8] hover:text-primary transition-colors p-1 rounded-sm cursor-pointer inline-flex items-center justify-center">
                     <MoreVertical size={16} />
                   </button>
                 </td>

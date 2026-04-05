@@ -75,7 +75,7 @@ export default function CoursesPage() {
         </div>
         <button 
           onClick={() => setIsNewCourseModalOpen(true)}
-          className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer">
+          className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -140,9 +140,9 @@ export default function CoursesPage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Course Curriculum</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Conduct and create your courses.</p>
         </div>
-        <button 
+          <button 
           onClick={() => setView('overview')}
-          className="text-[13px] font-semibold text-[#64748b] hover:text-[#006496] transition-all cursor-pointer">
+          className="text-[13px] font-semibold text-[#64748b] hover:text-[#6a5182] transition-all cursor-pointer">
           Back
         </button>
       </div>
@@ -156,21 +156,21 @@ export default function CoursesPage() {
             <div className="relative" ref={filterRef}>
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] hover:text-[#0d3349] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+                className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 Filter {filterStatus !== 'All' && `(${filterStatus})`}
               </button>
               
               {isFilterOpen && (
-                <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-xl shadow-lg z-10 flex flex-col overflow-hidden py-1">
-                  <button onClick={() => { setFilterStatus('All'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${filterStatus === 'All' ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>All Courses</button>
-                  <button onClick={() => { setFilterStatus('Active'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${filterStatus === 'Active' ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>Active</button>
-                  <button onClick={() => { setFilterStatus('Inactive'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${filterStatus === 'Inactive' ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>Inactive</button>
+                <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-sm shadow-lg z-10 flex flex-col overflow-hidden py-1">
+                  <button onClick={() => { setFilterStatus('All'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'All' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>All Courses</button>
+                  <button onClick={() => { setFilterStatus('Active'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'Active' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>Active</button>
+                  <button onClick={() => { setFilterStatus('Inactive'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'Inactive' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>Inactive</button>
                 </div>
               )}
             </div>
 
-            <button className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] hover:text-[#0d3349] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+            <button className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export CSV
             </button>
@@ -204,7 +204,7 @@ export default function CoursesPage() {
                       <div className="flex items-center justify-end gap-3 text-[#94a3b8]">
                         <button 
                           onClick={() => setEditingCourse({ ...course })}
-                          className="hover:text-[#006496] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
+                          className="hover:text-[#6a5182] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </button>
                         <button 
@@ -248,12 +248,12 @@ export default function CoursesPage() {
                 <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
                   <button 
                     onClick={() => setEditingCourse({...editingCourse, status: 'Active'})} 
-                    className={`flex-1 rounded-md py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Active' ? 'bg-white font-semibold text-[#10b981] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>
+                    className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Active' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>
                     Active
                   </button>
                   <button 
                     onClick={() => setEditingCourse({...editingCourse, status: 'Inactive'})} 
-                    className={`flex-1 rounded-md py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Inactive' ? 'bg-white font-semibold text-[#ef4444] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>
+                    className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Inactive' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>
                     Inactive
                   </button>
                 </div>
@@ -263,12 +263,12 @@ export default function CoursesPage() {
             <div className="flex gap-3 mt-8">
               <button 
                 onClick={() => setEditingCourse(null)}
-                className="flex-1 py-2.5 rounded-lg text-[13.5px] font-bold text-[#64748b] hover:bg-[#f1f5f9] transition-all cursor-pointer">
+                className="flex-1 py-2.5 rounded-sm text-[13.5px] font-bold text-[#6a5182] bg-[#f3eff7] hover:bg-[#6a5182] hover:text-white transition-all cursor-pointer border border-[#e2d9ed]">
                 Cancel
               </button>
               <button 
                 onClick={handleSaveEdit}
-                className="flex-[2] py-2.5 rounded-lg text-[13.5px] font-bold bg-[#006496] text-white hover:bg-[#004e75] shadow-md transition-all active:scale-[0.98] cursor-pointer">
+                className="flex-[2] py-2.5 rounded-sm text-[13.5px] font-bold bg-[#6a5182] text-white hover:bg-[#5b4471] shadow-md transition-all active:scale-[0.98] cursor-pointer">
                 Save Changes
               </button>
             </div>
@@ -295,17 +295,17 @@ export default function CoursesPage() {
             <form className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
-                <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
                 </div>
                 <div className="flex-1 flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
-                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
                 </div>
               </div>
 
@@ -317,7 +317,7 @@ export default function CoursesPage() {
                       key={day}
                       type="button" 
                       onClick={() => toggleDay(day)} 
-                      className={`flex-1 min-w-[40px] rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer border ${selectedDays.includes(day) ? 'bg-[#006496] font-semibold text-white border-[#006496] shadow-sm' : 'bg-white font-medium text-[#64748b] border-[#e2e8f0] hover:border-[#cbd5e1] hover:text-[#0d3349] hover:bg-[#f8fafc]'}`}
+                      className={`flex-1 min-w-[40px] rounded-sm py-1.5 text-[13px] transition-all duration-200 cursor-pointer border ${selectedDays.includes(day) ? 'bg-[#6a5182] font-semibold text-white border-[#6a5182] shadow-sm' : 'bg-[#f3eff7] font-medium text-[#6a5182] border-[#e2d9ed] hover:border-[#6a5182] hover:text-white hover:bg-[#6a5182]'}`}
                     >
                       {day}
                     </button>
@@ -327,14 +327,14 @@ export default function CoursesPage() {
 
               <div className="flex flex-col gap-1.5 mt-2">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Description</label>
-                <textarea rows={4} className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
+                <textarea rows={4} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
               </div>
 
               <div className="flex gap-3 mt-4">
-                <button type="button" onClick={() => setIsNewCourseModalOpen(false)} className="flex-1 bg-white border border-[#cbd5e1] hover:bg-[#f8fafc] text-[#475569] text-[14px] font-semibold px-6 py-3 rounded-lg transition-all active:scale-[0.98] w-full cursor-pointer">
+                <button type="button" onClick={() => setIsNewCourseModalOpen(false)} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] w-full cursor-pointer">
                   Cancel
                 </button>
-                <button type="button" className="flex-[2] bg-[#006496] hover:bg-[#004e75] text-white text-[14px] font-semibold px-6 py-3 rounded-lg transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
+                <button type="button" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
                   Create and Activate Course
                 </button>
               </div>

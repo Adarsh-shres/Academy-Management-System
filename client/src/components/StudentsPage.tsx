@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import StatCard from '../components/StatCard';
+import StatCard from './StatCard';
 
 export default function StudentsPage() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ export default function StudentsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Students Registration</h1>
+          <h1 className="text-[28px] font-extrabold text-[#4b3f68] tracking-tight">Students Registration</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Register and manage your students</p>
         </div>
         <button

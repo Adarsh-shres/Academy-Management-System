@@ -1,4 +1,4 @@
-import { MoreVertical, Filter, FileText, FileSpreadsheet, Presentation } from 'lucide-react';
+import { MoreVertical, FileText, FileSpreadsheet, Presentation } from './icons';
 
 interface FileItem {
   id: string;
@@ -24,20 +24,16 @@ export default function TeacherLatestFiles() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e2e8f0] flex flex-col w-full mt-6">
-      <div className="p-5 border-b border-[#e2e8f0] flex items-center justify-between">
-        <h3 className="text-[16px] font-bold text-[#0d3349]">Latest Uploaded Files</h3>
-
-        <button className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
-          <Filter size={14} />
-          All Courses
-        </button>
+    <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full mt-6 shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+      <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
+        <h3 className="text-[16px] font-bold text-[#4b3f68]">Latest Uploaded Files</h3>
+        <span className="text-[12px] font-semibold text-[#7c8697]">Recent materials</span>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+            <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
               <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">File</th>
               <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course/Topic</th>
               <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Date</th>
@@ -46,19 +42,19 @@ export default function TeacherLatestFiles() {
           </thead>
           <tbody>
             {MOCK_FILES.map(item => (
-              <tr key={item.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors group">
+              <tr key={item.id} className="border-b border-[#e7dff0] last:border-0 hover:bg-[#fbf8fe] transition-colors group">
                 <td className="py-3 px-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-[#f1f5f9] flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-sm bg-[#f3eff7] flex items-center justify-center shrink-0">
                       {getFileIcon(item.type)}
                     </div>
-                    <span className="text-[13px] font-semibold text-[#1e293b]">{item.filename}</span>
+                    <span className="text-[13px] font-semibold text-[#4b3f68]">{item.filename}</span>
                   </div>
                 </td>
                 <td className="py-3 px-6 text-[13px] font-medium text-[#475569] max-w-[200px] truncate">{item.courseTopic}</td>
                 <td className="py-3 px-6 text-[13px] font-semibold text-[#64748b]">{item.date}</td>
                 <td className="py-3 px-6 text-right">
-                  <button className="text-[#94a3b8] hover:text-[#006496] transition-colors p-1 rounded-md cursor-pointer inline-flex items-center justify-center">
+                  <button className="text-[#94a3b8] hover:text-primary transition-colors p-1 rounded-sm cursor-pointer inline-flex items-center justify-center">
                     <MoreVertical size={16} />
                   </button>
                 </td>

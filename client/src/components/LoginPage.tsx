@@ -15,7 +15,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
       {/* Main card - 2 column layout */}
-      <div className="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-5xl flex">
+      <div className="bg-white rounded-sm shadow-xl overflow-hidden w-full max-w-5xl flex">
 
         {/* Left Column: Branding (Clean Text Version) */}
         <div className="hidden md:flex w-1/2 bg-brand-blue flex-col items-center justify-center p-12 text-white">
