@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage.tsx';
 import DashboardPage from './pages/DashboardPage.tsx';
+import LandingPage from './pages/LandingPage.tsx';
 
 import Dashboard from './components/Dashboard.tsx';
 import StudentsPage from './pages/StudentsPage.tsx';
@@ -25,7 +26,7 @@ function App() {
     <Router>
       <Routes>
         {/* 1. The Landing Route */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<LandingPage />} />
 
         {/* 2. The Login Route */}
         <Route path="/login" element={<LoginPage />} />

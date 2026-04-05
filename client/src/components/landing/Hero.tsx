@@ -14,7 +14,7 @@ export default function Hero() {
             <div className="hero-buttons">
                 <button className="primary" onClick={() => navigate('/login')}>Get Started</button>
                 <button className="secondary"
-                    onClick={() => document.getElementById('features')?.scrollIntoView({behavior:'smooth'})}>Learn
+                    onClick={() => navigate('/login')}>Learn
                     More</button>
             </div>
         </div>
