@@ -11,6 +11,7 @@ import CoursesPage from './pages/CoursesPage.tsx';
 import SchedulePage from './pages/SchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
+import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
 import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 
 function UnderDevelopment() {
@@ -45,6 +46,9 @@ function App() {
         </Route>
 
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+        <Route element={<DashboardPage />}>
+          <Route path="/student/dashboard" element={<StudentDashboardPage />} />
+        </Route>
       </Routes>
     </Router>
   );
