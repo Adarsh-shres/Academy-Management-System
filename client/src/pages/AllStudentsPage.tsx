@@ -1,18 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useStudents } from '../context/StudentContext';
 
 export default function AllStudentsPage() {
   const navigate = useNavigate();
-  const [students, setStudents] = useState([
-    { id: '1', name: 'John Doe', department: 'CSE', course: 'B.Tech', email: 'john@example.com', dateEnrolled: '2025-08-14', isActive: true },
-    { id: '2', name: 'Jane Smith', department: 'ECE', course: 'B.Tech', email: 'jane@example.com', dateEnrolled: '2025-08-15', isActive: true },
-    { id: '3', name: 'Alice Johnson', department: 'IT', course: 'B.Tech', email: 'alice@example.com', dateEnrolled: '2025-08-16', isActive: false },
-    { id: '4', name: 'Bob Brown', department: 'Mech', course: 'B.Tech', email: 'bob@example.com', dateEnrolled: '2025-08-17', isActive: true },
-  ]);
-
-  const toggleStatus = (id: string) => {
-    setStudents(prev => prev.map(s => s.id === id ? { ...s, isActive: !s.isActive } : s));
-  };
+  const { students, toggleStudentStatus, deleteStudent } = useStudents();
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
@@ -39,7 +30,7 @@ export default function AllStudentsPage() {
               {students.length > 0 ? (
                 students.map((student) => (
                   <tr key={student.id} className="hover:bg-[#f8fafc] transition-colors">
-                    <td className="px-6 py-4 font-medium text-[#0d3349]">{student.name}</td>
+                    <td className="px-6 py-4 font-medium text-[#0d3349]">{student.firstName} {student.lastName}</td>
                     <td className="px-6 py-4">
                       <span className="bg-[#e6f7f9] text-[#006496] px-2.5 py-1 rounded-md text-[12px] font-bold mr-2">
                         {student.department}
@@ -64,12 +55,24 @@ export default function AllStudentsPage() {
                         </button>
                         <span className="text-[#e2e8f0]">|</span>
                         <button 
-                          onClick={() => toggleStatus(student.id)}
+                          onClick={() => toggleStudentStatus(student.id)}
                           className={`font-semibold text-[13px] hover:underline ${
                             student.isActive ? 'text-rose-600 hover:text-rose-800' : 'text-emerald-600 hover:text-emerald-800'
                           }`}
                         >
                           {student.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <span className="text-[#e2e8f0]">|</span>
+                        <button 
+                          onClick={() => {
+                            if (window.confirm('Delete this student permanently?')) {
+                              deleteStudent(student.id);
+                            }
+                          }}
+                          className="font-semibold text-[13px] text-gray-400 hover:text-red-600 transition-colors"
+                          title="Delete Student"
+                        >
+                          Delete
                         </button>
                       </div>
                     </td>

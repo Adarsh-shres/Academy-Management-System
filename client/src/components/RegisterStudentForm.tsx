@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import type { Student, Gender, Department } from '../types/student';
+import type { StudentFormData, Gender, Department } from '../types/student';
+import { useStudents } from '../context/StudentContext';
 
 const departments: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
 const courses = ['B.Tech', 'M.Tech', 'BCA', 'MCA', 'MBA'];
 
-const initial: Student = {
+const initial: StudentFormData = {
   firstName: '', lastName: '', fatherName: '', dateOfBirth: '',
   mobileNo: '', email: '', password: '', gender: 'Male',
   department: 'CSE', course: '', city: '', address: '', photo: null,
 };
 
 export default function RegisterStudentForm() {
-  const [form, setForm] = useState<Student>(initial);
+  const { addStudent } = useStudents();
+  const [form, setForm] = useState<StudentFormData>(initial);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -25,8 +28,10 @@ export default function RegisterStudentForm() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Student data:', form);
-    // TODO: connect to Express API via fetch/axios
+    const record = addStudent(form);
+    setSuccessMsg(`✓ ${record.firstName} ${record.lastName} registered successfully (ID: ${record.id})`);
+    setForm(initial);
+    setTimeout(() => setSuccessMsg(''), 4000);
   };
 
   const inputClass = "border border-[#e2e8f0] rounded-sm px-3 py-2 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-1 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]";
@@ -36,6 +41,13 @@ export default function RegisterStudentForm() {
     <form onSubmit={handleSubmit} className="bg-white rounded-sm border border-[#e2e8f0] p-6 md:p-8 shadow-sm">
       <h2 className="text-[18px] font-bold text-[#4b3f68] mb-6">Register Students</h2>
 
+      {/* Success Banner */}
+      {successMsg && (
+        <div className="mb-5 bg-[#d1fae5] border border-[#a7f3d0] text-[#065f46] text-[13.5px] font-semibold px-4 py-3 rounded-sm flex items-center gap-2 animate-fade-up">
+          {successMsg}
+        </div>
+      )}
+
       <div className="flex flex-col gap-4">
 
         {/* Student name */}
@@ -43,9 +55,9 @@ export default function RegisterStudentForm() {
           <label className={labelClass}>Student name :</label>
           <div className="flex-1 flex flex-col sm:flex-row gap-3">
             <input name="firstName" placeholder="First Name" value={form.firstName}
-              onChange={handleChange} className={`${inputClass} flex-1`} />
+              onChange={handleChange} className={`${inputClass} flex-1`} required />
             <input name="lastName"  placeholder="Last Name"  value={form.lastName}
-              onChange={handleChange} className={`${inputClass} flex-1`} />
+              onChange={handleChange} className={`${inputClass} flex-1`} required />
           </div>
         </div>
 
@@ -77,7 +89,7 @@ export default function RegisterStudentForm() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
           <label className={labelClass}>Email id :</label>
           <input name="email" type="email" value={form.email}
-            onChange={handleChange} className={inputClass} />
+            onChange={handleChange} className={inputClass} required />
         </div>
 
         {/* Password */}
