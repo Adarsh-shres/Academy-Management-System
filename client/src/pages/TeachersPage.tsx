@@ -350,8 +350,10 @@ export default function TeachersPage() {
               ))}
             </div>
           </div>
-          {/* ─── Add Teacher Modal ─────────────────────────────── */}
-          {isAddModalOpen && (
+        </>
+      )}
+      {/* ─── Add Teacher Modal ─────────────────────────────── */}
+      {isAddModalOpen && (
             <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }}>
               <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-5">
@@ -429,8 +431,6 @@ export default function TeachersPage() {
               </div>
             </div>
           )}
-        </>
-      )}
     </div>
   );
 }
