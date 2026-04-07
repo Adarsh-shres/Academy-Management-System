@@ -1,23 +1,60 @@
 import { useState, useRef, useEffect } from 'react';
-
-const dummySchedule = [
-  { id: 1, time: '08:00 AM', course: 'Web Development', level: 'Beginner', instructor: 'Dr. John Doe', room: 'Room 101' },
-  { id: 2, time: '09:00 AM', course: 'Algorithms', level: 'Intermediate', instructor: 'Prof. Jane Smith', room: 'Room 102' },
-  { id: 3, time: '10:00 AM', course: 'Break', level: '-', instructor: '-', room: '-' },
-  { id: 4, time: '11:00 AM', course: 'Java', level: 'Advanced', instructor: 'Dr. Alan Turing', room: 'Room 205' },
-  { id: 5, time: '12:00 PM', course: 'Lunch Break', level: '-', instructor: '-', room: '-' },
-  { id: 6, time: '01:00 PM', course: 'Python', level: 'Beginner', instructor: 'Dr. Guido Rossum', room: 'Room 303' },
-  { id: 7, time: '02:00 PM', course: 'Collaborative Dev', level: 'Intermediate', instructor: 'Prof. Linus Torvalds', room: 'Room 404' },
-];
+import { useSchedule } from '../context/ScheduleContext';
 
 export default function SchedulePage() {
+  const { schedule, addEntry, updateEntry, deleteEntry } = useSchedule();
+
+  const [editingEntry, setEditingEntry] = useState<any>(null);
+
   const [dayView, setDayView] = useState<'Today' | 'Tomorrow'>('Today');
   const [classFilter, setClassFilter] = useState('All');
   const [levelFilter, setLevelFilter] = useState('All');
   
   const [isClassFilterOpen, setIsClassFilterOpen] = useState(false);
   const [isLevelFilterOpen, setIsLevelFilterOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  /* ─── Create Schedule form state ───────────────────────────── */
+  const [newTime, setNewTime] = useState('');
+  const [newCourse, setNewCourse] = useState('');
+  const [newLevel, setNewLevel] = useState('Beginner');
+  const [newInstructor, setNewInstructor] = useState('');
+  const [newRoom, setNewRoom] = useState('');
+
+  const resetForm = () => {
+    setNewTime('');
+    setNewCourse('');
+    setNewLevel('Beginner');
+    setNewInstructor('');
+    setNewRoom('');
+  };
+
+  const handleCreate = () => {
+    addEntry({
+      time: newTime || '09:00 AM',
+      course: newCourse || 'New Course',
+      level: newLevel,
+      instructor: newInstructor || 'TBD',
+      room: newRoom || 'TBD',
+    });
+    resetForm();
+    setIsCreateModalOpen(false);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingEntry) {
+      updateEntry(editingEntry.id, {
+        time: editingEntry.time,
+        course: editingEntry.course,
+        level: editingEntry.level,
+        instructor: editingEntry.instructor,
+        room: editingEntry.room
+      });
+      setEditingEntry(null);
+    }
+  };
+
+  /* ─── Filters ──────────────────────────────────────────────── */
   const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +68,9 @@ export default function SchedulePage() {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  const filteredSchedule = dummySchedule.filter(item => {
+  const uniqueCourses = Array.from(new Set(schedule.filter(s => s.course !== 'Break' && s.course !== 'Lunch Break').map(s => s.course)));
+
+  const filteredSchedule = schedule.filter(item => {
     if (item.course === 'Break' || item.course === 'Lunch Break') return true;
     if (classFilter !== 'All' && item.course !== classFilter) return false;
     if (levelFilter !== 'All' && item.level !== levelFilter) return false;
@@ -45,7 +84,9 @@ export default function SchedulePage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Schedule</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Manage and view your hourly class schedule.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -84,7 +125,7 @@ export default function SchedulePage() {
               
               {isClassFilterOpen && (
                 <div className="absolute top-[110%] right-0 w-48 bg-white border border-[#e2e8f0] rounded-sm shadow-lg z-10 flex flex-col overflow-hidden py-1">
-                  {['All', 'Web Development', 'Algorithms', 'Java', 'Python', 'Collaborative Dev'].map(c => (
+                  {['All', ...uniqueCourses].map(c => (
                     <button key={c} onClick={() => { setClassFilter(c); setIsClassFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${classFilter === c ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>{c}</button>
                   ))}
                 </div>
@@ -148,8 +189,17 @@ export default function SchedulePage() {
                     <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">{item.room}</td>
                     <td className="py-3 px-6 text-right">
                       <div className="flex items-center justify-end gap-3 text-[#94a3b8]">
-                        <button className="hover:text-[#6a5182] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
+                        <button onClick={() => setEditingEntry({...item})} className="hover:text-[#6a5182] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (window.confirm('Delete this schedule entry?')) {
+                              deleteEntry(item.id);
+                            }
+                          }}
+                          className="hover:text-[#ef4444] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Delete">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                         </button>
                       </div>
                     </td>
@@ -164,6 +214,117 @@ export default function SchedulePage() {
           </table>
         </div>
       </div>
+
+      {/* ─── Create Schedule Modal ───────────────────────────────── */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsCreateModalOpen(false); resetForm(); }}>
+          <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-[18px] font-bold text-[#0d3349]">New Schedule Entry</h3>
+              <button onClick={() => { setIsCreateModalOpen(false); resetForm(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleCreate(); }}>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Time Slot</label>
+                  <input type="text" value={newTime} onChange={e => setNewTime(e.target.value)} placeholder="e.g. 09:00 AM" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Room</label>
+                  <input type="text" value={newRoom} onChange={e => setNewRoom(e.target.value)} placeholder="e.g. Room 101" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
+                <input type="text" value={newCourse} onChange={e => setNewCourse(e.target.value)} placeholder="e.g. Web Development" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Level</label>
+                  <select value={newLevel} onChange={e => setNewLevel(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Instructor</label>
+                  <input type="text" value={newInstructor} onChange={e => setNewInstructor(e.target.value)} placeholder="e.g. Dr. John Doe" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button type="button" onClick={() => { setIsCreateModalOpen(false); resetForm(); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">
+                  Add to Schedule
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Edit Schedule Modal ───────────────────────────────── */}
+      {editingEntry && (
+        <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditingEntry(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-[18px] font-bold text-[#0d3349]">Edit Schedule Entry</h3>
+              <button onClick={() => setEditingEntry(null)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleSaveEdit(); }}>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Time Slot</label>
+                  <input type="text" value={editingEntry.time} onChange={e => setEditingEntry({...editingEntry, time: e.target.value})} placeholder="e.g. 09:00 AM" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Room</label>
+                  <input type="text" value={editingEntry.room} onChange={e => setEditingEntry({...editingEntry, room: e.target.value})} placeholder="e.g. Room 101" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
+                <input type="text" value={editingEntry.course} onChange={e => setEditingEntry({...editingEntry, course: e.target.value})} placeholder="e.g. Web Development" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Level</label>
+                  <select value={editingEntry.level} onChange={e => setEditingEntry({...editingEntry, level: e.target.value})} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="-">-</option>
+                  </select>
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Instructor</label>
+                  <input type="text" value={editingEntry.instructor} onChange={e => setEditingEntry({...editingEntry, instructor: e.target.value})} placeholder="e.g. Dr. John Doe" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button type="button" onClick={() => setEditingEntry(null)} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

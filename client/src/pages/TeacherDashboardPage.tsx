@@ -10,6 +10,33 @@ import TeacherGrades from '../components/TeacherGrades';
 export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState('Dashboard');
 
+  /* ─── Announcements state ──────────────────────────────────── */
+  const [announcements, setAnnouncements] = useState([
+    { id: 1, author: 'Super Admin', initials: 'SA', time: '2 hours ago', text: 'Please make sure all final grades for this semester are submitted by Friday at 5:00 PM. The system will be locked for grading review over the weekend. Thank you for your hard work!' },
+  ]);
+  const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
+  const [announcementText, setAnnouncementText] = useState('');
+
+  const handleAddAnnouncement = () => {
+    const trimmed = announcementText.trim();
+    if (!trimmed) return;
+    setAnnouncements(prev => [{
+      id: prev.length + 1,
+      author: 'You (Teacher)',
+      initials: 'YT',
+      time: 'Just now',
+      text: trimmed,
+    }, ...prev]);
+    setAnnouncementText('');
+    setIsAnnouncementModalOpen(false);
+  };
+
+  const deleteAnnouncement = (id: number | string) => {
+    if (window.confirm('Delete this announcement?')) {
+      setAnnouncements(announcements.filter(a => a.id !== id));
+    }
+  };
+
   const COURSES = [
     { id: '1', course: 'Math 101', percentage: 63, classes: 5 },
     { id: '2', course: 'Math 102', percentage: 45, classes: 3 },
@@ -55,28 +82,61 @@ export default function TeacherDashboardPage() {
         <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
           <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
             <h3 className="text-[16px] font-bold text-[#4b3f68]">Announcements</h3>
-            <button className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#eadff4] text-primary text-[13px] font-semibold px-4 py-2 rounded-sm border border-[#e2d9ed] transition-all cursor-pointer">
+            <button onClick={() => setIsAnnouncementModalOpen(true)} className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#eadff4] text-primary text-[13px] font-semibold px-4 py-2 rounded-sm border border-[#e2d9ed] transition-all cursor-pointer">
               <PlusCircle size={14} />
               New Announcement
             </button>
           </div>
-          <div className="p-5">
-            <div className="flex gap-4 p-4 rounded-sm border border-[#e7dff0] bg-[#fbf8fe] hover:shadow-sm transition-all border-l-[3px] border-l-primary">
-              <div className="w-10 h-10 rounded-sm bg-primary shrink-0 text-white flex items-center justify-center font-bold text-[14px]">
-                SA
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-[14px] font-bold text-[#4b3f68]">Super Admin</h4>
-                  <span className="text-[11px] text-[#64748b] font-medium">2 hours ago</span>
+          <div className="p-5 flex flex-col gap-4">
+            {announcements.map(a => (
+              <div key={a.id} className="flex gap-4 p-4 rounded-sm border border-[#e7dff0] bg-[#fbf8fe] hover:shadow-sm transition-all border-l-[3px] border-l-primary">
+                <div className="w-10 h-10 rounded-sm bg-primary shrink-0 text-white flex items-center justify-center font-bold text-[14px]">
+                  {a.initials}
                 </div>
-                <p className="text-[13px] text-[#475569] leading-relaxed">
-                  Please make sure all final grades for this semester are submitted by Friday at 5:00 PM. The system will be locked for grading review over the weekend. Thank you for your hard work!
-                </p>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-1">
+                    <div>
+                      <h4 className="text-[14px] font-bold text-[#4b3f68]">{a.author}</h4>
+                      <span className="text-[11px] text-[#64748b] font-medium">{a.time}</span>
+                    </div>
+                    <button 
+                      onClick={() => deleteAnnouncement(a.id)}
+                      className="text-[#94a3b8] hover:text-rose-500 transition-colors p-1"
+                      title="Delete Announcement"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </div>
+                  <p className="text-[13px] text-[#475569] leading-relaxed">{a.text}</p>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
+
+        {/* New Announcement Modal */}
+        {isAnnouncementModalOpen && (
+          <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsAnnouncementModalOpen(false); setAnnouncementText(''); }}>
+            <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-5">
+                <h3 className="text-[18px] font-bold text-[#0d3349]">New Announcement</h3>
+                <button onClick={() => { setIsAnnouncementModalOpen(false); setAnnouncementText(''); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleAddAnnouncement(); }}>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Message</label>
+                  <textarea rows={4} value={announcementText} onChange={e => setAnnouncementText(e.target.value)} placeholder="Write your announcement here…" autoFocus className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b] resize-none" />
+                </div>
+                <div className="flex gap-3 mt-2">
+                  <button type="button" onClick={() => { setIsAnnouncementModalOpen(false); setAnnouncementText(''); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">Cancel</button>
+                  <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">Post Announcement</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
 

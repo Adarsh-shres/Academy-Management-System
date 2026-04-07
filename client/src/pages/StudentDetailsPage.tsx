@@ -1,27 +1,25 @@
 import { useParams, useNavigate } from 'react-router-dom';
-
-const mockStudent = {
-  id: '1',
-  firstName: 'John',
-  lastName: 'Doe',
-  fatherName: 'Richard Doe',
-  dateOfBirth: '2005-04-12',
-  mobileNo: '9876543210',
-  email: 'john@example.com',
-  gender: 'Male',
-  department: 'CSE',
-  course: 'B.Tech',
-  city: 'New York',
-  address: '123 Tech Street, Silicon Valley, NY',
-  isActive: true,
-  dateEnrolled: '2025-08-14'
-};
+import { useStudents } from '../context/StudentContext';
 
 export default function StudentDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // Simulate fetching a student, fallback to mock details for demonstration
-  const student = { ...mockStudent, id: id || '1' };
+  const { getStudentById } = useStudents();
+
+  const student = getStudentById(id || '1');
+
+  if (!student) {
+    return (
+      <div className="flex flex-col gap-6 md:gap-8 pb-10">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-[#f3eff7] border border-[#e2d9ed] rounded-lg hover:bg-[#6a5182] hover:text-white transition-colors text-[#6a5182]">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <h1 className="text-[28px] font-extrabold text-[#0d3349]">Student Not Found</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
