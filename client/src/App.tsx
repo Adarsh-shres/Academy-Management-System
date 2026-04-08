@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage.tsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import DashboardPage from './pages/DashboardPage.tsx';
 import LandingPage from './pages/LandingPage.tsx';
 
@@ -28,6 +30,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route element={<DashboardPage />}>
           <Route path="/dashboard" element={<Dashboard />} />

@@ -23,6 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 logs/
 *.log
+client/out.txt
+client/tsc_output.txt
+client/tmp-update-theme.js
 
 .vscode/
 .idea/
