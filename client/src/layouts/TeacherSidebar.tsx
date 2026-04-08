@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardList, Users, Calendar, Settings } from './icons';
+import { LayoutDashboard, ClipboardList, Users, Calendar, Settings } from '../components/icons';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', id: 'Dashboard', icon: <LayoutDashboard size={16} /> },
@@ -29,7 +29,7 @@ export default function TeacherSidebar({ activeTab, onTabChange }: TeacherSideba
           const isActive = activeTab === item.id;
           return (
             <button
-              key={item.name}
+              key={item.id}
               onClick={() => onTabChange(item.id)}
               className={`w-full flex items-center gap-2.5 p-[10px_16px] text-[13.5px] font-medium cursor-pointer border-l-[3px] transition-all duration-200 text-left
                 ${isActive 

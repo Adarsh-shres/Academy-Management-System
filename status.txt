@@ -1,0 +1,3 @@
+﻿client/src/components/TeacherAssignments.tsx
+client/src/components/TeacherClasses.tsx
+client/src/components/TeacherFullSchedule.tsx

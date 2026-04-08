@@ -35,6 +35,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
+        {/* Admin Routes */}
         <Route element={<DashboardPage />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentsPage />} />
@@ -50,8 +51,10 @@ function App() {
           <Route path="*" element={<UnderDevelopment />} />
         </Route>
 
+        {/* Teacher Routes — standalone layout (no DashboardPage wrapper) */}
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
 
+        {/* Student Routes */}
         <Route element={<DashboardPage />}>
           <Route path="/student/dashboard" element={<StudentDashboardPage />} />
           <Route path="/student/courses" element={<StudentCoursesPage />} />

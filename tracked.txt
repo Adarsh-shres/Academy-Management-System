@@ -1,0 +1,7 @@
+﻿client/src/components/TeacherGrades.tsx
+client/src/components/TeacherHeaderCard.tsx
+client/src/components/TeacherLatestFiles.tsx
+client/src/components/TeacherSchedule.tsx
+client/src/components/TeacherSidebar.tsx
+client/src/components/TeacherStatCard.tsx
+client/src/components/TeacherWhatsDue.tsx
