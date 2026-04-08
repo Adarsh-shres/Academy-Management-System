@@ -1,38 +1,54 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password);
-    navigate('/dashboard');
+    setError(null);
+    setIsSubmitting(true);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      console.log('Logged in successfully:', data.user);
+      navigate('/dashboard');
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-      {/* Main card - 2 column layout */}
       <div className="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-5xl flex">
-
-        {/* Left Column: Branding (Clean Text Version) */}
         <div className="hidden md:flex w-1/2 bg-brand-blue flex-col items-center justify-center p-12 text-white">
           <h1 className="text-4xl font-bold mb-3">Academic</h1>
           <h2 className="text-xl font-medium tracking-wide">Management System</h2>
-          <p className="mt-8 text-sm text-neutral-200 text-center">Nepal's modern educational backbone.</p>
+          <p className="mt-8 text-sm text-neutral-200 text-center">Nepal&apos;s modern educational backbone.</p>
         </div>
 
-        {/* Right Column: Form */}
         <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
           <h3 className="text-3xl font-semibold text-neutral-900 mb-2">Welcome Back</h3>
           <p className="text-neutral-600 mb-10">Sign in to manage the academic lifecycle.</p>
 
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Input */}
+            {error && (
+              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+                {error}
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
                 School Email
@@ -48,15 +64,14 @@ const LoginPage: React.FC = () => {
               />
             </div>
 
-            {/* Password Input */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
                   Password
                 </label>
-                <a href="#" className="text-sm font-medium text-brand-blue hover:text-blue-700">
-                  Forgot?
-                </a>
+                <Link to="/forgot-password" className="text-sm font-medium text-brand-blue hover:text-blue-700">
+                  Forgot password?
+                </Link>
               </div>
               <input
                 id="password"
@@ -64,12 +79,11 @@ const LoginPage: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="........"
                 className="w-full px-4 py-3 border border-neutral-300 rounded-md focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition"
               />
             </div>
 
-            {/* Remember Me */}
             <div className="flex items-center">
               <input
                 id="remember_me"
@@ -81,18 +95,17 @@ const LoginPage: React.FC = () => {
               </label>
             </div>
 
-            {/* Submit Button */}
             <div>
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-brand-blue text-white font-semibold rounded-none shadow-md hover:bg-primary transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                disabled={isSubmitting}
+                className="w-full px-6 py-3 bg-brand-blue text-white font-semibold rounded-none shadow-md hover:bg-primary transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Sign In to Dashboard
+                {isSubmitting ? 'Signing In...' : 'Sign In to Dashboard'}
               </button>
             </div>
           </form>
 
-          {/* Footer */}
           <p className="mt-12 text-center text-xs text-neutral-500">
             For technical support, contact the system administrator.
           </p>
