@@ -96,7 +96,7 @@ export default function StudentAssignmentsPage() {
 
         {openAssignments.length === 0 ? (
           <div className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_4px_16px_rgba(57,31,86,0.02)] p-10 text-center">
-            <p className="text-[32px] mb-3">🎉</p>
+            <p className="text-[32px] mb-3"></p>
             <p className="text-[13px] font-extrabold text-[#7c8697] uppercase tracking-wider">No pending assignments!</p>
           </div>
         ) : (

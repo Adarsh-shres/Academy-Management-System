@@ -64,7 +64,7 @@ export default function StudentAttendancePage() {
       {/* Course Comparison Section */}
       <div className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_4px_16px_rgba(57,31,86,0.02)] p-[32px]">
         <div className="flex items-center gap-[12px] mb-[28px] border-b border-[#f3eff7] pb-[20px]">
-          <span className="flex items-center justify-center w-8 h-8 rounded-[8px] bg-[#f3eff7] text-primary text-[16px]">📊</span>
+          <span className="flex items-center justify-center w-8 h-8 rounded-[8px] bg-[#f3eff7] text-primary text-[16px]"></span>
           <h3 className="font-sans text-[20px] md:text-[22px] font-extrabold text-[#4b3f68] tracking-tight">Course Comparison</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[48px] gap-y-[28px]">

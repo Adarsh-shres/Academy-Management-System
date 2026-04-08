@@ -44,7 +44,7 @@ export default function TeacherSchedule() {
         ))}
 
         <div className="mt-4 flex flex-col items-center justify-center p-4 bg-[#f3eff7] rounded-sm text-center border border-[#e2d9ed]">
-          <span className="text-[13px] font-bold text-primary">Your day ends here! Enjoy your day 🎉</span>
+          <span className="text-[13px] font-bold text-primary">Your day ends here! Enjoy your day</span>
         </div>
       </div>
     </div>

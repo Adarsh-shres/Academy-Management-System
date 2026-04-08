@@ -1,12 +1,14 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { Course } from '../types/course';
 import { MOCK_COURSES } from '../data/mockCourses';
+import { useAuth } from './AuthContext';
 
 /* ─── Context shape ─────────────────────────────────────────── */
 
 interface CourseContextValue {
   courses: Course[];
+  myCourses: Course[];
   getCourseById: (id: string) => Course | undefined;
   addCourse: (data: Omit<Course, 'id'>) => Course;
   updateCourse: (id: string, data: Partial<Course>) => void;
@@ -24,7 +26,19 @@ const generateCourseId = () => {
 };
 
 export function CourseProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
+
+  const myCourses = useMemo(() => {
+    if (!user) return [];
+    if (user.role === 'teacher') {
+      // Mock teacher teaching first 3 active courses
+      return courses.slice(0, 3);
+    } else {
+      // Mock student enrolled in next 4 active courses
+      return courses.slice(3, 7);
+    }
+  }, [courses, user]);
 
   const getCourseById = useCallback(
     (id: string) => courses.find(c => c.id === id),
@@ -48,7 +62,7 @@ export function CourseProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <CourseContext.Provider value={{ courses, getCourseById, addCourse, updateCourse, deleteCourse }}>
+    <CourseContext.Provider value={{ courses, myCourses, getCourseById, addCourse, updateCourse, deleteCourse }}>
       {children}
     </CourseContext.Provider>
   );
