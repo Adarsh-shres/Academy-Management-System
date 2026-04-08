@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
@@ -34,12 +35,20 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* ── Public routes ──────────────────────────────────────── */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        <Route element={<DashboardPage />}>
+        {/* ── Admin dashboard routes ─────────────────────────────── */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentsPage />} />
           <Route path="/students/:id" element={<StudentDetailsPage />} />
@@ -54,9 +63,24 @@ function App() {
           <Route path="*" element={<UnderDevelopment />} />
         </Route>
 
-        <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+        {/* ── Teacher dashboard routes ───────────────────────────── */}
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherDashboardPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route element={<DashboardPage />}>
+        {/* ── Student dashboard routes ───────────────────────────── */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/student/dashboard" element={<StudentDashboardPage />} />
           <Route path="/student/courses" element={<StudentCoursesPage />} />
           <Route path="/student/schedule" element={<StudentSchedulePage />} />

@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Search, Bell, Mail, ChevronLeft, ChevronRight, PlusCircle, UserCircle, ClipboardList, Users, Calendar, Settings } from '../components/icons';
+import { Search, Bell, Mail, ChevronLeft, ChevronRight, PlusCircle, ClipboardList, Users, Calendar, Settings } from '../components/icons';
 import TeacherSidebar from '../components/TeacherSidebar';
 import TeacherStatCard from '../components/TeacherStatCard';
 import TeacherSchedule from '../components/TeacherSchedule';
 import TeacherWhatsDue from '../components/TeacherWhatsDue';
 import TeacherLatestFiles from '../components/TeacherLatestFiles';
 import TeacherGrades from '../components/TeacherGrades';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -199,9 +200,7 @@ export default function TeacherDashboardPage() {
             
             <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
             
-            <div className="flex items-center justify-center shrink-0 cursor-pointer text-[#64748b] hover:text-[#4b3f68] transition-colors p-1">
-              <UserCircle size={28} strokeWidth={1.5} />
-            </div>
+            <ProfileDropdown useSimpleIcon={true} />
           </div>
         </header>
 
