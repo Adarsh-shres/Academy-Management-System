@@ -6,14 +6,14 @@ export default function StudentProfilePage() {
   const [form, setForm] = useState({ ...studentProfile });
 
   const fields: { label: string, key: keyof typeof studentProfile, icon: string }[] = [
-    { label: "Full Name", key: "name", icon: "👤" },
-    { label: "Email Address", key: "email", icon: "✉️" },
-    { label: "Roll Number", key: "rollNo", icon: "🪪" },
-    { label: "Department", key: "department", icon: "🏛️" },
-    { label: "Course", key: "course", icon: "📚" },
-    { label: "Semester", key: "semester", icon: "📅" },
-    { label: "Batch", key: "batch", icon: "🎓" },
-    { label: "Phone", key: "phone", icon: "📱" },
+    { label: "Full Name", key: "name", icon: "" },
+    { label: "Email Address", key: "email", icon: "" },
+    { label: "Roll Number", key: "rollNo", icon: "" },
+    { label: "Department", key: "department", icon: "" },
+    { label: "Course", key: "course", icon: "" },
+    { label: "Semester", key: "semester", icon: "" },
+    { label: "Batch", key: "batch", icon: "" },
+    { label: "Phone", key: "phone", icon: "" },
   ];
 
   return (

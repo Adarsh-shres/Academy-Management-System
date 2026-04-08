@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Search, Bell, Mail, ChevronLeft, ChevronRight, PlusCircle, ClipboardList, Users, Calendar, Settings } from '../components/icons';
 import TeacherSidebar from '../components/TeacherSidebar';
 import TeacherStatCard from '../components/TeacherStatCard';
-import TeacherSchedule from '../components/TeacherSchedule';
+import PersonalizedSchedule from '../components/PersonalizedSchedule';
+import EnrolledCoursesList from '../components/EnrolledCoursesList';
 import TeacherWhatsDue from '../components/TeacherWhatsDue';
 import TeacherLatestFiles from '../components/TeacherLatestFiles';
 import TeacherGrades from '../components/TeacherGrades';
 import ProfileDropdown from '../components/ProfileDropdown';
+import AcademyCalendar from '../components/AcademyCalendar';
 
 export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -79,6 +81,11 @@ export default function TeacherDashboardPage() {
           <TeacherLatestFiles />
         </div>
 
+        {/* Calendar Widget */}
+        <div className="mb-8">
+          <AcademyCalendar assignmentsList={[]} />
+        </div>
+
         {/* Announcements */}
         <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
           <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
@@ -142,11 +149,13 @@ export default function TeacherDashboardPage() {
       </div>
 
       {/* RIGHT SIDEBAR PANEL */}
-      <div className="w-full lg:w-[320px] flex flex-col shrink-0">
+      <div className="w-full lg:w-[320px] flex flex-col shrink-0 gap-6">
         <div className="h-[400px]">
-          <TeacherSchedule />
+          <PersonalizedSchedule />
         </div>
-        
+        <div className="h-[300px]">
+          <EnrolledCoursesList />
+        </div>
         <TeacherGrades />
       </div>
     </div>

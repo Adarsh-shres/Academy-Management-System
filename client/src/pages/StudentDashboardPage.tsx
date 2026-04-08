@@ -4,114 +4,10 @@ import StudentAssignmentCard from '../components/StudentAssignmentCard';
 import StatCard from '../components/StatCard';
 import type { Assignment } from '../components/StudentAssignmentCard';
 
-function AcademyCalendarModal({ isOpen, onClose, assignmentsList }: { isOpen: boolean, onClose: () => void, assignmentsList: Assignment[] }) {
-  if (!isOpen) return null;
+import PersonalizedSchedule from '../components/PersonalizedSchedule';
+import EnrolledCoursesList from '../components/EnrolledCoursesList';
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const year = today.getFullYear();
-  const month = today.getMonth();
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const getDayStatus = (day: number) => {
-    const date = new Date(year, month, day);
-    date.setHours(0, 0, 0, 0);
-
-    const deadlineInfo = assignmentsList.find(a => {
-      const d = new Date(a.deadline);
-      return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
-    });
-
-    if (!deadlineInfo) return null;
-
-    if (deadlineInfo.status === "submitted") return "bg-[#10b981] text-white shadow-sm ring-1 ring-[#047857]";
-    if (new Date(deadlineInfo.deadline) < today && deadlineInfo.status !== "submitted") return "bg-[#ef4444] text-white shadow-sm ring-1 ring-[#b91c1c]";
-    return "bg-[#f59e0b] text-white shadow-sm ring-1 ring-[#b45309]";
-  };
-
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const monthName = today.toLocaleString("default", { month: "long" });
-
-  const cells = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-  return (
-    <div className="fixed inset-0 bg-[#391f56]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <div className="bg-white rounded-sm shadow-[0_20px_40px_rgba(0,0,0,0.15)] w-full max-w-md overflow-hidden border border-[#e7dff0]">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] p-7 text-white relative">
-          <button
-            onClick={onClose}
-            className="absolute top-5 right-5 w-8 h-8 rounded-sm bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-          <div className="flex items-center gap-3 mb-1">
-            <span className="w-9 h-9 rounded-[8px] bg-white/20 flex items-center justify-center text-[18px]">📅</span>
-            <h2 className="text-[20px] font-extrabold tracking-tight">Academy Calendar</h2>
-          </div>
-          <p className="text-[#efe8f5] text-[13px] font-medium">{monthName} {year} Schedule</p>
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="p-7">
-          <div className="grid grid-cols-7 gap-2 mb-6">
-            {dayNames.map((d) => (
-              <div key={d} className="text-center text-[10.5px] font-bold text-[#778196] uppercase tracking-[0.08em] pb-2">
-                {d}
-              </div>
-            ))}
-            {cells.map((day, i) => {
-              if (!day) return <div key={`empty-${i}`} />;
-              const statusCls = getDayStatus(day);
-              const isToday = day === today.getDate() && month === today.getMonth();
-
-              return (
-                <div
-                  key={day}
-                  className={`
-                    h-[38px] flex items-center justify-center rounded-[8px] text-[13px] font-extrabold transition-all cursor-default
-                    ${statusCls ? statusCls : isToday ? "bg-[#f3eff7] text-primary border border-[#e7dff0]" : "text-[#4b3f68] hover:bg-[#faf8fc]"}
-                  `}
-                >
-                  {day}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Legend */}
-          <div className="grid grid-cols-3 gap-3 pt-5 border-t border-[#f3eff7]">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]" />
-              <span className="text-[10.5px] font-bold text-[#778196] uppercase tracking-wide">Done</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" />
-              <span className="text-[10.5px] font-bold text-[#778196] uppercase tracking-wide">Pending</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]" />
-              <span className="text-[10.5px] font-bold text-[#778196] uppercase tracking-wide">Missed</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="px-7 pb-7">
-          <button
-            onClick={onClose}
-            className="w-full py-3 rounded-[8px] bg-primary text-white text-[13px] font-bold hover:opacity-90 transition-opacity uppercase tracking-wider"
-          >
-            Got it
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import AcademyCalendar from '../components/AcademyCalendar';
 
 function ActivityItem({ item }: { item: { icon: string, text: string, time: string } }) {
   const iconMap: Record<string, React.ReactNode> = {
@@ -135,8 +31,6 @@ function ActivityItem({ item }: { item: { icon: string, text: string, time: stri
 }
 
 export default function StudentDashboardPage() {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
   const totalCourses = courses.length;
   const pendingAssignments = assignments.filter((a) => a.status === "pending").length;
   const submittedAssignments = assignments.filter((a) => a.status === "submitted").length;
@@ -219,34 +113,17 @@ export default function StudentDashboardPage() {
               <StudentAssignmentCard key={a.id} assignment={a} compact={false} />
             ))}
           </div>
+          
+          <div className="pt-2">
+            <AcademyCalendar assignmentsList={assignments as Assignment[]} />
+          </div>
         </div>
 
         {/* Right Column: Actions & Recent Activity */}
         <div className="flex flex-col gap-6">
-          {/* Quick Actions / Academy Calendar Button */}
-          <div className="space-y-[18px]">
-            <h2 className="font-sans text-[20px] md:text-[22px] font-extrabold text-[#4b3f68] tracking-tight">
-              Utilities
-            </h2>
-            <button
-              onClick={() => setIsCalendarOpen(true)}
-              className="w-full bg-[#f3eff7] group hover:bg-[#e7dff0] p-[22px] rounded-sm transition-all flex items-center justify-between border border-[#e7dff0]"
-            >
-              <div className="flex items-center gap-[18px]">
-                <div className="w-[42px] h-[42px] rounded-[8px] bg-white flex items-center justify-center text-[20px] group-hover:scale-105 transition-transform shadow-sm">
-                  📅
-                </div>
-                <div className="text-left">
-                  <p className="text-[13px] font-extrabold text-primary uppercase tracking-wide leading-none">Academy Calendar</p>
-                  <p className="text-[11px] font-medium text-[#7c8697] mt-1.5">Click to view schedule</p>
-                </div>
-              </div>
-              <svg className="w-5 h-5 text-[#8b6ca8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
+          <PersonalizedSchedule />
+          <EnrolledCoursesList />
+          
           <div className="space-y-[18px]">
             <h2 className="font-sans text-[20px] md:text-[22px] font-extrabold text-[#4b3f68] tracking-tight">
               Recent Activity
@@ -259,13 +136,6 @@ export default function StudentDashboardPage() {
           </div>
         </div>
       </div>
-
-      {/* Academy Calendar Modal Component */}
-      <AcademyCalendarModal
-        isOpen={isCalendarOpen}
-        onClose={() => setIsCalendarOpen(false)}
-        assignmentsList={assignments as Assignment[]}
-      />
     </div>
   );
 }

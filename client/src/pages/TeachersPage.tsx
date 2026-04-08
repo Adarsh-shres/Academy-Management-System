@@ -51,7 +51,7 @@ export default function TeachersPage() {
       avgAttendance: 0,
       upcomingSessions: 0,
       schedule: [],
-      activities: [{ id: 1, text: 'Profile created', time: 'Just now', icon: '🆕' }],
+      activities: [{ id: 1, text: 'Profile created', time: 'Just now', icon: '' }],
     });
     resetAddForm();
     setIsAddModalOpen(false);

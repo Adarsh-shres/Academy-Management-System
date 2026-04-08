@@ -14,9 +14,9 @@ export const MOCK_TEACHERS: Teacher[] = [
       { day: 'Friday',    time: '14:00 – 16:00', course: 'PHY-401 Research Seminar',  room: 'Seminar Rm' },
     ],
     activities: [
-      { id: 1, text: 'Submitted grades for PHY-301 midterm exam',            time: '2 hours ago',  icon: '📝' },
-      { id: 2, text: 'Created new assignment: Thermodynamics Problem Set 4',  time: '5 hours ago',  icon: '📄' },
-      { id: 3, text: 'Marked attendance for PHY-205 (28/30 present)',         time: 'Yesterday',    icon: '✅' },
+      { id: 1, text: 'Submitted grades for PHY-301 midterm exam',            time: '2 hours ago',  icon: '' },
+      { id: 2, text: 'Created new assignment: Thermodynamics Problem Set 4',  time: '5 hours ago',  icon: '' },
+      { id: 3, text: 'Marked attendance for PHY-205 (28/30 present)',         time: 'Yesterday',    icon: '' },
     ],
   },
   {
@@ -31,8 +31,8 @@ export const MOCK_TEACHERS: Teacher[] = [
       { day: 'Friday',    time: '11:00 – 13:00', course: 'CS-450 Advanced Algorithms',  room: 'Hall C-02' },
     ],
     activities: [
-      { id: 1, text: 'Merged pull requests for CS-201 final project',  time: '1 hour ago',  icon: '💻' },
-      { id: 2, text: 'Sent announcement: Guest lecture on Friday',     time: 'Yesterday',   icon: '📢' },
+      { id: 1, text: 'Merged pull requests for CS-201 final project',  time: '1 hour ago',  icon: '' },
+      { id: 2, text: 'Sent announcement: Guest lecture on Friday',     time: 'Yesterday',   icon: '' },
     ],
   },
   {
@@ -46,8 +46,8 @@ export const MOCK_TEACHERS: Teacher[] = [
       { day: 'Wednesday', time: '08:00 – 10:00', course: 'CHE-210 Organic Chemistry I', room: 'Chem Lab 1' },
     ],
     activities: [
-      { id: 1, text: 'Approved leave request for next week',        time: '2 days ago',  icon: '✈️' },
-      { id: 2, text: 'Updated course syllabus for CHE-210',         time: '4 days ago',  icon: '📚' },
+      { id: 1, text: 'Approved leave request for next week',        time: '2 days ago',  icon: '' },
+      { id: 2, text: 'Updated course syllabus for CHE-210',         time: '4 days ago',  icon: '' },
     ],
   },
   {
@@ -62,8 +62,8 @@ export const MOCK_TEACHERS: Teacher[] = [
       { day: 'Friday',    time: '09:00 – 10:30', course: 'MAT-101 Linear Algebra',    room: 'Hall B-11' },
     ],
     activities: [
-      { id: 1, text: 'Published quiz results for MAT-101',              time: '3 hours ago', icon: '📊' },
-      { id: 2, text: 'Created new assignment: Matrix Transformations',   time: '1 day ago',   icon: '📄' },
+      { id: 1, text: 'Published quiz results for MAT-101',              time: '3 hours ago', icon: '' },
+      { id: 2, text: 'Created new assignment: Matrix Transformations',   time: '1 day ago',   icon: '' },
     ],
   },
   {
@@ -76,7 +76,7 @@ export const MOCK_TEACHERS: Teacher[] = [
       { day: 'Wednesday', time: '14:00 – 17:00', course: 'CE-402 Structural Design', room: 'Design Studio' },
     ],
     activities: [
-      { id: 1, text: 'Archived course materials for CE-402', time: '1 week ago', icon: '📦' },
+      { id: 1, text: 'Archived course materials for CE-402', time: '1 week ago', icon: '' },
     ],
   },
   {
@@ -91,9 +91,9 @@ export const MOCK_TEACHERS: Teacher[] = [
       { day: 'Thursday',  time: '15:00 – 16:30', course: 'ECO-410 Public Policy',  room: 'Room 312' },
     ],
     activities: [
-      { id: 1, text: 'Marked attendance for ECO-201 (45/48 present)',  time: '4 hours ago', icon: '✅' },
-      { id: 2, text: 'Uploaded reading materials for Week 4',          time: 'Yesterday',   icon: '📚' },
-      { id: 3, text: 'Scheduled guest speaker for ECO-410',            time: '2 days ago',  icon: '🗓️' },
+      { id: 1, text: 'Marked attendance for ECO-201 (45/48 present)',  time: '4 hours ago', icon: '' },
+      { id: 2, text: 'Uploaded reading materials for Week 4',          time: 'Yesterday',   icon: '' },
+      { id: 3, text: 'Scheduled guest speaker for ECO-410',            time: '2 days ago',  icon: '' },
     ],
   },
 ];

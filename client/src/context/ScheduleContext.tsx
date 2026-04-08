@@ -1,12 +1,14 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { ScheduleEntry } from '../types/schedule';
 import { MOCK_SCHEDULE } from '../data/mockSchedule';
+import { useAuth } from './AuthContext';
 
 /* ─── Context shape ─────────────────────────────────────────── */
 
 interface ScheduleContextValue {
   schedule: ScheduleEntry[];
+  mySchedule: ScheduleEntry[];
   getEntryById: (id: number) => ScheduleEntry | undefined;
   addEntry: (data: Omit<ScheduleEntry, 'id'>) => ScheduleEntry;
   updateEntry: (id: number, data: Partial<ScheduleEntry>) => void;
@@ -20,7 +22,19 @@ const ScheduleContext = createContext<ScheduleContextValue | null>(null);
 let nextId = MOCK_SCHEDULE.length + 1;
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [schedule, setSchedule] = useState<ScheduleEntry[]>(MOCK_SCHEDULE);
+
+  const mySchedule = useMemo(() => {
+    if (!user) return [];
+    if (user.role === 'teacher') {
+      // Mock teacher's schedule: First 4 items in the schedule
+      return schedule.slice(0, 4);
+    } else {
+      // Mock student's schedule: Last 4 items in the schedule
+      return schedule.slice(-4);
+    }
+  }, [schedule, user]);
 
   const getEntryById = useCallback(
     (id: number) => schedule.find(e => e.id === id),
@@ -44,7 +58,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ScheduleContext.Provider value={{ schedule, getEntryById, addEntry, updateEntry, deleteEntry }}>
+    <ScheduleContext.Provider value={{ schedule, mySchedule, getEntryById, addEntry, updateEntry, deleteEntry }}>
       {children}
     </ScheduleContext.Provider>
   );
