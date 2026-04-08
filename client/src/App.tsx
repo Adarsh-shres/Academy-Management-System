@@ -1,15 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import DashboardPage from './pages/DashboardPage.tsx';
-import LandingPage from './pages/LandingPage.tsx';
-
 import Dashboard from './components/Dashboard.tsx';
 import StudentsPage from './pages/StudentsPage.tsx';
 import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
+import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
 import SchedulePage from './pages/SchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
+import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
 import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
@@ -17,7 +18,6 @@ import StudentSchedulePage from './pages/StudentSchedulePage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
-import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -44,13 +44,14 @@ function App() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/teachers" element={<TeachersPage />} />
-          <Route path="/user-roles" element={<UnderDevelopment />} />
-          <Route path="/userroles" element={<UnderDevelopment />} />
+          <Route path="/user-roles" element={<UserRolesPage />} />
+          <Route path="/userroles" element={<UserRolesPage />} />
           <Route path="/under-development" element={<UnderDevelopment />} />
           <Route path="*" element={<UnderDevelopment />} />
         </Route>
 
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+
         <Route element={<DashboardPage />}>
           <Route path="/student/dashboard" element={<StudentDashboardPage />} />
           <Route path="/student/courses" element={<StudentCoursesPage />} />
