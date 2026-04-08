@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 export default function Topbar() {
   const navigate = useNavigate();
   return (
-    <header className="h-[58px] bg-white border-b border-[#e2e8f0] px-7 flex items-center gap-3.5 sticky top-0 z-50">
+    <header className="h-[58px] bg-white/85 backdrop-blur border-b border-[#e7dff0] px-7 flex items-center gap-3.5 sticky top-0 z-50 shadow-[0_6px_24px_rgba(57,31,86,0.04)]">
       
       {/* Search */}
       <div className="flex-1 max-w-[420px] relative">
@@ -11,7 +11,7 @@ export default function Topbar() {
         <input 
           type="text" 
           placeholder="Search institutional data…" 
-          className="w-full py-2 pr-3.5 pl-9 bg-transparent border-[1.5px] border-transparent rounded-full text-[13px] text-[#1e293b] outline-none transition-all duration-200 focus:bg-white focus:border-[#006496] focus:ring-[3px] focus:ring-[#006496]/10 placeholder:text-[#64748b]"
+          className="w-full py-2 pr-3.5 pl-9 bg-[#f6f2fb] border-[1.5px] border-transparent rounded-full text-[13px] text-[#1e293b] outline-none transition-all duration-200 focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 placeholder:text-[#7c8697]"
         />
       </div>
 
@@ -19,14 +19,14 @@ export default function Topbar() {
       <div className="flex items-center gap-2 ml-auto">
 
         
-        <div className="w-[1px] h-6 bg-[#e2e8f0] mx-1"></div>
+        <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
         
-        <div onClick={() => navigate('/login')} className="flex items-center gap-2 px-2.5 py-1.5 border-[1.5px] border-[#e2e8f0] rounded-full cursor-pointer transition-all duration-200 hover:border-[#006496]">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#006496] to-[#0d3349] text-white text-[11px] font-bold flex items-center justify-center">
+        <div onClick={() => navigate('/login')} className="flex items-center gap-2 px-2.5 py-1.5 border-[1.5px] border-[#e7dff0] rounded-sm cursor-pointer transition-all duration-200 hover:border-[#6a5182] bg-white">
+          <div className="w-7 h-7 rounded-sm bg-gradient-to-br from-[#6a5182] to-[#8d72ab] text-white text-[11px] font-bold flex items-center justify-center">
             SA
           </div>
           <div className="flex flex-col">
-            <span className="text-[12.5px] font-semibold text-[#0d3349] leading-[1.2]">Super Admin</span>
+            <span className="text-[12.5px] font-semibold text-[#4b3f68] leading-[1.2]">Super Admin</span>
             <span className="text-[10.5px] text-[#64748b]">Administrator</span>
           </div>
         </div>

@@ -9,7 +9,7 @@ export default function RegisterStudentsPage() {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="w-10 h-10 flex items-center justify-center bg-white border border-[#e2e8f0] rounded-lg hover:bg-[#f8fafc] transition-colors text-[#64748b]"
+          className="w-10 h-10 flex items-center justify-center bg-[#f3eff7] border border-[#e2d9ed] rounded-lg hover:bg-[#6a5182] hover:text-white transition-colors text-[#6a5182]"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>

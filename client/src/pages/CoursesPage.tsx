@@ -1,36 +1,53 @@
 import { useState, useRef, useEffect } from 'react';
 import StatCard from '../components/StatCard';
 import CurriculumCard from '../components/CurriculumCard';
-
-type CourseStatus = 'Active' | 'Inactive';
-
-interface Course {
-  id: string;
-  name: string;
-  status: CourseStatus;
-}
-
-const initialCourses: Course[] = [
-  { id: '5cs01', name: 'Collaborative Development', status: 'Active' },
-  { id: '5cs02', name: 'Fullstack Development', status: 'Active' },
-  { id: '5cs03', name: 'Algorithms and Currency', status: 'Inactive' },
-  { id: '5cs05', name: 'Beginner Python Course', status: 'Active' },
-  { id: '5cs06', name: 'Beginner Java Course', status: 'Active' },
-  { id: '5cs07', name: 'Beginner React Course', status: 'Active' },
-  { id: '5cs08', name: 'Beginner Pokemon Course', status: 'Inactive' },
-  { id: '5cs09', name: 'Beginner Javascript Course', status: 'Active' },
-  { id: '5cs10', name: 'WebDevelopment Course', status: 'Active' },
-];
+import { useCourses } from '../context/CourseContext';
+import type { Course } from '../types/course';
 
 export default function CoursesPage() {
-  const [view, setView] = useState<'overview' | 'list'>('overview');
-  const [schedule, setSchedule] = useState('Mon/Wed/Fri');
+  const { courses, addCourse, updateCourse, deleteCourse } = useCourses();
 
-  const [courses, setCourses] = useState<Course[]>(initialCourses);
-  const [filterStatus, setFilterStatus] = useState<'All' | CourseStatus>('All');
+  const [view, setView] = useState<'overview' | 'list'>('overview');
+  const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<'All' | 'Active' | 'Inactive'>('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  
+
+  /* ─── New Course form state ────────────────────────────────── */
+  const [newName, setNewName] = useState('');
+  const [newDept, setNewDept] = useState('');
+  const [newFaculty, setNewFaculty] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
+
+  const resetNewCourseForm = () => {
+    setNewName('');
+    setNewDept('');
+    setNewFaculty('');
+    setNewDescription('');
+    setSelectedDays([]);
+  };
+
+  const handleCreateCourse = () => {
+    addCourse({
+      name: newName || 'Untitled Course',
+      status: 'Active',
+      department: newDept || 'CSE',
+      facultyLead: newFaculty || 'Unassigned',
+      description: newDescription || 'No description provided.',
+      scheduleDays: selectedDays.length > 0 ? selectedDays : ['Mon', 'Wed', 'Fri'],
+    });
+    resetNewCourseForm();
+    setIsNewCourseModalOpen(false);
+  };
+
+  /* ─── Filter / Edit / Delete ───────────────────────────────── */
   const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,18 +62,32 @@ export default function CoursesPage() {
 
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
-      setCourses(courses.filter(course => course.id !== id));
+      deleteCourse(id);
     }
   };
 
   const handleSaveEdit = () => {
     if (editingCourse) {
-      setCourses(courses.map(course => (course.id === editingCourse.id ? editingCourse : course)));
+      updateCourse(editingCourse.id, editingCourse);
       setEditingCourse(null);
     }
   };
 
+  const toggleEditDay = (day: string) => {
+    setEditingCourse(prev => {
+      if (!prev) return prev;
+      const scheduleDays = prev.scheduleDays || [];
+      return {
+        ...prev,
+        scheduleDays: scheduleDays.includes(day) 
+          ? scheduleDays.filter(d => d !== day) 
+          : [...scheduleDays, day]
+      };
+    });
+  };
+
   const filteredCourses = courses.filter(course => filterStatus === 'All' || course.status === filterStatus);
+  const activeCourses = courses.filter(c => c.status === 'Active');
 
   const renderOverview = () => (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
@@ -66,7 +97,9 @@ export default function CoursesPage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Course Curriculum</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Conduct and create your courses.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer">
+        <button 
+          onClick={() => setIsNewCourseModalOpen(true)}
+          className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -75,84 +108,47 @@ export default function CoursesPage() {
         </button>
       </div>
 
-      {/* Main Content Split */}
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left Column (Stats + Form) */}
-        <div className="flex-1 flex flex-col gap-6 md:gap-8">
-          {/* Stats */}
-          <div className="flex flex-col sm:flex-row gap-6">
-            <div className="w-full sm:flex-1 max-w-[280px]">
-              <StatCard
-                icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
-                label="Total Courses"
-                value="50"
-                subContent={null}
-              />
-            </div>
-            <div className="w-full sm:flex-1 max-w-[280px]">
-              <StatCard
-                icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>}
-                label="Active Enrollments"
-                value="4,820"
-                subContent={null}
-              />
-            </div>
+      {/* Main Content Layout */}
+      <div className="flex flex-col gap-8">
+        {/* Stats */}
+        <div className="flex flex-col sm:flex-row gap-6">
+          <div className="w-full sm:flex-1 max-w-[280px]">
+            <StatCard
+              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
+              label="Total Courses"
+              value={String(courses.length)}
+              subContent={null}
+            />
           </div>
-
-          {/* Initialize Course Form */}
-          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
-            <h3 className="text-[16px] font-bold text-[#0d3349] mb-5">Initialize Course</h3>
-            <form className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
-                <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
-                </div>
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
-                  <input type="text" className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5 mt-1">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Primary Schedule</label>
-                <div className="flex bg-[#e2e8f0]/40 rounded-lg p-1 gap-1 w-full max-w-[400px]">
-                  <button type="button" onClick={() => setSchedule('Mon/Wed/Fri')} className={`flex-1 rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer ${schedule === 'Mon/Wed/Fri' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>Mon/Wed/Fri</button>
-                  <button type="button" onClick={() => setSchedule('Tue/Thu')} className={`flex-1 rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer ${schedule === 'Tue/Thu' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>Tue/Thu</button>
-                  <button type="button" onClick={() => setSchedule('Weekend')} className={`flex-1 rounded-md py-1.5 text-[13px] transition-all duration-200 cursor-pointer ${schedule === 'Weekend' ? 'bg-white font-semibold text-[#0d3349] shadow-sm' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>Weekend</button>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5 mt-2">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Description</label>
-                <textarea rows={4} className="bg-[#e2e8f0]/40 border-0 rounded-lg px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
-              </div>
-
-              <button type="button" className="mt-4 bg-[#006496] hover:bg-[#004e75] text-white text-[14px] font-semibold px-6 py-3 rounded-lg transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
-                Create and Activate Course
-              </button>
-            </form>
+          <div className="w-full sm:flex-1 max-w-[280px]">
+            <StatCard
+              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>}
+              label="Active Courses"
+              value={String(activeCourses.length)}
+              subContent={null}
+            />
           </div>
         </div>
 
-        {/* Right Column: Active Curriculum */}
-        <div className="w-full lg:w-[320px] xl:w-[360px] flex flex-col gap-3">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[15px] font-bold text-[#0d3349] leading-tight">Active<br/>Curriculum</h3>
+        {/* Active Curriculum */}
+        <div className="flex flex-col gap-5 mt-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-[18px] font-bold text-[#0d3349] leading-tight">Active Curriculum</h3>
+              <p className="text-[14px] text-[#64748b]">Currently running programs and their status.</p>
+            </div>
             <button 
               onClick={() => setView('list')}
-              className="text-[12px] font-semibold text-[#64748b] hover:text-[#006496] transition-all cursor-pointer underline-offset-2 hover:underline">
-              View All
+              className="text-[13px] font-semibold text-[#006496] hover:text-[#004e75] transition-all cursor-pointer underline-offset-2 hover:underline">
+              View All Courses
             </button>
           </div>
           
-          <CurriculumCard title="Collaborative Development" tag="STARTER" tagColor="bg-[#ccfbf1] text-[#0f766e]" />
-          <CurriculumCard title="Full stack Development" tag="CORE" tagColor="bg-[#dbeafe] text-[#1d4ed8]" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {activeCourses.slice(0, 3).map(c => (
+              <CurriculumCard key={c.id} title={c.name} tag={c.department} tagColor="bg-[#dbeafe] text-[#1d4ed8]" />
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -166,9 +162,9 @@ export default function CoursesPage() {
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Course Curriculum</h1>
           <p className="text-[14px] text-[#64748b] mt-1">Conduct and create your courses.</p>
         </div>
-        <button 
+          <button 
           onClick={() => setView('overview')}
-          className="text-[13px] font-semibold text-[#64748b] hover:text-[#006496] transition-all cursor-pointer">
+          className="text-[13px] font-semibold text-[#64748b] hover:text-[#6a5182] transition-all cursor-pointer">
           Back
         </button>
       </div>
@@ -182,21 +178,21 @@ export default function CoursesPage() {
             <div className="relative" ref={filterRef}>
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] hover:text-[#0d3349] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+                className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 Filter {filterStatus !== 'All' && `(${filterStatus})`}
               </button>
               
               {isFilterOpen && (
-                <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-xl shadow-lg z-10 flex flex-col overflow-hidden py-1">
-                  <button onClick={() => { setFilterStatus('All'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${filterStatus === 'All' ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>All Courses</button>
-                  <button onClick={() => { setFilterStatus('Active'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${filterStatus === 'Active' ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>Active</button>
-                  <button onClick={() => { setFilterStatus('Inactive'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f1f5f9] transition-colors ${filterStatus === 'Inactive' ? 'bg-[#f8fafc] font-bold text-[#006496]' : 'text-[#475569]'}`}>Inactive</button>
+                <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-sm shadow-lg z-10 flex flex-col overflow-hidden py-1">
+                  <button onClick={() => { setFilterStatus('All'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'All' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>All Courses</button>
+                  <button onClick={() => { setFilterStatus('Active'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'Active' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>Active</button>
+                  <button onClick={() => { setFilterStatus('Inactive'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'Inactive' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>Inactive</button>
                 </div>
               )}
             </div>
 
-            <button className="flex items-center gap-1.5 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] hover:text-[#0d3349] text-[#475569] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+            <button className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export CSV
             </button>
@@ -230,7 +226,7 @@ export default function CoursesPage() {
                       <div className="flex items-center justify-end gap-3 text-[#94a3b8]">
                         <button 
                           onClick={() => setEditingCourse({ ...course })}
-                          className="hover:text-[#006496] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
+                          className="hover:text-[#6a5182] transition-colors cursor-pointer hover:scale-110 active:scale-95" title="Edit">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </button>
                         <button 
@@ -255,12 +251,17 @@ export default function CoursesPage() {
       {/* Edit Modal Overlay */}
       {editingCourse && (
         <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditingCourse(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-[400px] shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-[18px] font-bold text-[#0d3349] mb-5">Edit Course</h3>
+          <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-[18px] font-bold text-[#0d3349]">Edit Course</h3>
+              <button onClick={() => setEditingCourse(null)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
             
-            <div className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleSaveEdit(); }}>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] font-bold text-[#64748b] tracking-wider">Course Name</label>
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
                 <input 
                   type="text" 
                   value={editingCourse.name} 
@@ -270,39 +271,132 @@ export default function CoursesPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] font-bold text-[#64748b] tracking-wider">Status</label>
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
                 <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
-                  <button 
+                  <button type="button"
                     onClick={() => setEditingCourse({...editingCourse, status: 'Active'})} 
-                    className={`flex-1 rounded-md py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Active' ? 'bg-white font-semibold text-[#10b981] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>
+                    className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Active' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>
                     Active
                   </button>
-                  <button 
+                  <button type="button"
                     onClick={() => setEditingCourse({...editingCourse, status: 'Inactive'})} 
-                    className={`flex-1 rounded-md py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Inactive' ? 'bg-white font-semibold text-[#ef4444] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#0d3349] hover:bg-black/5'}`}>
+                    className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editingCourse.status === 'Inactive' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>
                     Inactive
                   </button>
                 </div>
               </div>
-            </div>
 
-            <div className="flex gap-3 mt-8">
-              <button 
-                onClick={() => setEditingCourse(null)}
-                className="flex-1 py-2.5 rounded-lg text-[13.5px] font-bold text-[#64748b] hover:bg-[#f1f5f9] transition-all cursor-pointer">
-                Cancel
-              </button>
-              <button 
-                onClick={handleSaveEdit}
-                className="flex-[2] py-2.5 rounded-lg text-[13.5px] font-bold bg-[#006496] text-white hover:bg-[#004e75] shadow-md transition-all active:scale-[0.98] cursor-pointer">
-                Save Changes
-              </button>
-            </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
+                  <input type="text" value={editingCourse.department || ''} onChange={e => setEditingCourse({...editingCourse, department: e.target.value})} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#006496] focus:ring-1 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
+                  <input type="text" value={editingCourse.facultyLead || ''} onChange={e => setEditingCourse({...editingCourse, facultyLead: e.target.value})} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#006496] focus:ring-1 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-1">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Primary Schedule</label>
+                <div className="flex flex-wrap gap-2 w-full mt-1">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <button 
+                      key={day}
+                      type="button" 
+                      onClick={() => toggleEditDay(day)} 
+                      className={`flex-1 min-w-[40px] rounded-sm py-1.5 text-[13px] transition-all duration-200 cursor-pointer border ${(editingCourse.scheduleDays || []).includes(day) ? 'bg-[#6a5182] font-semibold text-white border-[#6a5182] shadow-sm' : 'bg-[#f8fafc] font-medium text-[#64748b] border-[#cbd5e1]'}`}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Description</label>
+                <textarea rows={3} value={editingCourse.description || ''} onChange={e => setEditingCourse({...editingCourse, description: e.target.value})} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-lg px-4 py-3 text-[14px] w-full outline-none focus:border-[#006496] focus:ring-1 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button type="button" onClick={() => setEditingCourse(null)} className="flex-1 py-2.5 rounded-sm text-[13.5px] font-bold text-[#6a5182] bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white transition-all cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" className="flex-[2] py-2.5 rounded-sm text-[13.5px] font-bold bg-[#6a5182] text-white hover:bg-[#5b4471] shadow-md transition-all active:scale-[0.98] cursor-pointer">
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
     </div>
   );
 
-  return view === 'overview' ? renderOverview() : renderList();
+  return (
+    <>
+      {view === 'overview' ? renderOverview() : renderList()}
+
+      {/* New Course Modal Overlay */}
+      {isNewCourseModalOpen && (
+        <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }}>
+          <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-[18px] font-bold text-[#0d3349]">Initialize Course</h3>
+              <button onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleCreateCourse(); }}>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
+                <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Advanced Machine Learning" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
+                  <input type="text" value={newDept} onChange={e => setNewDept(e.target.value)} placeholder="e.g. CSE" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
+                  <input type="text" value={newFaculty} onChange={e => setNewFaculty(e.target.value)} placeholder="e.g. Dr. John Doe" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-1">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Primary Schedule</label>
+                <div className="flex flex-wrap gap-2 w-full mt-1">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <button 
+                      key={day}
+                      type="button" 
+                      onClick={() => toggleDay(day)} 
+                      className={`flex-1 min-w-[40px] rounded-sm py-1.5 text-[13px] transition-all duration-200 cursor-pointer border ${selectedDays.includes(day) ? 'bg-[#6a5182] font-semibold text-white border-[#6a5182] shadow-sm' : 'bg-[#f3eff7] font-medium text-[#6a5182] border-[#e2d9ed] hover:border-[#6a5182] hover:text-white hover:bg-[#6a5182]'}`}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Description</label>
+                <textarea rows={4} value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Describe what this course covers…" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b] resize-none"></textarea>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button type="button" onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] w-full cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
+                  Create and Activate Course
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

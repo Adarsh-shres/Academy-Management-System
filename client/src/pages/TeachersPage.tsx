@@ -1,135 +1,7 @@
 import { useState } from 'react';
 import StatCard from '../components/StatCard';
-
-/* ─── Mock Data ─────────────────────────────────────────────── */
-interface ScheduleItem {
-  day: string;
-  time: string;
-  course: string;
-  room: string;
-}
-
-interface ActivityItem {
-  id: number;
-  text: string;
-  time: string;
-  icon: string;
-}
-
-interface Teacher {
-  id: string;
-  name: string;
-  initials: string;
-  subject: string;
-  department: string;
-  employeeId: string;
-  status: 'Active' | 'On Leave' | 'Inactive';
-  avatarGradient: string;
-  totalClasses: number;
-  totalStudents: number;
-  avgAttendance: number;
-  upcomingSessions: number;
-  schedule: ScheduleItem[];
-  activities: ActivityItem[];
-}
-
-const TEACHERS: Teacher[] = [
-  {
-    id: '1', name: 'Dr. Ramesh Kumar', initials: 'RK',
-    subject: 'Quantum Physics & Applied Mechanics', department: 'Dept. of Physics',
-    employeeId: 'FAC-00247', status: 'Active',
-    avatarGradient: 'from-[#0ea5b0] to-[#006496]',
-    totalClasses: 48, totalStudents: 312, avgAttendance: 91.2, upcomingSessions: 6,
-    schedule: [
-      { day: 'Monday',    time: '09:00 – 10:30', course: 'PHY-301 Quantum Mechanics', room: 'Hall A-12' },
-      { day: 'Monday',    time: '14:00 – 15:30', course: 'PHY-205 Thermodynamics',    room: 'Lab B-04' },
-      { day: 'Wednesday', time: '09:00 – 10:30', course: 'PHY-301 Quantum Mechanics', room: 'Hall A-12' },
-      { day: 'Friday',    time: '14:00 – 16:00', course: 'PHY-401 Research Seminar',  room: 'Seminar Rm' },
-    ],
-    activities: [
-      { id: 1, text: 'Submitted grades for PHY-301 midterm exam',       time: '2 hours ago',  icon: '📝' },
-      { id: 2, text: 'Created new assignment: Thermodynamics Problem Set 4', time: '5 hours ago',  icon: '📄' },
-      { id: 3, text: 'Marked attendance for PHY-205 (28/30 present)',   time: 'Yesterday',    icon: '✅' },
-    ]
-  },
-  {
-    id: '2', name: 'Prof. Sunita Sharma', initials: 'SS',
-    subject: 'Data Structures & Algorithms', department: 'Dept. of Computer Science',
-    employeeId: 'FAC-00189', status: 'Active',
-    avatarGradient: 'from-[#164e6a] to-[#0d3349]',
-    totalClasses: 52, totalStudents: 287, avgAttendance: 88.7, upcomingSessions: 8,
-    schedule: [
-      { day: 'Tuesday',   time: '10:00 – 11:30', course: 'CS-201 Data Structures',    room: 'Lab D-01' },
-      { day: 'Thursday',  time: '10:00 – 11:30', course: 'CS-201 Data Structures',    room: 'Lab D-01' },
-      { day: 'Friday',    time: '11:00 – 13:00', course: 'CS-450 Advanced Algorithms',room: 'Hall C-02' },
-    ],
-    activities: [
-      { id: 1, text: 'Merged pull requests for CS-201 final project',   time: '1 hour ago',   icon: '💻' },
-      { id: 2, text: 'Sent announcement: Guest lecture on Friday',      time: 'Yesterday',    icon: '📢' },
-    ]
-  },
-  {
-    id: '3', name: 'Dr. Priya Menon', initials: 'PM',
-    subject: 'Organic Chemistry', department: 'Dept. of Chemistry',
-    employeeId: 'FAC-00156', status: 'On Leave',
-    avatarGradient: 'from-[#fbbf24] to-[#d97706]',
-    totalClasses: 36, totalStudents: 198, avgAttendance: 85.1, upcomingSessions: 0,
-    schedule: [
-      { day: 'Monday',    time: '08:00 – 10:00', course: 'CHE-210 Organic Chemistry I',room: 'Chem Lab 1' },
-      { day: 'Wednesday', time: '08:00 – 10:00', course: 'CHE-210 Organic Chemistry I',room: 'Chem Lab 1' },
-    ],
-    activities: [
-      { id: 1, text: 'Approved leave request for next week',            time: '2 days ago',   icon: '✈️' },
-      { id: 2, text: 'Updated course syllabus for CHE-210',             time: '4 days ago',   icon: '📚' },
-    ]
-  },
-  {
-    id: '4', name: 'Prof. Suresh Pillai', initials: 'SP',
-    subject: 'Advanced Calculus & Linear Algebra', department: 'Dept. of Mathematics',
-    employeeId: 'FAC-00312', status: 'Active',
-    avatarGradient: 'from-[#0ea5b0] to-[#006496]',
-    totalClasses: 44, totalStudents: 256, avgAttendance: 92.4, upcomingSessions: 5,
-    schedule: [
-      { day: 'Tuesday',   time: '13:00 – 14:30', course: 'MAT-305 Advanced Calculus', room: 'Room 204' },
-      { day: 'Thursday',  time: '13:00 – 14:30', course: 'MAT-305 Advanced Calculus', room: 'Room 204' },
-      { day: 'Friday',    time: '09:00 – 10:30', course: 'MAT-101 Linear Algebra',    room: 'Hall B-11' },
-    ],
-    activities: [
-      { id: 1, text: 'Published quiz results for MAT-101',              time: '3 hours ago',  icon: '📊' },
-      { id: 2, text: 'Created new assignment: Matrix Transformations',  time: '1 day ago',    icon: '📄' },
-    ]
-  },
-  {
-    id: '5', name: 'Dr. Kavitha Nair', initials: 'KN',
-    subject: 'Structural Engineering', department: 'Dept. of Civil Engineering',
-    employeeId: 'FAC-00278', status: 'Inactive',
-    avatarGradient: 'from-[#f87171] to-[#ef4444]',
-    totalClasses: 22, totalStudents: 145, avgAttendance: 78.3, upcomingSessions: 0,
-    schedule: [
-      { day: 'Wednesday', time: '14:00 – 17:00', course: 'CE-402 Structural Design',  room: 'Design Studio' },
-    ],
-    activities: [
-      { id: 1, text: 'Archived course materials for CE-402',            time: '1 week ago',   icon: '📦' },
-    ]
-  },
-  {
-    id: '6', name: 'Prof. Anand Desai', initials: 'AD',
-    subject: 'Microeconomics & Public Policy', department: 'Dept. of Economics',
-    employeeId: 'FAC-00334', status: 'Active',
-    avatarGradient: 'from-[#164e6a] to-[#0d3349]',
-    totalClasses: 40, totalStudents: 220, avgAttendance: 89.5, upcomingSessions: 7,
-    schedule: [
-      { day: 'Monday',    time: '11:00 – 12:30', course: 'ECO-201 Microeconomics',    room: 'Hall A-05' },
-      { day: 'Wednesday', time: '11:00 – 12:30', course: 'ECO-201 Microeconomics',    room: 'Hall A-05' },
-      { day: 'Thursday',  time: '15:00 – 16:30', course: 'ECO-410 Public Policy',     room: 'Room 312' },
-    ],
-    activities: [
-      { id: 1, text: 'Marked attendance for ECO-201 (45/48 present)',   time: '4 hours ago',  icon: '✅' },
-      { id: 2, text: 'Uploaded reading materials for Week 4',           time: 'Yesterday',    icon: '📚' },
-      { id: 3, text: 'Scheduled guest speaker for ECO-410',             time: '2 days ago',   icon: '🗓️' },
-    ]
-  },
-];
+import { useTeachers } from '../context/TeacherContext';
+import type { Teacher, TeacherStatus } from '../types/teacher';
 
 const STATUS_STYLES: Record<string, string> = {
   'Active':    'bg-[#d1fae5] text-[#065f46]',
@@ -137,32 +9,88 @@ const STATUS_STYLES: Record<string, string> = {
   'Inactive':  'bg-[#f1f5f9] text-[#475569]',
 };
 
+const GRADIENTS = [
+  'from-[#0ea5b0] to-[#006496]',
+  'from-[#164e6a] to-[#0d3349]',
+  'from-[#fbbf24] to-[#d97706]',
+  'from-[#f87171] to-[#ef4444]',
+];
+
 /* ─── Component ─────────────────────────────────────────────── */
 
 export default function TeachersPage() {
+  const { teachers, addTeacher, updateTeacher, deleteTeacher } = useTeachers();
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  /* ─── Add Teacher form state ───────────────────────────────── */
+  const [newName, setNewName] = useState('');
+  const [newSubject, setNewSubject] = useState('');
+  const [newDept, setNewDept] = useState('');
+  const [newStatus, setNewStatus] = useState<TeacherStatus>('Active');
+
+  const resetAddForm = () => {
+    setNewName(''); setNewSubject(''); setNewDept(''); setNewStatus('Active');
+  };
+
+  const handleAddTeacher = () => {
+    const name = newName.trim() || 'New Teacher';
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const empNum = String(Math.floor(Math.random() * 900) + 100);
+    addTeacher({
+      name,
+      initials,
+      subject: newSubject || 'General Studies',
+      department: newDept || 'Dept. of General Studies',
+      employeeId: `FAC-00${empNum}`,
+      status: newStatus,
+      avatarGradient: GRADIENTS[teachers.length % GRADIENTS.length],
+      totalClasses: 0,
+      totalStudents: 0,
+      avgAttendance: 0,
+      upcomingSessions: 0,
+      schedule: [],
+      activities: [{ id: 1, text: 'Profile created', time: 'Just now', icon: '🆕' }],
+    });
+    resetAddForm();
+    setIsAddModalOpen(false);
+  };
+
+  /* ─── Edit Teacher form state ──────────────────────────────── */
+  const [editName, setEditName] = useState('');
+  const [editSubject, setEditSubject] = useState('');
+  const [editDept, setEditDept] = useState('');
+  const [editStatus, setEditStatus] = useState<TeacherStatus>('Active');
+
+  const openEditModal = () => {
+    if (selectedTeacher) {
+      setEditName(selectedTeacher.name);
+      setEditSubject(selectedTeacher.subject);
+      setEditDept(selectedTeacher.department);
+      setEditStatus(selectedTeacher.status);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleEditTeacher = () => {
+    if (selectedTeacher) {
+      const initials = editName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      const updates = {
+        name: editName,
+        subject: editSubject,
+        department: editDept,
+        status: editStatus,
+        initials
+      };
+      updateTeacher(selectedTeacher.id, updates);
+      setSelectedTeacher({ ...selectedTeacher, ...updates });
+      setIsEditModalOpen(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 p-[26px_28px_40px] flex-1">
-      
-      {/* ── Breadcrumb ── */}
-      <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#006496] tracking-widest uppercase mb-[-12px]">
-        <span>Institutional Overview</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-        <span 
-          className={selectedTeacher ? "cursor-pointer hover:underline" : ""} 
-          onClick={() => setSelectedTeacher(null)}
-        >
-          Teachers
-        </span>
-        {selectedTeacher && (
-           <>
-             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-             <span className="text-[#64748b]">{selectedTeacher.name}</span>
-           </>
-        )}
-      </div>
-
       {selectedTeacher ? (
         /* ── DETAIL PANEL ── */
         <div key={selectedTeacher.id} className="contents">
@@ -170,7 +98,7 @@ export default function TeachersPage() {
           <div className="flex items-center gap-4 animate-fade-up" style={{ animationDelay: '0ms' }}>
             <button
               onClick={() => setSelectedTeacher(null)}
-              className="w-10 h-10 flex items-center justify-center bg-white border border-[#e2e8f0] rounded-lg hover:bg-[#f8fafc] transition-colors text-[#64748b] cursor-pointer shadow-sm"
+              className="w-10 h-10 flex items-center justify-center bg-[#f3eff7] border border-[#e2d9ed] rounded-sm hover:bg-[#6a5182] hover:text-white transition-colors text-[#6a5182] cursor-pointer shadow-sm"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             </button>
@@ -199,10 +127,24 @@ export default function TeachersPage() {
                     <h2 className="font-sans text-[22px] font-extrabold text-[#0d3349] tracking-tight leading-tight">{selectedTeacher.name}</h2>
                     <p className="text-[13px] text-[#64748b] mt-1">{selectedTeacher.subject}</p>
                   </div>
-                  <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    Edit Profile
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={openEditModal} className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      Edit Profile
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this teacher profile permanently?')) {
+                          deleteTeacher(selectedTeacher.id);
+                          setSelectedTeacher(null);
+                        }
+                      }} 
+                      className="flex items-center justify-center w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-sm transition-all cursor-pointer shrink-0 border border-rose-200"
+                      title="Delete Profile"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-x-10 gap-y-4 mt-5">
                   <DetailField label="Employee ID" value={selectedTeacher.employeeId} />
@@ -234,7 +176,7 @@ export default function TeachersPage() {
               isAccent
               subContent={
                 selectedTeacher.avgAttendance >= 85
-                  ? <span className="text-[10.5px] font-bold text-[#006496] bg-[#e6f7f9] px-[9px] py-0.5 rounded-full tracking-wide">Above Target</span>
+                  ? <span className="text-[10.5px] font-bold text-[#6a5182] bg-[#f3eff7] px-[9px] py-0.5 rounded-sm tracking-wide">Above Target</span>
                   : <span className="text-[10.5px] font-bold text-[#92400e] bg-[#fef3c7] px-[9px] py-0.5 rounded-full tracking-wide">Below Target</span>
               }
             />
@@ -243,17 +185,16 @@ export default function TeachersPage() {
               label="Upcoming Sessions"
               value={String(selectedTeacher.upcomingSessions)}
               subContent="Scheduled this week"
-              linkText="View →"
             />
           </div>
 
           {/* ── Two-Column: Schedule + Activity ── */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 animate-fade-up" style={{ animationDelay: '225ms' }}>
             {/* Class Schedule Table */}
-            <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-[#e2e8f0] rounded-sm overflow-hidden shadow-sm">
               <div className="flex items-center justify-between p-5 border-b border-[#e2e8f0]">
                 <h3 className="font-sans text-[15px] font-bold text-[#0d3349]">Class Schedule</h3>
-                <button className="bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] hover:text-[#0d3349] text-[13px] font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer">
+                <button className="bg-[#f3eff7] hover:bg-[#6a5182] text-[#6a5182] hover:text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
                   This Week
                 </button>
               </div>
@@ -287,7 +228,7 @@ export default function TeachersPage() {
             <div className="bg-white border border-[#e2e8f0] rounded-2xl p-[22px] flex flex-col shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-sans text-[15px] font-bold text-[#0d3349]">Recent Activity</h3>
-                <span className="text-[12px] font-semibold text-[#006496] cursor-pointer hover:underline transition-all">View All</span>
+                <span className="text-[12px] font-semibold text-[#6a5182] cursor-pointer hover:underline transition-all">View All</span>
               </div>
               <div className="flex flex-col gap-0 flex-1">
                 {selectedTeacher.activities.map((act) => (
@@ -328,7 +269,7 @@ export default function TeachersPage() {
               <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Teachers</h1>
               <p className="text-[14px] text-[#64748b] mt-1">Manage and view faculty members</p>
             </div>
-            <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
+            <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add Teacher
             </button>
@@ -339,7 +280,7 @@ export default function TeachersPage() {
             <StatCard
               icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
               label="Total Faculty"
-              value={String(TEACHERS.length)}
+              value={String(teachers.length)}
               isAccent
               subContent={<><span className="text-[#10b981] font-bold">↑ 2</span> new this semester</>}
             />
@@ -360,7 +301,6 @@ export default function TeachersPage() {
               label="Upcoming Sessions"
               value="24"
               subContent="Scheduled this week"
-              linkText="View →"
             />
           </div>
 
@@ -368,11 +308,11 @@ export default function TeachersPage() {
           <div className="bg-white border border-[#e2e8f0] rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center justify-between p-5 border-b border-[#e2e8f0]">
               <h3 className="font-sans text-[15px] font-bold text-[#0d3349]">All Faculty Members</h3>
-              <span className="text-[12px] text-[#64748b]">{TEACHERS.length} members</span>
+              <span className="text-[12px] text-[#64748b]">{teachers.length} members</span>
             </div>
 
             <div className="divide-y divide-[#e2e8f0]">
-              {TEACHERS.map((teacher) => (
+              {teachers.map((teacher) => (
                 <div
                   key={teacher.id}
                   onClick={() => setSelectedTeacher(teacher)}
@@ -385,7 +325,7 @@ export default function TeachersPage() {
 
                   {/* Name + Subject */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[#0d3349] group-hover:text-[#006496] transition-colors truncate">{teacher.name}</p>
+                    <p className="text-[14px] font-semibold text-[#0d3349] group-hover:text-[#6a5182] transition-colors truncate">{teacher.name}</p>
                     <p className="text-[12px] text-[#64748b] mt-0.5 truncate">{teacher.subject}</p>
                   </div>
 
@@ -402,7 +342,7 @@ export default function TeachersPage() {
                   {/* Chevron */}
                   <svg
                     width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                    className="text-[#cbd5e1] group-hover:text-[#006496] transition-colors shrink-0"
+                    className="text-[#cbd5e1] group-hover:text-[#6a5182] transition-colors shrink-0"
                   >
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
@@ -412,6 +352,85 @@ export default function TeachersPage() {
           </div>
         </>
       )}
+      {/* ─── Add Teacher Modal ─────────────────────────────── */}
+      {isAddModalOpen && (
+            <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }}>
+              <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="text-[18px] font-bold text-[#0d3349]">Add New Teacher</h3>
+                  <button onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleAddTeacher(); }}>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Full Name</label>
+                    <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Dr. Ramesh Kumar" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Subject / Specialization</label>
+                    <input type="text" value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="e.g. Quantum Physics" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
+                    <input type="text" value={newDept} onChange={e => setNewDept(e.target.value)} placeholder="e.g. Dept. of Physics" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
+                    <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
+                      {(['Active', 'On Leave', 'Inactive'] as TeacherStatus[]).map(s => (
+                        <button key={s} type="button" onClick={() => setNewStatus(s)} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${newStatus === s ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>{s}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <button type="button" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">Cancel</button>
+                    <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">Add Teacher</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* ─── Edit Teacher Modal ────────────────────────────── */}
+          {isEditModalOpen && (
+            <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsEditModalOpen(false)}>
+              <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="text-[18px] font-bold text-[#0d3349]">Edit Teacher Profile</h3>
+                  <button onClick={() => setIsEditModalOpen(false)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleEditTeacher(); }}>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Full Name</label>
+                    <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Subject / Specialization</label>
+                    <input type="text" value={editSubject} onChange={e => setEditSubject(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
+                    <input type="text" value={editDept} onChange={e => setEditDept(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
+                    <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
+                      {(['Active', 'On Leave', 'Inactive'] as TeacherStatus[]).map(s => (
+                        <button key={s} type="button" onClick={() => setEditStatus(s)} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editStatus === s ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>{s}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">Cancel</button>
+                    <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
     </div>
   );
 }
@@ -429,14 +448,16 @@ function DetailField({ label, value }: { label: string; value: string }) {
 
 function QuickActionBtn({ icon, label, primary }: { icon: React.ReactNode; label: string; primary?: boolean }) {
   return primary ? (
-    <button className="flex items-center gap-2 bg-[#006496] hover:bg-[#004e75] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
+    <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
       {icon}
       {label}
     </button>
   ) : (
-    <button className="flex items-center gap-2 bg-[#f1f5f9] hover:bg-[#e2e8f0] active:bg-[#cbd5e1] text-[#475569] hover:text-[#0d3349] text-[13px] font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer">
+    <button className="flex items-center gap-2 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] text-[#6a5182] hover:text-white text-[13px] font-semibold px-4 py-2.5 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
       {icon}
       {label}
     </button>
   );
 }
+
+
