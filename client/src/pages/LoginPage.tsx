@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
+import { ROLE_ROUTE_MAP } from '../lib/routes';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -8,22 +9,35 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  /* ── If already logged in (e.g. returning visit), redirect immediately ── */
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      const target = ROLE_ROUTE_MAP[user.role] ?? '/dashboard';
+      navigate(target, { replace: true });
+    }
+  }, [isLoading, isAuthenticated, user, navigate]);
+
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const result = await login(email, password);
 
-    if (error) {
-      setError(error.message);
-    } else {
-      console.log('Logged in successfully:', data.user);
-      navigate('/dashboard');
+    if (!result.success) {
+      setError(result.error ?? 'Login failed. Please try again.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Login succeeded and profile was fetched — redirect by role
+    if (result.user) {
+      const target = ROLE_ROUTE_MAP[result.user.role] ?? '/dashboard';
+      navigate(target, { replace: true });
     }
 
     setIsSubmitting(false);
