@@ -17,7 +17,6 @@ import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
 import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
-import StudentSchedulePage from './pages/StudentSchedulePage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
@@ -83,7 +82,6 @@ function App() {
         >
           <Route path="/student/dashboard" element={<StudentDashboardPage />} />
           <Route path="/student/courses" element={<StudentCoursesPage />} />
-          <Route path="/student/schedule" element={<StudentSchedulePage />} />
           <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
           <Route path="/student/attendance" element={<StudentAttendancePage />} />
           <Route path="/student/profile" element={<StudentProfilePage />} />

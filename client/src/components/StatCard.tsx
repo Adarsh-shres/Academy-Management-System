@@ -11,34 +11,32 @@ interface StatCardProps {
 
 export default function StatCard({ icon, label, value, subContent, linkText, isAccent }: StatCardProps) {
   return (
-    <div className={`relative overflow-hidden rounded-sm border border-[#e7dff0] bg-white p-[22px_22px_20px] shadow-[0_10px_28px_rgba(57,31,86,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(57,31,86,0.1)]
+    <div className={`relative overflow-hidden rounded-[10px] border border-[#e7dff0] bg-white p-5 shadow-[0_2px_12px_rgba(57,31,86,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)]
       ${isAccent ? 'ring-1 ring-[#e0d6ef]' : ''}
     `}>
-      <div className="absolute inset-0 bg-gradient-to-br from-[#f5effa] via-transparent to-transparent pointer-events-none"></div>
-      
-      <div className="relative w-[38px] h-[38px] bg-[#f3eff7] rounded-[8px] flex items-center justify-center text-primary mb-[14px]">
+      <div className="w-[36px] h-[36px] bg-[#f3eff7] rounded-[8px] flex items-center justify-center text-primary mb-3.5">
         {icon}
       </div>
       
-      <div className="relative text-[10.5px] font-bold text-[#778196] uppercase tracking-[0.08em] mb-1.5">
+      <div className="text-[11px] font-semibold text-[#778196] uppercase tracking-[0.06em] mb-1.5">
         {label}
       </div>
       
-      <div className="relative font-sans text-[34px] font-extrabold text-[#4b3f68] leading-none mb-[7px] tracking-tight">
+      <div className="font-sans text-[30px] font-bold text-[#4b3f68] leading-none mb-2 tracking-tight">
         {value}
       </div>
       
-      <div className="relative text-[12px] text-[#64748b] flex items-center gap-1 flex-wrap pb-5">
+      <div className="text-[12px] text-[#64748b] flex items-center gap-1 flex-wrap pb-4">
         {subContent}
       </div>
       
       {linkText && (
-        <div className="absolute bottom-[18px] right-5 text-[11.5px] font-bold text-primary cursor-pointer tracking-wide transition-opacity hover:opacity-70">
+        <div className="absolute bottom-[18px] right-5 text-[11.5px] font-semibold text-primary cursor-pointer tracking-wide transition-opacity hover:opacity-70">
           {linkText}
         </div>
       )}
 
-      <div className="relative mt-3 h-[4px] rounded-full bg-[#efe8f5] overflow-hidden">
+      <div className="mt-1 h-[3px] rounded-full bg-[#efe8f5] overflow-hidden">
         <div className={`h-full rounded-full ${isAccent ? 'w-[72%]' : 'w-[58%]'} bg-gradient-to-r from-[#6a5182] to-[#8b6ca8]`}></div>
       </div>
     </div>
