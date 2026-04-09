@@ -5,6 +5,7 @@ import type { UserRole } from '../context/AuthContext';
  * Used for post-login redirects and for ProtectedRoute mismatch redirects.
  */
 export const ROLE_ROUTE_MAP: Record<UserRole, string> = {
+  super_admin: '/dashboard',
   admin:   '/dashboard',
   teacher: '/teacher/dashboard',
   student: '/student/dashboard',

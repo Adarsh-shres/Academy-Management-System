@@ -33,6 +33,20 @@ function avatarColor(id: string) {
   return AVATAR_COLORS[index];
 }
 
+function getRoleSummary(user: User) {
+  if (user.course.trim()) return user.course;
+  return user.role === ROLES.TEACHER ? 'Teacher account' : 'Student account';
+}
+
+function getDepartmentLabel(user: User) {
+  if (!user.department.trim()) {
+    return 'No department set';
+  }
+
+  const lastWord = user.department.split(' ').pop();
+  return lastWord ? `Dept. of ${lastWord}` : user.department;
+}
+
 export default function UserTable({
   title,
   users,
@@ -51,7 +65,8 @@ export default function UserTable({
     return (
       u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.department.toLowerCase().includes(searchQuery.toLowerCase())
+      u.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.role.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
@@ -147,12 +162,12 @@ export default function UserTable({
                     {user.role}
                   </span>
                 </div>
-                <span className="text-[11.5px] text-[#64748b] font-medium truncate mt-0.5">{user.course}</span>
+                <span className="text-[11.5px] text-[#64748b] font-medium truncate mt-0.5">{getRoleSummary(user)}</span>
               </div>
 
               <div className="ml-auto hidden md:block">
                 <div className="px-3.5 py-1.5 rounded-sm bg-[#f3eff7] text-[#6a5182] text-[11.5px] font-bold tracking-tight border border-[#e2d9ed]">
-                  Dept. of {user.department.split(' ').pop()}
+                  {getDepartmentLabel(user)}
                 </div>
               </div>
 

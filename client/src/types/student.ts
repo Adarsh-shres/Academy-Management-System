@@ -1,5 +1,5 @@
 export type Gender = 'Male' | 'Female';
-export type Department = 'CSE' | 'IT' | 'ECE' | 'Civil' | 'Mech';
+export type Department = '' | 'CSE' | 'IT' | 'ECE' | 'Civil' | 'Mech';
 
 /** Shape used by the registration form (input-only, no id yet) */
 export interface StudentFormData {

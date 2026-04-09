@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import StatCard from '../components/StatCard';
 import { useTeachers } from '../context/TeacherContext';
 import type { Teacher, TeacherStatus } from '../types/teacher';
+import { provisionUser } from '../lib/userProvisioning';
+import AppModal from '../components/AppModal';
 
 const STATUS_STYLES: Record<string, string> = {
   'Active':    'bg-[#d1fae5] text-[#065f46]',
@@ -9,52 +12,73 @@ const STATUS_STYLES: Record<string, string> = {
   'Inactive':  'bg-[#f1f5f9] text-[#475569]',
 };
 
-const GRADIENTS = [
-  'from-[#0ea5b0] to-[#006496]',
-  'from-[#164e6a] to-[#0d3349]',
-  'from-[#fbbf24] to-[#d97706]',
-  'from-[#f87171] to-[#ef4444]',
-];
-
 /* ─── Component ─────────────────────────────────────────────── */
 
 export default function TeachersPage() {
-  const { teachers, addTeacher, updateTeacher, deleteTeacher } = useTeachers();
+  const { teachers, refreshTeachers, updateTeacher, deleteTeacher } = useTeachers();
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   /* ─── Add Teacher form state ───────────────────────────────── */
   const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [newSubject, setNewSubject] = useState('');
   const [newDept, setNewDept] = useState('');
   const [newStatus, setNewStatus] = useState<TeacherStatus>('Active');
+  const [isCreatingTeacher, setIsCreatingTeacher] = useState(false);
+  const [createTeacherError, setCreateTeacherError] = useState('');
+  const [createTeacherSuccess, setCreateTeacherSuccess] = useState('');
 
   const resetAddForm = () => {
-    setNewName(''); setNewSubject(''); setNewDept(''); setNewStatus('Active');
+    setNewName('');
+    setNewEmail('');
+    setNewPassword('');
+    setNewSubject('');
+    setNewDept('');
+    setNewStatus('Active');
+    setCreateTeacherError('');
+    setCreateTeacherSuccess('');
   };
 
-  const handleAddTeacher = () => {
+  const handleAddTeacher = async () => {
     const name = newName.trim() || 'New Teacher';
-    const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    const empNum = String(Math.floor(Math.random() * 900) + 100);
-    addTeacher({
-      name,
-      initials,
-      subject: newSubject || 'General Studies',
-      department: newDept || 'Dept. of General Studies',
-      employeeId: `FAC-00${empNum}`,
-      status: newStatus,
-      avatarGradient: GRADIENTS[teachers.length % GRADIENTS.length],
-      totalClasses: 0,
-      totalStudents: 0,
-      avgAttendance: 0,
-      upcomingSessions: 0,
-      schedule: [],
-      activities: [{ id: 1, text: 'Profile created', time: 'Just now', icon: '' }],
-    });
-    resetAddForm();
-    setIsAddModalOpen(false);
+    const email = newEmail.trim().toLowerCase();
+    const password = newPassword.trim();
+
+    if (!email || !password) {
+      setCreateTeacherError('Email and password are required to create a teacher login.');
+      return;
+    }
+
+    setIsCreatingTeacher(true);
+    setCreateTeacherError('');
+    setCreateTeacherSuccess('');
+
+    try {
+      await provisionUser({
+        email,
+        password,
+        fullName: name,
+        role: 'teacher',
+        profile: {
+          subject: newSubject || 'General Studies',
+          department: newDept || 'Dept. of General Studies',
+          status: newStatus,
+        },
+      });
+
+      await refreshTeachers();
+      setCreateTeacherSuccess(`Teacher account created for ${name}.`);
+      resetAddForm();
+      setIsAddModalOpen(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to create teacher account.';
+      setCreateTeacherError(message);
+    } finally {
+      setIsCreatingTeacher(false);
+    }
   };
 
   /* ─── Edit Teacher form state ──────────────────────────────── */
@@ -354,83 +378,139 @@ export default function TeachersPage() {
       )}
       {/* ─── Add Teacher Modal ─────────────────────────────── */}
       {isAddModalOpen && (
-            <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }}>
-              <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
-                <div className="flex justify-between items-center mb-5">
-                  <h3 className="text-[18px] font-bold text-[#0d3349]">Add New Teacher</h3>
-                  <button onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
+        <AppModal onClose={() => { setIsAddModalOpen(false); resetAddForm(); }} widthClass="max-w-4xl">
+          <div className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_32px_80px_rgba(57,31,86,0.18)]">
+            <div className="border-b border-[#ece4f4] bg-[linear-gradient(135deg,#f8f4fd_0%,#eef7fb_100%)] px-6 py-6 md:px-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Faculty Provisioning</p>
+                  <h3 className="mt-2 text-[24px] font-extrabold tracking-tight text-[#0d3349]">Create Teacher Account</h3>
+                  <p className="mt-1 text-[13px] text-[#64748b]">Provision a faculty login and capture the teaching identity details in one clean flow.</p>
                 </div>
-                <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleAddTeacher(); }}>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Full Name</label>
-                    <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Dr. Ramesh Kumar" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Subject / Specialization</label>
-                    <input type="text" value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="e.g. Quantum Physics" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-                    <input type="text" value={newDept} onChange={e => setNewDept(e.target.value)} placeholder="e.g. Dept. of Physics" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
-                    <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
-                      {(['Active', 'On Leave', 'Inactive'] as TeacherStatus[]).map(s => (
-                        <button key={s} type="button" onClick={() => setNewStatus(s)} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${newStatus === s ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>{s}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex gap-3 mt-4">
-                    <button type="button" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">Cancel</button>
-                    <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">Add Teacher</button>
-                  </div>
-                </form>
+                <button onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="rounded-full border border-[#ddd2ea] bg-white p-2 text-[#6a5182] transition-colors hover:bg-[#f4ecfb]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                </button>
               </div>
             </div>
-          )}
+
+            <form className="max-h-[calc(100vh-180px)] overflow-y-auto px-6 py-6 md:px-8" onSubmit={e => { e.preventDefault(); handleAddTeacher(); }}>
+              <div className="grid gap-8">
+                {createTeacherError && (
+                  <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] font-medium text-rose-700">
+                    {createTeacherError}
+                  </div>
+                )}
+                {createTeacherSuccess && (
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] font-medium text-emerald-700">
+                    {createTeacherSuccess}
+                  </div>
+                )}
+
+                <section className="grid gap-4">
+                  <div>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Identity</p>
+                    <h4 className="mt-2 text-[20px] font-extrabold tracking-tight text-[#0d3349]">Account Credentials</h4>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <TeacherField label="Full Name">
+                      <TeacherInput value={newName} onChange={setNewName} placeholder="e.g. Dr. Ramesh Kumar" required />
+                    </TeacherField>
+                    <TeacherField label="Email">
+                      <TeacherInput value={newEmail} onChange={setNewEmail} placeholder="teacher@school.edu" type="email" required />
+                    </TeacherField>
+                    <TeacherField label="Temporary Password">
+                      <TeacherInput value={newPassword} onChange={setNewPassword} placeholder="Minimum 8 characters" type="password" minLength={8} required />
+                    </TeacherField>
+                    <TeacherField label="Status">
+                      <TeacherStatusPicker value={newStatus} onChange={setNewStatus} />
+                    </TeacherField>
+                  </div>
+                </section>
+
+                <section className="grid gap-4">
+                  <div>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Faculty Details</p>
+                    <h4 className="mt-2 text-[20px] font-extrabold tracking-tight text-[#0d3349]">Teaching Identity</h4>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <TeacherField label="Subject / Specialization">
+                      <TeacherInput value={newSubject} onChange={setNewSubject} placeholder="e.g. Quantum Physics" />
+                    </TeacherField>
+                    <TeacherField label="Department">
+                      <TeacherInput value={newDept} onChange={setNewDept} placeholder="e.g. Dept. of Physics" />
+                    </TeacherField>
+                  </div>
+                </section>
+              </div>
+
+              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#ece4f4] pt-5 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="rounded-2xl border border-[#e2d9ed] bg-[#f7f2fb] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#eadff4]">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isCreatingTeacher} className="rounded-2xl bg-[#6a5182] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.22)] transition-all hover:bg-[#5b4471] disabled:cursor-not-allowed disabled:opacity-60">
+                  {isCreatingTeacher ? 'Creating...' : 'Create Teacher Account'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </AppModal>
+      )}
 
           {/* ─── Edit Teacher Modal ────────────────────────────── */}
-          {isEditModalOpen && (
-            <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsEditModalOpen(false)}>
-              <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
-                <div className="flex justify-between items-center mb-5">
-                  <h3 className="text-[18px] font-bold text-[#0d3349]">Edit Teacher Profile</h3>
-                  <button onClick={() => setIsEditModalOpen(false)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
+      {isEditModalOpen && (
+        <AppModal onClose={() => setIsEditModalOpen(false)} widthClass="max-w-3xl">
+          <div className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_32px_80px_rgba(57,31,86,0.18)]">
+            <div className="border-b border-[#ece4f4] bg-[linear-gradient(135deg,#eef7fb_0%,#f8f4fd_100%)] px-6 py-6 md:px-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Faculty Editor</p>
+                  <h3 className="mt-2 text-[24px] font-extrabold tracking-tight text-[#0d3349]">Edit Teacher Profile</h3>
+                  <p className="mt-1 text-[13px] text-[#64748b]">Adjust the visible faculty card details for this teacher profile.</p>
                 </div>
-                <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleEditTeacher(); }}>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Full Name</label>
-                    <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Subject / Specialization</label>
-                    <input type="text" value={editSubject} onChange={e => setEditSubject(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-                    <input type="text" value={editDept} onChange={e => setEditDept(e.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
-                    <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
-                      {(['Active', 'On Leave', 'Inactive'] as TeacherStatus[]).map(s => (
-                        <button key={s} type="button" onClick={() => setEditStatus(s)} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editStatus === s ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68] hover:bg-black/5'}`}>{s}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex gap-3 mt-4">
-                    <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] cursor-pointer">Cancel</button>
-                    <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer">Save Changes</button>
-                  </div>
-                </form>
+                <button onClick={() => setIsEditModalOpen(false)} className="rounded-full border border-[#ddd2ea] bg-white p-2 text-[#6a5182] transition-colors hover:bg-[#f4ecfb]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a5182] shadow-sm">
+                  {editStatus}
+                </span>
+                <span className="rounded-full bg-[#eef6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#006496] shadow-sm">
+                  {editDept || 'Department Not Set'}
+                </span>
               </div>
             </div>
-          )}
+
+            <form className="max-h-[calc(100vh-180px)] overflow-y-auto px-6 py-6 md:px-8" onSubmit={e => { e.preventDefault(); handleEditTeacher(); }}>
+              <div className="grid gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <TeacherField label="Full Name">
+                    <TeacherInput value={editName} onChange={setEditName} />
+                  </TeacherField>
+                  <TeacherField label="Department">
+                    <TeacherInput value={editDept} onChange={setEditDept} />
+                  </TeacherField>
+                </div>
+                <TeacherField label="Subject / Specialization">
+                  <TeacherInput value={editSubject} onChange={setEditSubject} />
+                </TeacherField>
+                <TeacherField label="Status">
+                  <TeacherStatusPicker value={editStatus} onChange={setEditStatus} />
+                </TeacherField>
+              </div>
+
+              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#ece4f4] pt-5 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="rounded-2xl border border-[#e2d9ed] bg-[#f7f2fb] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#eadff4]">
+                  Cancel
+                </button>
+                <button type="submit" className="rounded-2xl bg-[#6a5182] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.22)] transition-all hover:bg-[#5b4471]">
+                  Save Teacher Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </AppModal>
+      )}
     </div>
   );
 }
@@ -446,7 +526,77 @@ function DetailField({ label, value }: { label: string; value: string }) {
   );
 }
 
-function QuickActionBtn({ icon, label, primary }: { icon: React.ReactNode; label: string; primary?: boolean }) {
+function TeacherField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="grid gap-2">
+      <label className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#64748b]">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function TeacherInput({
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+  required = false,
+  minLength,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: 'text' | 'email' | 'password';
+  required?: boolean;
+  minLength?: number;
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      required={required}
+      minLength={minLength}
+      className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10"
+    />
+  );
+}
+
+function TeacherStatusPicker({
+  value,
+  onChange,
+}: {
+  value: TeacherStatus;
+  onChange: (value: TeacherStatus) => void;
+}) {
+  const statuses: TeacherStatus[] = ['Active', 'On Leave', 'Inactive'];
+
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {statuses.map((status) => {
+        const isSelected = value === status;
+
+        return (
+          <button
+            key={status}
+            type="button"
+            onClick={() => onChange(status)}
+            className={`rounded-2xl border px-4 py-3 text-[13px] font-bold transition-all ${
+              isSelected
+                ? 'border-[#6a5182] bg-[#f6f0fb] text-[#6a5182] shadow-sm'
+                : 'border-[#dbe4f0] bg-[#fbfdff] text-[#475569] hover:border-[#c7b5db] hover:bg-[#faf7fd]'
+            }`}
+          >
+            {status}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function QuickActionBtn({ icon, label, primary }: { icon: ReactNode; label: string; primary?: boolean }) {
   return primary ? (
     <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
       {icon}

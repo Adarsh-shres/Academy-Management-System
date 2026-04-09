@@ -42,7 +42,10 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
   // Format the role for display
   const formatRole = (role?: string) => {
     if (!role) return '';
-    return role.charAt(0).toUpperCase() + role.slice(1);
+    return role
+      .split('_')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
   };
 
   const buttonContent = useSimpleIcon ? (

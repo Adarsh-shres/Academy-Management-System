@@ -44,7 +44,7 @@ function App() {
         {/* ── Admin dashboard routes ─────────────────────────────── */}
         <Route
           element={
-            <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
               <DashboardPage />
             </ProtectedRoute>
           }

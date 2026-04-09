@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 
-export type UserRole = 'admin' | 'teacher' | 'student';
+export type UserRole = 'super_admin' | 'admin' | 'teacher' | 'student';
 
 export interface AuthUser {
   id: string;

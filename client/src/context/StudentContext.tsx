@@ -1,9 +1,7 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { StudentRecord, StudentFormData } from '../types/student';
-import { MOCK_STUDENTS } from '../data/mockStudents';
-
-/* ─── Context shape ─────────────────────────────────────────── */
+import { supabase } from '../lib/supabase';
+import type { Department, StudentFormData, StudentRecord } from '../types/student';
 
 interface StudentContextValue {
   students: StudentRecord[];
@@ -12,59 +10,121 @@ interface StudentContextValue {
   updateStudent: (id: string, data: Partial<StudentRecord>) => void;
   deleteStudent: (id: string) => void;
   toggleStudentStatus: (id: string) => void;
+  refreshStudents: () => Promise<void>;
+}
+
+interface SupabaseUserRow {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string | null;
 }
 
 const StudentContext = createContext<StudentContextValue | null>(null);
 
-/* ─── Provider ──────────────────────────────────────────────── */
+function splitName(name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return { firstName: 'Unnamed', lastName: 'Student' };
+  }
 
-let nextId = MOCK_STUDENTS.length + 1;
+  const [firstName, ...rest] = trimmed.split(/\s+/);
+  return {
+    firstName,
+    lastName: rest.join(' ') || 'Student',
+  };
+}
+
+function mapStudent(row: SupabaseUserRow): StudentRecord | null {
+  if (row.role !== 'student') {
+    return null;
+  }
+
+  const { firstName, lastName } = splitName(row.name ?? '');
+
+  return {
+    id: row.id,
+    firstName,
+    lastName,
+    fatherName: '',
+    dateOfBirth: '',
+    mobileNo: '',
+    email: row.email ?? '',
+    password: '',
+    gender: 'Male',
+    department: '' as Department,
+    course: '',
+    city: '',
+    address: '',
+    isActive: true,
+    dateEnrolled: '',
+  };
+}
 
 export function StudentProvider({ children }: { children: ReactNode }) {
-  const [students, setStudents] = useState<StudentRecord[]>(MOCK_STUDENTS);
+  const [students, setStudents] = useState<StudentRecord[]>([]);
+
+  const refreshStudents = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, email, name, role')
+      .eq('role', 'student')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('[StudentContext] Failed to load students:', error.message);
+      return;
+    }
+
+    const mapped = (data as SupabaseUserRow[])
+      .map(mapStudent)
+      .filter((student): student is StudentRecord => Boolean(student));
+
+    setStudents(mapped);
+  }, []);
+
+  useEffect(() => {
+    refreshStudents();
+  }, [refreshStudents]);
 
   const getStudentById = useCallback(
-    (id: string) => students.find(s => s.id === id),
+    (id: string) => students.find((student) => student.id === id),
     [students],
   );
 
   const addStudent = useCallback((data: StudentFormData): StudentRecord => {
     const newStudent: StudentRecord = {
       ...data,
-      id: String(nextId++),
+      id: crypto.randomUUID(),
       isActive: true,
       dateEnrolled: new Date().toISOString().split('T')[0],
     };
-    setStudents(prev => [...prev, newStudent]);
+    setStudents((prev) => [newStudent, ...prev]);
     return newStudent;
   }, []);
 
   const updateStudent = useCallback((id: string, data: Partial<StudentRecord>) => {
-    setStudents(prev =>
-      prev.map(s => (s.id === id ? { ...s, ...data } : s)),
-    );
+    setStudents((prev) => prev.map((student) => (student.id === id ? { ...student, ...data } : student)));
   }, []);
 
   const deleteStudent = useCallback((id: string) => {
-    setStudents(prev => prev.filter(s => s.id !== id));
+    setStudents((prev) => prev.filter((student) => student.id !== id));
   }, []);
 
   const toggleStudentStatus = useCallback((id: string) => {
-    setStudents(prev =>
-      prev.map(s => (s.id === id ? { ...s, isActive: !s.isActive } : s)),
+    setStudents((prev) =>
+      prev.map((student) => (student.id === id ? { ...student, isActive: !student.isActive } : student)),
     );
   }, []);
 
   return (
     <StudentContext.Provider
-      value={{ students, getStudentById, addStudent, updateStudent, deleteStudent, toggleStudentStatus }}
+      value={{ students, getStudentById, addStudent, updateStudent, deleteStudent, toggleStudentStatus, refreshStudents }}
     >
       {children}
     </StudentContext.Provider>
   );
 }
-
-/* ─── Hook ──────────────────────────────────────────────────── */
 
 export function useStudents() {
   const ctx = useContext(StudentContext);
