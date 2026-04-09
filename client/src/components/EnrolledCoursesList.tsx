@@ -19,7 +19,7 @@ export default function EnrolledCoursesList() {
           {myCourses.length} Courses
         </span>
       </div>
-      
+
       <div className="p-5 flex-1 flex flex-col gap-3">
         {myCourses.length > 0 ? (
           myCourses.map((course) => (

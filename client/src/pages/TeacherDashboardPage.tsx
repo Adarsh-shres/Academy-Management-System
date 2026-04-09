@@ -10,6 +10,9 @@ import TeacherGrades from '../components/TeacherGrades';
 import ProfileDropdown from '../components/ProfileDropdown';
 import AcademyCalendar from '../components/AcademyCalendar';
 import AttendanceRosterModal from '../components/AttendanceRosterModal';
+import TeacherAssignmentPage from './TeacherAssignmentPage';
+import TeacherClassesPage from './TeacherClassesPage';
+import TeacherSchedulePage from './TeacherSchedulePage';
 
 export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -182,9 +185,9 @@ export default function TeacherDashboardPage() {
   const renderContent = () => {
     switch (activeTab) {
       case 'Dashboard': return renderDashboardContent();
-      case 'Assignment': return renderPlaceholder('Assignments', ClipboardList);
-      case 'Classes': return renderPlaceholder('Classes', Users);
-      case 'Schedule': return renderPlaceholder('Schedule', Calendar);
+      case 'Assignment': return <TeacherAssignmentPage />;
+      case 'Classes': return <TeacherClassesPage />;
+      case 'Schedule': return <TeacherSchedulePage />;
       case 'Settings': return renderPlaceholder('Settings', Settings);
       default: return renderDashboardContent();
     }

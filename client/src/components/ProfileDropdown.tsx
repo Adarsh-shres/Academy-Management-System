@@ -70,8 +70,8 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)} 
+      <button
+        onClick={() => setIsOpen(!isOpen)}
         className="focus:outline-none cursor-pointer block"
       >
         {buttonContent}

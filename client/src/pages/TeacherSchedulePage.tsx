@@ -1,0 +1,155 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
+import { Users, MapPin, Calendar } from '../components/icons';
+
+const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+const MOCK_SCHEDULE = [
+  { id: '1', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Monday', timeRange: "10:00AM - 11:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
+  { id: '2', name: 'Math 102', course_code: 'MTH-102', schedule_days: 'Monday', timeRange: "11:00AM - 12:00PM", room: "Room 3b", students: 23, sessionType: "TUTORIAL" },
+  { id: '3', name: 'Math 103', course_code: 'MTH-103', schedule_days: 'Tuesday', timeRange: "09:00AM - 10:00AM", room: "Room 2c", students: 30, sessionType: "WORKSHOP" },
+  { id: '4', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Wednesday', timeRange: "10:00AM - 11:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
+  { id: '5', name: 'Math 104', course_code: 'MTH-104', schedule_days: 'Thursday', timeRange: "02:00PM - 03:00PM", room: "Room 1d", students: 15, sessionType: "TUTORIAL" },
+  { id: '6', name: 'Math 102', course_code: 'MTH-102', schedule_days: 'Friday', timeRange: "01:00PM - 02:00PM", room: "Room 3b", students: 23, sessionType: "WORKSHOP" },
+];
+
+export default function TeacherSchedulePage() {
+  const { user } = useAuth();
+  const [courses, setCourses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setCourses(MOCK_SCHEDULE);
+    setIsLoading(false);
+  }, []);
+
+  // Group courses by day based on `schedule_days` column
+  // schedule_days could be a string "Monday, Wednesday" or a stringified JSON array
+  const safeParseDays = (daysObj: any): string[] => {
+    if (!daysObj) return [];
+    if (Array.isArray(daysObj)) return daysObj;
+    if (typeof daysObj === 'string') {
+      try {
+        const parsed = JSON.parse(daysObj);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        return daysObj.split(',').map(d => d.trim());
+      }
+    }
+    return [];
+  };
+
+  const scheduleMap: Record<string, any[]> = {};
+  DAYS_OF_WEEK.forEach(day => { scheduleMap[day] = []; });
+
+  courses.forEach(course => {
+    const days = safeParseDays(course.schedule_days);
+    days.forEach(day => {
+      // Normalize day name
+      const normalizedDay = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+      if (scheduleMap[normalizedDay]) {
+        scheduleMap[normalizedDay].push(course);
+      } else {
+        // Fallback for partial matches (e.g. "Mon" instead of "Monday")
+        const matchedDay = DAYS_OF_WEEK.find(d => d.toLowerCase().startsWith(day.toLowerCase()));
+        if (matchedDay) scheduleMap[matchedDay].push(course);
+      }
+    });
+  });
+
+  return (
+    <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1400px] mx-auto w-full">
+      {/* Header section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">Weekly Schedule</h1>
+          <p className="text-[#64748b] font-medium mt-1">Manage your teaching schedule for this semester</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6">
+        {DAYS_OF_WEEK.map(day => {
+          const isSunday = day === 'Sunday';
+          const dayCourses = scheduleMap[day] || [];
+
+          return (
+            <div key={day} className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden flex flex-col md:flex-row">
+              {/* Day Header */}
+              <div className="bg-[#fbf8fe] p-6 border-b md:border-b-0 md:border-r border-[#e7dff0] w-full md:w-[220px] shrink-0 flex flex-col md:justify-center items-center md:items-start text-center md:text-left gap-2">
+                <h3 className="text-[20px] font-extrabold text-[#4b3f68] tracking-tight">{day}</h3>
+                {!isSunday && (
+                  <span className="bg-[#e2d9ed] text-[#4b3f68] text-[11px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wide">
+                    {dayCourses.length} {dayCourses.length === 1 ? 'Class' : 'Classes'}
+                  </span>
+                )}
+              </div>
+
+              {/* Day Content */}
+              <div className="p-6 flex-1 bg-white">
+                {isSunday ? (
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-6 md:py-8">
+                    <span className="text-[40px] leading-none drop-shadow-sm">🏖️</span>
+                    <div>
+                      <h4 className="text-[16px] font-bold text-[#4e5d78] mb-0.5">Weekend Holiday</h4>
+                      <p className="text-[13.5px] text-[#8a94a6] font-medium">Weekend Holiday — Enjoy your break from the curriculum!</p>
+                    </div>
+                  </div>
+                ) : (
+                  isLoading ? (
+                    <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+                      {[1, 2].map(i => <div key={i} className="animate-pulse bg-[#f1f5f9] h-[140px] min-w-[280px] rounded-sm border border-[#e2e8f0]"></div>)}
+                    </div>
+                  ) : dayCourses.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {dayCourses.map((course, idx) => {
+                        const mockTimeRange = course.timeRange;
+                        const mockRoom = course.room;
+                        const mockSessionType = course.sessionType;
+                        const mockStudentCount = course.students;
+
+                        return (
+                          <div key={`${course.id}-${idx}`} className="border border-[#e2d9ed] rounded-sm p-4 hover:border-[#b096cc] hover:shadow-sm transition-all bg-[#fbf8fe]/30 group">
+                            <div className="flex justify-between items-start mb-3">
+                              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider ${mockSessionType === 'LECTURE' ? 'bg-[#ffedd5] text-[#ea580c]' :
+                                  mockSessionType === 'TUTORIAL' ? 'bg-[#dcfce7] text-[#16a34a]' :
+                                    'bg-[#e0f2fe] text-[#0284c7]'
+                                }`}>
+                                {mockSessionType}
+                              </span>
+                              <span className="bg-white border border-[#e2d9ed] text-[#64748b] text-[11px] font-bold px-2 py-0.5 rounded-sm">
+                                {course.course_code || 'CRS'}
+                              </span>
+                            </div>
+
+                            <h4 className="text-[15px] font-bold text-[#4b3f68] mb-3 leading-tight group-hover:text-[#6a5182] transition-colors">{course.name}</h4>
+
+                            <div className="flex flex-col gap-2 mt-auto">
+                              <div className="flex items-center gap-2 text-[12px] font-medium text-[#475569]">
+                                <Calendar size={14} className="text-[#94a3b8]" />
+                                <span>{mockTimeRange}</span>
+                              </div>
+                              <div className="flex items-center gap-4 text-[12px] font-medium text-[#475569]">
+                                <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {mockRoom}</span>
+                                <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {mockStudentCount}</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-8 bg-[#f8fafc] rounded-sm border border-dashed border-[#cbd5e1] text-center h-full min-h-[140px]">
+                      <span className="text-[13.5px] font-medium text-[#64748b]">No classes scheduled for {day}.</span>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
