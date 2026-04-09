@@ -1,6 +1,9 @@
-import type { Course } from '../types/course';
-
-export const MOCK_COURSES: Course[] = [
+/**
+ * Legacy mock data — no longer used.
+ * Courses are now fetched from Supabase via CourseContext.
+ * Kept for reference only.
+ */
+export const MOCK_COURSES = [
   {
     id: '5cs01',
     name: 'Collaborative Development',

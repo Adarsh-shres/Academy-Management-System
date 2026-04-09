@@ -4,17 +4,47 @@ import CurriculumCard from '../components/CurriculumCard';
 import { useCourses } from '../context/CourseContext';
 import type { Course } from '../types/course';
 
+/* ─── Inline toast notification ──────────────────────────────── */
+function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3500);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div
+      className={`fixed bottom-6 right-6 z-[999] flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-[13.5px] font-semibold backdrop-blur-md transition-all animate-[slideUp_0.35s_ease-out]
+        ${type === 'success'
+          ? 'bg-gradient-to-r from-[#10b981]/90 to-[#059669]/90 text-white'
+          : 'bg-gradient-to-r from-[#ef4444]/90 to-[#dc2626]/90 text-white'
+        }`}
+    >
+      {type === 'success' ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      )}
+      {message}
+    </div>
+  );
+}
+
 export default function CoursesPage() {
-  const { courses, addCourse, updateCourse, deleteCourse } = useCourses();
+  const { courses, loading, error: contextError, addCourse, updateCourse, deleteCourse } = useCourses();
 
   const [view, setView] = useState<'overview' | 'list'>('overview');
   const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'All' | 'Active' | 'Inactive'>('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  /* ─── Toast state ─────────────────────────────────────────── */
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   /* ─── New Course form state ────────────────────────────────── */
   const [newName, setNewName] = useState('');
+  const [newCode, setNewCode] = useState('');
   const [newDept, setNewDept] = useState('');
   const [newFaculty, setNewFaculty] = useState('');
   const [newDescription, setNewDescription] = useState('');
@@ -28,23 +58,34 @@ export default function CoursesPage() {
 
   const resetNewCourseForm = () => {
     setNewName('');
+    setNewCode('');
     setNewDept('');
     setNewFaculty('');
     setNewDescription('');
     setSelectedDays([]);
   };
 
-  const handleCreateCourse = () => {
-    addCourse({
-      name: newName || 'Untitled Course',
-      status: 'Active',
-      department: newDept || 'CSE',
-      facultyLead: newFaculty || 'Unassigned',
-      description: newDescription || 'No description provided.',
-      scheduleDays: selectedDays.length > 0 ? selectedDays : ['Mon', 'Wed', 'Fri'],
-    });
-    resetNewCourseForm();
-    setIsNewCourseModalOpen(false);
+  const handleCreateCourse = async () => {
+    setSaving(true);
+    try {
+      await addCourse({
+        courseCode: newCode || `CRS${Date.now().toString(36).toUpperCase()}`,
+        name: newName || 'Untitled Course',
+        status: 'Active',
+        department: newDept || 'CSE',
+        facultyLead: newFaculty || 'Unassigned',
+        description: newDescription || 'No description provided.',
+        scheduleDays: selectedDays.length > 0 ? selectedDays : ['Mon', 'Wed', 'Fri'],
+      });
+      resetNewCourseForm();
+      setIsNewCourseModalOpen(false);
+      setToast({ message: 'Course created successfully!', type: 'success' });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create course';
+      setToast({ message: msg, type: 'error' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* ─── Filter / Edit / Delete ───────────────────────────────── */
@@ -60,16 +101,31 @@ export default function CoursesPage() {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
-      deleteCourse(id);
+      try {
+        await deleteCourse(id);
+        setToast({ message: 'Course deleted successfully', type: 'success' });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Failed to delete course';
+        setToast({ message: msg, type: 'error' });
+      }
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingCourse) {
-      updateCourse(editingCourse.id, editingCourse);
-      setEditingCourse(null);
+      setSaving(true);
+      try {
+        await updateCourse(editingCourse.id, editingCourse);
+        setEditingCourse(null);
+        setToast({ message: 'Course updated successfully!', type: 'success' });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Failed to update course';
+        setToast({ message: msg, type: 'error' });
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -88,6 +144,67 @@ export default function CoursesPage() {
 
   const filteredCourses = courses.filter(course => filterStatus === 'All' || course.status === filterStatus);
   const activeCourses = courses.filter(c => c.status === 'Active');
+
+  /* ─── CSV Export ────────────────────────────────────────────── */
+  const handleExportCSV = () => {
+    if (!window.confirm('Download courses data as a CSV file?')) return;
+
+    const headers = ['Course Code', 'Course Name', 'Department', 'Faculty Lead', 'Status', 'Weekly Schedule', 'Description'];
+
+    const escapeCSV = (val: string) => {
+      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+        return `"${val.replace(/"/g, '""')}"`;
+      }
+      return val;
+    };
+
+    const rows = filteredCourses.map(c => [
+      escapeCSV(c.courseCode),
+      escapeCSV(c.name),
+      escapeCSV(c.department),
+      escapeCSV(c.facultyLead),
+      c.status,
+      escapeCSV((c.scheduleDays || []).join(' | ')),
+      escapeCSV(c.description || ''),
+    ].join(','));
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `courses_export_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setToast({ message: `Exported ${filteredCourses.length} courses to CSV`, type: 'success' });
+  };
+
+  /* ─── Loading state ─────────────────────────────────────────── */
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <p className="text-[14px] text-[#64748b] font-medium">Loading courses…</p>
+      </div>
+    );
+  }
+
+  /* ─── Error state ──────────────────────────────────────────── */
+  if (contextError && courses.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-14 h-14 rounded-full bg-[#fef2f2] flex items-center justify-center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <p className="text-[14px] text-[#ef4444] font-semibold">Failed to load courses</p>
+        <p className="text-[13px] text-[#64748b] max-w-md text-center">{contextError}</p>
+      </div>
+    );
+  }
 
   const renderOverview = () => (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
@@ -192,7 +309,9 @@ export default function CoursesPage() {
               )}
             </div>
 
-            <button className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
+            <button 
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export CSV
             </button>
@@ -204,8 +323,9 @@ export default function CoursesPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course ID</th>
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Code</th>
                 <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</th>
+                <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</th>
                 <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</th>
                 <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Actions</th>
               </tr>
@@ -214,8 +334,11 @@ export default function CoursesPage() {
               {filteredCourses.length > 0 ? (
                 filteredCourses.map((course) => (
                   <tr key={course.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors group">
-                    <td className="py-3 px-6 text-[13px] font-semibold text-[#475569]">{course.id}</td>
+                    <td className="py-3 px-6 text-[13px] font-semibold text-[#475569]">{course.courseCode}</td>
                     <td className="py-3 px-6 text-[13px] font-medium text-[#1e293b]">{course.name}</td>
+                    <td className="py-3 px-6">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#dbeafe] text-[#1d4ed8]">{course.department}</span>
+                    </td>
                     <td className="py-3 px-6">
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${course.status === 'Active' ? 'bg-[#10b981]' : 'bg-[#ef4444]'}`}></span>
@@ -240,7 +363,7 @@ export default function CoursesPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="py-10 text-center text-[13px] text-[#64748b]">No courses found matching this selection.</td>
+                  <td colSpan={5} className="py-10 text-center text-[13px] text-[#64748b]">No courses found matching this selection.</td>
                 </tr>
               )}
             </tbody>
@@ -260,6 +383,16 @@ export default function CoursesPage() {
             </div>
             
             <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleSaveEdit(); }}>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Code</label>
+                <input 
+                  type="text" 
+                  value={editingCourse.courseCode} 
+                  onChange={(e) => setEditingCourse({...editingCourse, courseCode: e.target.value})}
+                  className="bg-[#f8fafc] border border-[#cbd5e1] rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#006496] focus:ring-1 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]" 
+                />
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
                 <input 
@@ -322,8 +455,9 @@ export default function CoursesPage() {
                 <button type="button" onClick={() => setEditingCourse(null)} className="flex-1 py-2.5 rounded-sm text-[13.5px] font-bold text-[#6a5182] bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white transition-all cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" className="flex-[2] py-2.5 rounded-sm text-[13.5px] font-bold bg-[#6a5182] text-white hover:bg-[#5b4471] shadow-md transition-all active:scale-[0.98] cursor-pointer">
-                  Save Changes
+                <button type="submit" disabled={saving} className="flex-[2] py-2.5 rounded-sm text-[13.5px] font-bold bg-[#6a5182] text-white hover:bg-[#5b4471] shadow-md transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>}
+                  {saving ? 'Saving…' : 'Save Changes'}
                 </button>
               </div>
             </form>
@@ -348,6 +482,11 @@ export default function CoursesPage() {
               </button>
             </div>
             <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleCreateCourse(); }}>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Code</label>
+                <input type="text" value={newCode} onChange={e => setNewCode(e.target.value)} placeholder="e.g. 5cs11" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
                 <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Advanced Machine Learning" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 transition-all font-sans text-[#1e293b]" />
@@ -389,14 +528,18 @@ export default function CoursesPage() {
                 <button type="button" onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all active:scale-[0.98] w-full cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer">
-                  Create and Activate Course
+                <button type="submit" disabled={saving} className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm active:scale-[0.98] w-full cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>}
+                  {saving ? 'Creating…' : 'Create and Activate Course'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Toast Notification */}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </>
   );
 }
