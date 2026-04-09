@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import StatCard from '../components/StatCard';
+import AttendanceRosterModal from '../components/AttendanceRosterModal';
 import { useTeachers } from '../context/TeacherContext';
 import type { Teacher, TeacherStatus } from '../types/teacher';
 
@@ -23,6 +24,7 @@ export default function TeachersPage() {
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
 
   /* ─── Add Teacher form state ───────────────────────────────── */
   const [newName, setNewName] = useState('');
@@ -253,7 +255,7 @@ export default function TeachersPage() {
           <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-sm animate-fade-up" style={{ animationDelay: '300ms' }}>
             <h3 className="font-sans text-[15px] font-bold text-[#0d3349] mb-4">Quick Actions</h3>
             <div className="flex flex-wrap gap-3">
-              <QuickActionBtn icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>} label="Take Attendance" primary />
+              <QuickActionBtn onClick={() => setIsAttendanceModalOpen(true)} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>} label="Take Attendance" primary />
               <QuickActionBtn icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>} label="Create Assignment" />
               <QuickActionBtn icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>} label="Send Announcement" />
               <QuickActionBtn icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>} label="View Reports" />
@@ -431,6 +433,11 @@ export default function TeachersPage() {
               </div>
             </div>
           )}
+
+          <AttendanceRosterModal 
+            isOpen={isAttendanceModalOpen} 
+            onClose={() => setIsAttendanceModalOpen(false)} 
+          />
     </div>
   );
 }
@@ -446,14 +453,14 @@ function DetailField({ label, value }: { label: string; value: string }) {
   );
 }
 
-function QuickActionBtn({ icon, label, primary }: { icon: React.ReactNode; label: string; primary?: boolean }) {
+function QuickActionBtn({ icon, label, primary, onClick }: { icon: React.ReactNode; label: string; primary?: boolean, onClick?: () => void }) {
   return primary ? (
-    <button className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
+    <button onClick={onClick} className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer">
       {icon}
       {label}
     </button>
   ) : (
-    <button className="flex items-center gap-2 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] text-[#6a5182] hover:text-white text-[13px] font-semibold px-4 py-2.5 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
+    <button onClick={onClick} className="flex items-center gap-2 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] text-[#6a5182] hover:text-white text-[13px] font-semibold px-4 py-2.5 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]">
       {icon}
       {label}
     </button>

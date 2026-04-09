@@ -9,9 +9,17 @@ import TeacherLatestFiles from '../components/TeacherLatestFiles';
 import TeacherGrades from '../components/TeacherGrades';
 import ProfileDropdown from '../components/ProfileDropdown';
 import AcademyCalendar from '../components/AcademyCalendar';
+import AttendanceRosterModal from '../components/AttendanceRosterModal';
 
 export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+  const [selectedClassForAttendance, setSelectedClassForAttendance] = useState<any>(null);
+
+  const handleTakeAttendance = (course: any) => {
+    setSelectedClassForAttendance(course);
+    setIsAttendanceModalOpen(true);
+  };
 
   /* ─── Announcements state ──────────────────────────────────── */
   const [announcements, setAnnouncements] = useState([
@@ -151,7 +159,7 @@ export default function TeacherDashboardPage() {
       {/* RIGHT SIDEBAR PANEL */}
       <div className="w-full lg:w-[320px] flex flex-col shrink-0 gap-6">
         <div className="h-[400px]">
-          <PersonalizedSchedule />
+          <PersonalizedSchedule onTakeAttendance={handleTakeAttendance} />
         </div>
         <div className="h-[300px]">
           <EnrolledCoursesList />
@@ -214,8 +222,17 @@ export default function TeacherDashboardPage() {
         </header>
 
         {/* MAIN RENDERING AREA */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative">
           {renderContent()}
+
+          <AttendanceRosterModal 
+            isOpen={isAttendanceModalOpen} 
+            onClose={() => {
+              setIsAttendanceModalOpen(false);
+              setSelectedClassForAttendance(null);
+            }} 
+            courseName={selectedClassForAttendance?.course}
+          />
         </div>
       </main>
       

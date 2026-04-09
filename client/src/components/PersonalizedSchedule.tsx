@@ -2,7 +2,11 @@ import { CalendarCheck2, MapPin } from './icons';
 import { useAuth } from '../context/AuthContext';
 import { useSchedule } from '../context/ScheduleContext';
 
-export default function PersonalizedSchedule() {
+interface PersonalizedScheduleProps {
+  onTakeAttendance?: (course: any) => void;
+}
+
+export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedScheduleProps = {}) {
   const { user } = useAuth();
   const { mySchedule } = useSchedule();
 
@@ -44,11 +48,20 @@ export default function PersonalizedSchedule() {
                   <span><strong className="text-[#64748b] font-semibold">Level:</strong> {item.level}</span>
                 </p>
               </div>
-              <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-2 pt-2 border-t border-[#e2d9ed]/50 text-[11.5px] text-[#253f58] font-medium">
+              <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-2 pt-2 border-t border-[#e2d9ed]/50 text-[11.5px] text-[#253f58] font-medium justify-between">
                 <div className="flex items-center gap-1.5 text-primary">
                   <MapPin size={12} />
                   <span className="font-semibold text-primary">{item.room}</span>
                 </div>
+                {user?.role === 'teacher' && onTakeAttendance && (
+                  <button 
+                    onClick={() => onTakeAttendance(item)}
+                    className="flex items-center gap-1 bg-[#6a5182]/10 hover:bg-[#6a5182]/20 text-[#6a5182] px-2.5 py-1.5 rounded-md font-bold transition-colors cursor-pointer"
+                  >
+                    <CalendarCheck2 size={13} />
+                    Take Attendance
+                  </button>
+                )}
               </div>
             </div>
           ))

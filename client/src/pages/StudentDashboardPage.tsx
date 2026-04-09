@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { courses, assignments, recentActivity, studentProfile } from '../data/studentMockData';
 import StudentAssignmentCard from '../components/StudentAssignmentCard';
 import StatCard from '../components/StatCard';
