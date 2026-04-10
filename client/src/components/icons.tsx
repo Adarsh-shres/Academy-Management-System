@@ -1,4 +1,7 @@
 import type { ReactNode, SVGProps } from 'react';
+import { CheckCircle } from 'lucide-react';
+
+export { CheckCircle };
 
 type IconProps = SVGProps<SVGSVGElement> & {
   size?: number | string;
@@ -242,6 +245,53 @@ export function UserCircle(props: IconProps) {
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="10" r="3" />
       <path d="M6.5 18a6.5 6.5 0 0 1 11 0" />
+    </IconBase>
+  );
+}
+
+export function Send(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M22 2L11 13" />
+      <path d="M22 2L15 22 11 13 2 9 22 2z" />
+    </IconBase>
+  );
+}
+
+export function Trash2(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
+    </IconBase>
+  );
+}
+
+export function ChevronDown(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </IconBase>
+  );
+}
+
+export function Video(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="m22 8-6 4 6 4V8Z" />
+      <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+    </IconBase>
+  );
+}
+
+export function File(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
     </IconBase>
   );
 }

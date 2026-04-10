@@ -46,8 +46,9 @@ export default function ViewStudentsModal({ isOpen, onClose, course }: ViewStude
   if (!isOpen || !course) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-md w-full max-w-[600px] shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 bg-white rounded-md w-full max-w-[600px] shadow-2xl flex flex-col max-h-[90vh]">
         <div className="p-5 border-b border-[#e7dff0] flex justify-between items-center bg-[#fbf8fe] rounded-t-md">
           <div>
             <h3 className="text-[18px] font-bold text-[#4b3f68]">Enrolled Students</h3>

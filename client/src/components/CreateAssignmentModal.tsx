@@ -14,6 +14,11 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   const [courses, setCourses] = useState<{ id: string; name: string; course_code?: string }[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(false);
   const [courseName, setCourseName] = useState('');
+  
+  const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
+  const [isLoadingClasses, setIsLoadingClasses] = useState(false);
+  const [classId, setClassId] = useState('');
+  
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -35,6 +40,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
   const resetForm = () => {
     setCourseName(courses.length > 0 ? courses[0].name : '');
+    setClassId('');
     setTitle('');
     setDescription('');
     setDueDate('');
@@ -77,6 +83,38 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     fetchCourses();
   }, [isOpen, user]);
 
+  // Fetch classes when courseName changes
+  useEffect(() => {
+    async function fetchClasses() {
+      const selectedCourse = courses.find(c => c.name === courseName);
+      if (!selectedCourse?.id) {
+        setClasses([]);
+        setClassId('');
+        return;
+      }
+      setIsLoadingClasses(true);
+      const { data, error: err } = await supabase
+        .from('classes')
+        .select('id, name')
+        .eq('course_id', selectedCourse.id);
+        
+      if (!err) {
+        setClasses(data || []);
+        if (data && data.length > 0) setClassId(data[0].id);
+        else setClassId('');
+      } else {
+        console.error('Classes fetch error:', err.message);
+        setClasses([]);
+        setClassId('');
+      }
+      setIsLoadingClasses(false);
+    }
+    
+    if (isOpen) {
+      fetchClasses();
+    }
+  }, [courseName, courses, isOpen]);
+
   if (!isOpen) return null;
 
   const handleFileUpload = async (file: File): Promise<string> => {
@@ -98,7 +136,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     if (e) e.preventDefault();
     
     // Validate all fields
-    if (!courseName || !title || !description || !dueDate || !dueTime || !file) {
+    if (!courseName || !classId || !title || !description || !dueDate || !dueTime || !file) {
       alert('Please fill in all required fields');
       return;
     }
@@ -113,16 +151,21 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
       // 2. Combine date + time
       const combined = new Date(`${dueDate}T${dueTime}:00`).toISOString();
 
+      const selectedCourse = courses.find(c => c.name === courseName);
       // 3. Insert assignment
       const { error: insertError } = await supabase
         .from('assignments')
         .insert({
           teacher_id: user?.id,
-          course: courseName,
+          course_id: selectedCourse?.id,
+          class_id: classId,
           title: title,
           description: description,
           due_date: combined,
           file_url: fileUrl,
+          type: 'assignment',
+          status: 'active',
+          portal_open: false,
           created_at: new Date().toISOString()
         });
 
@@ -141,8 +184,9 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   };
 
   return (
-    <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-md w-full max-w-[500px] shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { resetForm(); onClose(); }} />
+      <div className="relative z-10 bg-white rounded-md w-full max-w-[500px] shadow-2xl flex flex-col max-h-[90vh]">
         <div className="p-5 border-b border-[#e7dff0] flex justify-between items-center bg-[#fbf8fe] rounded-t-md">
           <h3 className="text-[18px] font-bold text-[#4b3f68]">Create Assignment</h3>
           <button onClick={() => { resetForm(); onClose(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
@@ -164,6 +208,23 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                 {!isLoadingCourses && courses.length === 0 && <option value="" disabled>No courses assigned</option>}
                 {!isLoadingCourses && courses.map(c => (
                   <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Class *</label>
+              <select 
+                value={classId}
+                onChange={e => setClassId(e.target.value)}
+                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                disabled={!courseName || isLoadingClasses || classes.length === 0}
+              >
+                {!courseName && <option value="" disabled>Select a course first</option>}
+                {courseName && isLoadingClasses && <option value="" disabled>Loading classes...</option>}
+                {courseName && !isLoadingClasses && classes.length === 0 && <option value="" disabled>No classes found</option>}
+                {courseName && !isLoadingClasses && classes.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
