@@ -5,8 +5,8 @@ import { Users, MapPin, Calendar } from '../components/icons';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const MOCK_SCHEDULE = [
-  { id: '1', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Monday', timeRange: "10:00AM - 11:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
+const MOCK_SCHEDULE: any[] = [
+  { id: '1', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Monday', timeRange: "09:00AM - 10:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
   { id: '2', name: 'Math 102', course_code: 'MTH-102', schedule_days: 'Monday', timeRange: "11:00AM - 12:00PM", room: "Room 3b", students: 23, sessionType: "TUTORIAL" },
   { id: '3', name: 'Math 103', course_code: 'MTH-103', schedule_days: 'Tuesday', timeRange: "09:00AM - 10:00AM", room: "Room 2c", students: 30, sessionType: "WORKSHOP" },
   { id: '4', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Wednesday', timeRange: "10:00AM - 11:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
@@ -20,9 +20,41 @@ export default function TeacherSchedulePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    setCourses(MOCK_SCHEDULE);
-    setIsLoading(false);
+    async function loadSchedule() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        setIsLoading(true);
+        // We fetch courses to build a schedule template map
+        const { data } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('faculty_lead', user.user_metadata?.name || user.email?.split('@')[0]); // Use mapped name
+        
+        if (data && data.length > 0) {
+           const structuredSchedule = data.map(course => ({
+              id: course.id,
+              name: course.name,
+              course_code: course.course_code,
+              schedule_days: course.schedule_days || ['Monday', 'Wednesday'], // Fallback if missing
+              timeRange: course.schedule_time || '10:00AM - 11:30AM',
+              room: course.department ? `Dept: ${course.department}` : 'Virtual',
+              students: course.enrolled_students || '--',
+              sessionType: 'LECTURE'
+           }));
+           setCourses(structuredSchedule);
+        } else {
+           setCourses(MOCK_SCHEDULE);
+        }
+      } catch (err) {
+         console.error('Failed to load schedule', err);
+         setCourses(MOCK_SCHEDULE);
+      } finally {
+         setIsLoading(false);
+      }
+    }
+    loadSchedule();
   }, []);
 
   // Group courses by day based on `schedule_days` column

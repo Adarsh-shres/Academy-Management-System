@@ -6,11 +6,10 @@ import AssignmentCard from '../components/AssignmentCard';
 import CreateAssignmentModal from '../components/CreateAssignmentModal';
 import ViewSubmissionsModal from '../components/ViewSubmissionsModal';
 
-const MOCK_ASSIGNMENTS = [
-  { id: '1', title: 'Unit 2: Add and Subtract', course: 'Math 101', due_date: '2024-12-23T15:00:00Z', created_at: new Date().toISOString(), totalStudents: 25, submitted: 17 },
-  { id: '2', title: 'Motion and Forces', course: 'Math 102', due_date: '2024-12-20T15:00:00Z', created_at: new Date().toISOString(), totalStudents: 23, submitted: 23 },
-  { id: '3', title: 'Linear Equations', course: 'Math 104', due_date: '2024-12-13T15:00:00Z', created_at: new Date().toISOString(), totalStudents: 15, submitted: 15 },
-  { id: '4', title: 'Quadratic Functions', course: 'Math 103', due_date: '2024-12-30T15:00:00Z', created_at: new Date().toISOString(), totalStudents: 30, submitted: 5 },
+const MOCK_ASSIGNMENTS: any[] = [
+  { id: 'm1', title: 'Midterm Project', course: 'Advanced Algorithms', due_date: new Date(Date.now() + 86400000 * 3).toISOString(), created_at: new Date().toISOString(), status: 'pending', class_id: null },
+  { id: 'm2', title: 'Weekly Quiz 4', course: 'Database Systems', due_date: new Date(Date.now() + 86400000 * 1).toISOString(), created_at: new Date().toISOString(), status: 'pending', class_id: null },
+  { id: 'm3', title: 'Homework 1', course: 'Web Development', due_date: new Date(Date.now() - 86400000 * 5).toISOString(), created_at: new Date(Date.now() - 86400000 * 10).toISOString(), status: 'pending', class_id: null },
 ];
 
 export default function TeacherAssignmentPage() {
@@ -28,34 +27,78 @@ export default function TeacherAssignmentPage() {
 
   const fetchAssignmentsData = async () => {
     setIsLoading(true);
-    setAssignments(MOCK_ASSIGNMENTS);
-    setTotalStudents(93); // dummy total
-    
-    const countMap: Record<string, number> = {};
-    MOCK_ASSIGNMENTS.forEach(a => {
-      countMap[a.id] = a.submitted;
-    });
-    setSubmissionsCountMap(countMap);
-    setIsLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: assignmentsData } = await supabase
+        .from('assignments')
+        .select(`*, courses(name)`)
+        .eq('teacher_id', user.id);
+
+      if (!assignmentsData) return;
+
+      // Temporary totalStudents fallback
+      setTotalStudents(1); 
+
+      let mappedAssignments: any[] = [];
+      if (assignmentsData.length > 0) {
+        mappedAssignments = assignmentsData.map((a: any) => ({
+          id: a.id,
+          title: a.title,
+          course: a.courses?.name || 'Unknown Course',
+          due_date: a.due_date ? `${a.due_date}T${a.due_time || '23:59:00'}Z` : '',
+          created_at: a.created_at,
+          class_id: a.class_id,
+          portal_open: a.portal_open || false, 
+          status: a.status
+        }));
+      } else {
+        mappedAssignments = MOCK_ASSIGNMENTS;
+      }
+
+      setAssignments(mappedAssignments);
+
+      // fetch submission counts
+      const assignIds = mappedAssignments.map(a => a.id);
+      if (assignIds.length > 0) {
+        const { data: subData } = await supabase
+          .from('submissions')
+          .select('assignment_id, id')
+          .in('assignment_id', assignIds)
+          .not('file_url', 'is', null);
+        
+        const countMap: Record<string, number> = {};
+        if (subData) {
+           subData.forEach((sub: any) => {
+             countMap[sub.assignment_id] = (countMap[sub.assignment_id] || 0) + 1;
+           });
+        }
+        setSubmissionsCountMap(countMap);
+      }
+    } catch (err) {
+      console.error('Failed to fetch assignments:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchAssignmentsData();
-  }, [user]);
+  }, []);
 
   // Derived state based on logic
   const processedAssignments = assignments.map(a => {
-    const submitted = a.submitted;
+    const submitted = submissionsCountMap[a.id] || 0;
     const currentTotal = a.totalStudents || totalStudents;
 
     let statusLabel = 'PENDING';
-    if (submitted === 0) statusLabel = 'PENDING';
-    else if (submitted > 0 && submitted < currentTotal) statusLabel = 'READY';
-    else if (submitted === currentTotal && currentTotal > 0) statusLabel = 'GRADED';
+    if (a.status === 'graded') statusLabel = 'GRADED';
+    else if (submitted > 0) statusLabel = 'READY';
 
     return { ...a, submitted, statusLabel };
   }).filter(a => {
-    if (searchTerm && !a.title.toLowerCase().includes(searchTerm.toLowerCase()) && !a.course.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (searchTerm && !a.title?.toLowerCase().includes(searchTerm.toLowerCase()) && !a.course?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     if (activeFilter !== 'ALL' && a.statusLabel !== activeFilter) return false;
     return true;
   });
@@ -156,6 +199,7 @@ export default function TeacherAssignmentPage() {
                     totalStudents={assignment.totalStudents || totalStudents}
                     submittedCount={assignment.submitted}
                     onViewSubmissions={setSelectedAssignment}
+                    onRefresh={fetchAssignmentsData}
                   />
                 ))}
               </div>
@@ -185,6 +229,7 @@ export default function TeacherAssignmentPage() {
                     totalStudents={assignment.totalStudents || totalStudents}
                     submittedCount={assignment.submitted}
                     onViewSubmissions={setSelectedAssignment}
+                    onRefresh={fetchAssignmentsData}
                   />
                 ))}
               </div>

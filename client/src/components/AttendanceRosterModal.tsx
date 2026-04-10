@@ -64,13 +64,13 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
   const formattedDate = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
       {/* Blurred Backdrop */}
-      <div className="absolute inset-0 bg-[#0d3349]/40 backdrop-blur-md transition-opacity duration-300"></div>
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300"></div>
 
       {/* Modal Content */}
       <div 
-        className="relative w-full max-w-[640px] bg-white rounded-sm shadow-[0_20px_60px_rgba(13,51,73,0.15)] flex flex-col max-h-[90vh] overflow-hidden animate-fade-up transform transition-all"
+        className="relative z-10 w-full max-w-[640px] bg-white rounded-sm shadow-[0_20px_60px_rgba(13,51,73,0.15)] flex flex-col max-h-[90vh] overflow-hidden animate-fade-up transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header (Glassmorphic) */}
