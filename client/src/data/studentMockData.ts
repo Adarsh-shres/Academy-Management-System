@@ -22,7 +22,7 @@ export const courses = [
     attendance: 87,
     totalClasses: 45,
     attendedClasses: 39,
-    color: "#10b981",
+    color: "#6a5182",
     schedule: "Mon, Wed, Fri — 9:00 AM",
   },
   {
@@ -34,7 +34,7 @@ export const courses = [
     attendance: 92,
     totalClasses: 38,
     attendedClasses: 35,
-    color: "#10b981",
+    color: "#8b6ca8",
     schedule: "Tue, Thu — 11:00 AM",
   },
   {
@@ -46,7 +46,7 @@ export const courses = [
     attendance: 74,
     totalClasses: 42,
     attendedClasses: 31,
-    color: "#10b981",
+    color: "#4b3f68",
     schedule: "Mon, Wed — 2:00 PM",
   },
   {
@@ -58,8 +58,8 @@ export const courses = [
     attendance: 95,
     totalClasses: 36,
     attendedClasses: 34,
-    color: "#10b981",
-    schedule: "Tue, Thu, Sat — 10:00 AM",
+    color: "#b096cc",
+    schedule: "Tue, Thu, Fri — 1:00 PM",
   },
   {
     id: 5,
@@ -70,7 +70,7 @@ export const courses = [
     attendance: 81,
     totalClasses: 32,
     attendedClasses: 26,
-    color: "#10b981",
+    color: "#778196",
     schedule: "Wed, Fri — 3:00 PM",
   },
 ];

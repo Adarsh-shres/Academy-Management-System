@@ -1,14 +1,14 @@
 
 
 export interface Assignment {
-  id: number;
+  id: string;
   title: string;
   course: string;
   courseCode: string;
   deadline: string;
   status: string;
-  description: string;
-  marks: number;
+  description?: string;
+  marks: string;
   submittedOn?: string | null;
   grade?: string | null;
 }
@@ -30,25 +30,25 @@ export default function StudentAssignmentCard({ assignment, compact = false }: S
 
   const getDueBadge = () => {
     if (!isPending) return null;
-    if (diffDays < 0) return { text: "Overdue", cls: "text-[#ef4444] bg-[#fef2f2] border-[#fee2e2]" };
-    if (diffDays === 0) return { text: "Due Today", cls: "text-[#c2410c] bg-[#fff7ed] border-[#ffedd5]" };
-    if (diffDays <= 3) return { text: `${diffDays}d left`, cls: "text-[#b45309] bg-[#fffbeb] border-[#fef3c7]" };
+    if (diffDays < 0) return { text: "Overdue", cls: "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" };
+    if (diffDays === 0) return { text: "Due Today", cls: "text-primary bg-[#f3eff7] border-[#e7dff0]" };
+    if (diffDays <= 3) return { text: `${diffDays}d left`, cls: "text-[#64748b] bg-[#f8fafc] border-[#e2e8f0]" };
     return { text: `${diffDays}d left`, cls: "text-[#64748b] bg-[#f8fafc] border-[#f1f5f9]" };
   };
 
   const dueBadge = getDueBadge();
 
   return (
-    <div className={`bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] hover:shadow-[0_16px_36px_rgba(57,31,86,0.1)] transition-all duration-200 ${compact ? "p-4" : "p-[22px_22px_20px]"}`}>
-      <div className="flex items-start gap-3">
+    <div className={`bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)] transition-all duration-200 ${compact ? "p-4" : "p-5"}`}>
+      <div className="flex items-start gap-4">
         {/* Status icon */}
-        <div className={`mt-0.5 w-[38px] h-[38px] rounded-[8px] flex items-center justify-center flex-shrink-0 ${isPending ? "bg-[#fffbeb]" : "bg-[#ecfdf5]"}`}>
+        <div className={`mt-0.5 w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 ${isPending ? "bg-[#faf8fc]" : "bg-[#f3eff7]"}`}>
           {isPending ? (
-            <svg className="w-5 h-5 text-[#f59e0b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[18px] h-[18px] text-[#4b3f68]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[18px] h-[18px] text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           )}
@@ -57,10 +57,10 @@ export default function StudentAssignmentCard({ assignment, compact = false }: S
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
-            <h3 className="font-sans text-[15px] font-extrabold text-[#4b3f68] leading-tight tracking-tight">{title}</h3>
+            <h3 className="font-sans text-[14px] font-semibold text-[#4b3f68] leading-tight tracking-tight">{title}</h3>
             <span
-              className={`text-[10px] font-bold px-2 py-[2px] uppercase tracking-wide rounded-full border flex-shrink-0 ${
-                isPending ? "text-[#b45309] bg-[#fffbeb] border-[#fef3c7]" : "text-[#047857] bg-[#ecfdf5] border-[#d1fae5]"
+              className={`text-[10px] font-semibold px-2 py-[2px] uppercase tracking-wide rounded-full border flex-shrink-0 ${
+                isPending ? "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" : "text-primary bg-[#f3eff7] border-[#e7dff0]"
               }`}
             >
               {isPending ? "Pending" : "Submitted"}
@@ -69,19 +69,19 @@ export default function StudentAssignmentCard({ assignment, compact = false }: S
 
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="text-[12px] font-medium text-[#7c8697]">{course}</span>
-            <span className="text-[#cbd5e1]">•</span>
-            <span className="text-[11px] font-bold text-primary">{courseCode}</span>
+            <span className="text-[#cbd5e1]">&bull;</span>
+            <span className="text-[11px] font-semibold text-primary">{courseCode}</span>
           </div>
 
           {!compact && (
-            <div className="flex items-center gap-[10px] mt-2 flex-wrap">
+            <div className="flex items-center gap-2.5 mt-2 flex-wrap">
               <span className="text-[12px] text-[#7c8697]">
                 {isPending ? `Due: ${new Date(deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : (submittedOn ? `Submitted: ${new Date(submittedOn).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : '')}
               </span>
-              <span className="text-[12px] text-[#7c8697]">{marks} marks</span>
-              {grade && <span className="text-[11px] font-bold text-primary bg-[#f3eff7] px-[8px] py-[2px] rounded-[6px]">Grade: {grade}</span>}
+              <span className="text-[12px] text-[#7c8697]">{marks}</span>
+              {grade && <span className="text-[11px] font-semibold text-primary bg-[#f3eff7] px-2 py-[2px] rounded-[6px]">Grade: {grade}</span>}
               {dueBadge && (
-                <span className={`text-[11px] font-bold px-[8px] py-[2px] rounded-[6px] border ${dueBadge.cls}`}>
+                <span className={`text-[11px] font-semibold px-2 py-[2px] rounded-[6px] border ${dueBadge.cls}`}>
                   {dueBadge.text}
                 </span>
               )}
@@ -91,13 +91,19 @@ export default function StudentAssignmentCard({ assignment, compact = false }: S
       </div>
 
       {!compact && (
-        <div className="mt-[18px] flex gap-2">
+        <div className="mt-5 flex gap-3">
           {isPending ? (
-            <button className="flex-1 py-2 rounded-[8px] text-[12px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity">
+            <button 
+              onClick={() => window.alert(`Opening submission flow for: ${title}`)}
+              className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity cursor-pointer"
+            >
               Submit Assignment
             </button>
           ) : (
-            <button className="flex-1 py-2 rounded-[8px] text-[12px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors">
+            <button 
+              onClick={() => window.alert(`Opening report flow for: ${title}`)}
+              className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors cursor-pointer"
+            >
               View Report
             </button>
           )}
