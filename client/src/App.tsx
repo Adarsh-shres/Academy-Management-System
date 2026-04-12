@@ -11,7 +11,6 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
-import SchedulePage from './pages/SchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
@@ -55,7 +54,6 @@ function App() {
           <Route path="/register-students" element={<RegisterStudentsPage />} />
           <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/teachers" element={<TeachersPage />} />
           <Route path="/user-roles" element={<UserRolesPage />} />
           <Route path="/userroles" element={<UserRolesPage />} />

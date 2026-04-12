@@ -10,7 +10,7 @@ export default function Topbar() {
         <input 
           type="text" 
           placeholder="Search institutional data…" 
-          className="w-full py-2 pr-3.5 pl-9 bg-[#f6f2fb] border-[1.5px] border-transparent rounded-full text-[13px] text-[#1e293b] outline-none transition-all duration-200 focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 placeholder:text-[#7c8697]"
+          className="w-full py-2 pr-3.5 pl-9 bg-transparent border-none rounded-full text-[13px] text-[#1e293b] outline-none transition-all duration-200 placeholder:text-[#7c8697] focus:ring-0"
         />
       </div>
 

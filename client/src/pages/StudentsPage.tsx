@@ -1,12 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import StatCard from '../components/StatCard';
 import { useStudents } from '../context/StudentContext';
 
 export default function StudentsPage() {
   const navigate = useNavigate();
   const { students } = useStudents();
 
-  const activeStudents = students.filter((student) => student.isActive);
   const recentStudents = students.slice(-5).reverse();
 
   const formatCourseSummary = (department: string, course: string) => {
@@ -33,22 +31,6 @@ export default function StudentsPage() {
           </svg>
           Add students
         </button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
-        <StatCard
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>}
-          label="Total students"
-          value={String(students.length)}
-          isAccent={true}
-          subContent={null}
-        />
-        <StatCard
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>}
-          label="Active Enrollments"
-          value={String(activeStudents.length)}
-          subContent={null}
-        />
       </div>
 
       <div className="bg-white rounded-sm border border-[#e2e8f0] p-5 shadow-sm flex flex-col mt-4">

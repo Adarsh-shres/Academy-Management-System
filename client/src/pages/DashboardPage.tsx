@@ -5,6 +5,7 @@ import TodoList from '../components/TodoList';
 
 export default function DashboardPage() {
   const location = useLocation();
+  const showTodoList = location.pathname === '/dashboard' || location.pathname === '/student/dashboard';
 
   return (
     <div className="flex w-full min-h-screen text-[#1e293b] bg-main-bg font-sans antialiased">
@@ -20,9 +21,11 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="w-full xl:w-[308px] xl:shrink-0 xl:pr-6 xl:py-6 pb-6 px-5 md:px-8 xl:px-0">
-            <TodoList />
-          </div>
+          {showTodoList && (
+            <div className="w-full xl:w-[308px] xl:shrink-0 xl:pr-6 xl:pt-10 xl:pb-6 pb-6 px-5 md:px-8 xl:px-0">
+              <TodoList />
+            </div>
+          )}
         </div>
       </main>
     </div>

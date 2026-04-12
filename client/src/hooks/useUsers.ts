@@ -49,6 +49,7 @@ export const useUsers = () => {
     const { data, error } = await supabase
       .from('users')
       .select('id, email, name, role')
+      .in('role', ['teacher', 'student'])
       .order('name', { ascending: true });
 
     if (error) {

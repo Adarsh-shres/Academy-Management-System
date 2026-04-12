@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import StatCard from '../components/StatCard';
 import CurriculumCard from '../components/CurriculumCard';
 import { useCourses } from '../context/CourseContext';
 import type { Course } from '../types/course';
@@ -88,6 +87,44 @@ export default function CoursesPage() {
 
   const filteredCourses = courses.filter(course => filterStatus === 'All' || course.status === filterStatus);
   const activeCourses = courses.filter(c => c.status === 'Active');
+  const inactiveCourses = courses.filter(c => c.status === 'Inactive');
+
+  const renderCurriculumSection = (
+    title: string,
+    description: string,
+    items: typeof courses,
+    tagColor: string,
+    emptyMessage: string,
+    showViewAll = false,
+  ) => (
+    <div className="flex flex-col gap-5 mt-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-[18px] font-bold text-[#0d3349] leading-tight">{title}</h3>
+          <p className="text-[14px] text-[#64748b]">{description}</p>
+        </div>
+        {showViewAll ? (
+          <button 
+            onClick={() => setView('list')}
+            className="text-[13px] font-semibold text-[#6a5182] hover:text-[#5b4471] transition-all cursor-pointer underline-offset-2 hover:underline">
+            View All Courses
+          </button>
+        ) : null}
+      </div>
+
+      {items.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {items.slice(0, 3).map(c => (
+            <CurriculumCard key={c.id} title={c.name} tag={c.department} tagColor={tagColor} />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-sm border border-dashed border-[#cbd5e1] p-5 text-[14px] text-[#64748b] shadow-sm">
+          {emptyMessage}
+        </div>
+      )}
+    </div>
+  );
 
   const renderOverview = () => (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
@@ -110,46 +147,22 @@ export default function CoursesPage() {
 
       {/* Main Content Layout */}
       <div className="flex flex-col gap-8">
-        {/* Stats */}
-        <div className="flex flex-col sm:flex-row gap-6">
-          <div className="w-full sm:flex-1 max-w-[280px]">
-            <StatCard
-              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
-              label="Total Courses"
-              value={String(courses.length)}
-              subContent={null}
-            />
-          </div>
-          <div className="w-full sm:flex-1 max-w-[280px]">
-            <StatCard
-              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>}
-              label="Active Courses"
-              value={String(activeCourses.length)}
-              subContent={null}
-            />
-          </div>
-        </div>
+        {renderCurriculumSection(
+          'Active Curriculum',
+          'Currently running programs and their status.',
+          activeCourses,
+          'bg-[#dbeafe] text-[#1d4ed8]',
+          'No active courses available right now.',
+          true,
+        )}
 
-        {/* Active Curriculum */}
-        <div className="flex flex-col gap-5 mt-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-[18px] font-bold text-[#0d3349] leading-tight">Active Curriculum</h3>
-              <p className="text-[14px] text-[#64748b]">Currently running programs and their status.</p>
-            </div>
-            <button 
-              onClick={() => setView('list')}
-              className="text-[13px] font-semibold text-[#006496] hover:text-[#004e75] transition-all cursor-pointer underline-offset-2 hover:underline">
-              View All Courses
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {activeCourses.slice(0, 3).map(c => (
-              <CurriculumCard key={c.id} title={c.name} tag={c.department} tagColor="bg-[#dbeafe] text-[#1d4ed8]" />
-            ))}
-          </div>
-        </div>
+        {renderCurriculumSection(
+          'Inactive Curriculum',
+          'Paused or archived programs that are not currently running.',
+          inactiveCourses,
+          'bg-[#fee2e2] text-[#b91c1c]',
+          'No inactive courses available right now.',
+        )}
       </div>
     </div>
   );

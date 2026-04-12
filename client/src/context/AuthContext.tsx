@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 
-/* ─── Types ─────────────────────────────────────────────────── */
 
 export type UserRole = 'super_admin' | 'admin' | 'teacher' | 'student';
 
@@ -23,7 +22,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-/* ─── Helpers ───────────────────────────────────────────────── */
 
 /**
  * Fetch the user's profile row from the public `users` table.
@@ -66,13 +64,13 @@ async function fetchUserProfile(userId: string, email?: string): Promise<AuthUse
   };
 }
 
-/* ─── Provider ──────────────────────────────────────────────── */
+/*Provider */
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  /* ── Bootstrap: check existing session on mount ─────────────── */
+  /*  Bootstrap: check existing session on mount */
   useEffect(() => {
     let isMounted = true;
 
@@ -116,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  /* ── Login ───────────────────────────────────────────────────── */
+  // Login
   const login = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string; user?: AuthUser }> => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -141,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
-
+/*  */
   /* ── Logout ──────────────────────────────────────────────────── */
   const logout = useCallback(async () => {
     await supabase.auth.signOut();

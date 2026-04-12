@@ -5,8 +5,10 @@ import DeleteConfirmModal from '../components/UserRoles/DeleteConfirmModal.tsx';
 import Toast from '../components/UserRoles/Toast.tsx';
 import { useUsers } from '../hooks/useUsers.ts';
 import { type User, ROLES } from '../data/mockUsers.ts';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserRolesPage() {
+  const navigate = useNavigate();
   const { users, addUser, updateUser, deleteUser, bulkDelete } = useUsers();
 
   const [roleFilter, setRoleFilter] = useState('All');
@@ -50,9 +52,33 @@ export default function UserRolesPage() {
     showToast(`${ids.length} users deleted successfully`);
   };
 
+  const handleRowOpen = (user: User) => {
+    if (user.role === ROLES.TEACHER) {
+      navigate('/teachers', { state: { selectedTeacherId: user.id } });
+      return;
+    }
+
+    navigate(`/students/${user.id}`);
+  };
+
   const facultyList = users.filter((u) => u.role === ROLES.TEACHER);
   const studentList = users.filter((u) => u.role === ROLES.STUDENT);
   const userToDelete = users.find((u) => u.id === deletingId);
+  const filteredUsers =
+    roleFilter === ROLES.TEACHER
+      ? facultyList
+      : roleFilter === ROLES.STUDENT
+        ? studentList
+        : users;
+
+  const getFilterChipClass = (filterValue: string, isPrimary = false) =>
+    `inline-flex items-center rounded-sm px-3 py-2 text-[12px] font-semibold border transition-all cursor-pointer ${
+      roleFilter === filterValue
+        ? 'bg-[#f3eff7] text-[#6a5182] border-[#e2d9ed]'
+        : isPrimary
+          ? 'bg-white text-[#64748b] border-[#e2e8f0] hover:text-[#6a5182] hover:border-[#d9cde8]'
+          : 'bg-white text-[#64748b] border-[#e2e8f0] hover:text-[#6a5182] hover:border-[#d9cde8]'
+    }`;
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
@@ -63,47 +89,42 @@ export default function UserRolesPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center rounded-sm bg-[#f3eff7] px-3 py-2 text-[12px] font-semibold text-[#6a5182] border border-[#e2d9ed]">
+          <button
+            type="button"
+            onClick={() => setRoleFilter('All')}
+            className={getFilterChipClass('All', true)}
+          >
             {users.length} members
-          </span>
-          <span className="inline-flex items-center rounded-sm bg-white px-3 py-2 text-[12px] font-semibold text-[#64748b] border border-[#e2e8f0]">
+          </button>
+          <button
+            type="button"
+            onClick={() => setRoleFilter(ROLES.TEACHER)}
+            className={getFilterChipClass(ROLES.TEACHER)}
+          >
             {facultyList.length} teachers
-          </span>
-          <span className="inline-flex items-center rounded-sm bg-white px-3 py-2 text-[12px] font-semibold text-[#64748b] border border-[#e2e8f0]">
+          </button>
+          <button
+            type="button"
+            onClick={() => setRoleFilter(ROLES.STUDENT)}
+            className={getFilterChipClass(ROLES.STUDENT)}
+          >
             {studentList.length} students
-          </span>
+          </button>
         </div>
       </div>
 
-      <div className="space-y-6">
-        {(roleFilter === 'All' || roleFilter === ROLES.TEACHER) && (
-          <UserTable
-            title="Faculty Members"
-            users={facultyList}
-            onEdit={handleOpenEdit}
-            onDelete={handleOpenDelete}
-            onBulkDelete={handleBulkDelete}
-            searchPlaceholder="Search faculty..."
-            roleFilter={roleFilter}
-            onRoleFilterChange={setRoleFilter}
-            showRoleFilter={true}
-          />
-        )}
-
-        {(roleFilter === 'All' || roleFilter === ROLES.STUDENT) && (
-          <UserTable
-            title="Students"
-            users={studentList}
-            onEdit={handleOpenEdit}
-            onDelete={handleOpenDelete}
-            onBulkDelete={handleBulkDelete}
-            searchPlaceholder="Search students..."
-            roleFilter={roleFilter}
-            onRoleFilterChange={setRoleFilter}
-            showRoleFilter={roleFilter === ROLES.STUDENT}
-          />
-        )}
-      </div>
+      <UserTable
+        title="Members"
+        users={filteredUsers}
+        onEdit={handleOpenEdit}
+        onDelete={handleOpenDelete}
+        onBulkDelete={handleBulkDelete}
+        onRowClick={handleRowOpen}
+        searchPlaceholder="Search members..."
+        roleFilter={roleFilter}
+        onRoleFilterChange={setRoleFilter}
+        showRoleFilter={false}
+      />
 
       <UserModal
         isOpen={isModalOpen}

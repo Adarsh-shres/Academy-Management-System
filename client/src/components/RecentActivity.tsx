@@ -63,51 +63,53 @@ export default function RecentActivity() {
         </button>
       </div>
 
-      <div className="bg-white border border-[#e6dfef] rounded-sm overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
-        <table className="w-full border-collapse text-[13px]">
-          <thead>
-            <tr>
-              <th className="bg-[#faf7fe] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap first:rounded-tl-2xl last:rounded-tr-2xl">#</th>
-              <th className="bg-[#faf7fe] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Name</th>
-              <th className="bg-[#faf7fe] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Role</th>
-              <th className="bg-[#faf7fe] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Course / Department</th>
-              <th className="bg-[#faf7fe] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Date</th>
-              <th className="bg-[#faf7fe] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ACTIVITIES.map((act) => (
-              <tr key={act.id} className="border-b border-[#ece5f3] last:border-b-0 transition-colors hover:bg-[#fbf8fe]">
-                <td className="p-[12px_16px] text-[#64748b] text-[12px] font-semibold align-middle">{act.id}</td>
-                <td className="p-[12px_16px] text-text-custom align-middle">
-                  <div className="flex items-center gap-[9px] font-medium">
-                    <div className={`w-[28px] h-[28px] rounded-sm text-white text-[10px] font-bold flex items-center justify-center shrink-0
-                      ${act.color === 'default' ? 'bg-gradient-to-br from-[#164e6a] to-[#4b3f68]' : ''}
-                      ${act.color === 'teal' ? 'bg-gradient-to-br from-[#0ea5b0] to-primary' : ''}
-                      ${act.color === 'amber' ? 'bg-gradient-to-br from-[#fbbf24] to-[#d97706]' : ''}
-                      ${act.color === 'red' ? 'bg-gradient-to-br from-[#f87171] to-[#ef4444]' : ''}
-                    `}>
-                      {act.initials}
-                    </div>
-                    {act.name}
-                  </div>
-                </td>
-                <td className="p-[12px_16px] text-text-custom align-middle">{act.role}</td>
-                <td className="p-[12px_16px] text-text-custom align-middle">{act.dept}</td>
-                <td className="p-[12px_16px] text-text-custom align-middle whitespace-nowrap">{act.date}</td>
-                <td className="p-[12px_16px] text-text-custom align-middle">
-                  <span className={`inline-block p-[3px_10px] rounded-sm text-[11px] font-bold tracking-[0.02em]
-                    ${act.status === 'Active' ? 'bg-[#d1fae5] text-[#065f46]' : ''}
-                    ${act.status === 'Pending' ? 'bg-[#fef3c7] text-[#92400e]' : ''}
-                    ${act.status === 'Inactive' ? 'bg-[#f1f5f9] text-[#475569]' : ''}
-                  `}>
-                    {act.status}
-                  </span>
-                </td>
+      <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-[13px]">
+            <thead>
+              <tr>
+                <th className="bg-[#f8fafc] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">#</th>
+                <th className="bg-[#f8fafc] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Name</th>
+                <th className="bg-[#f8fafc] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Role</th>
+                <th className="bg-[#f8fafc] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Course / Department</th>
+                <th className="bg-[#f8fafc] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Date</th>
+                <th className="bg-[#f8fafc] p-[10px_16px] text-left text-[10.5px] font-bold text-[#7d8797] tracking-[0.08em] uppercase whitespace-nowrap">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {ACTIVITIES.map((act) => (
+                <tr key={act.id} className="border-b border-[#ece5f3] last:border-b-0 transition-colors hover:bg-[#fbf8fe]">
+                  <td className="p-[12px_16px] text-[#64748b] text-[12px] font-semibold align-middle">{act.id}</td>
+                  <td className="p-[12px_16px] text-text-custom align-middle">
+                    <div className="flex items-center gap-[9px] font-medium">
+                      <div className={`w-[28px] h-[28px] rounded-sm text-white text-[10px] font-bold flex items-center justify-center shrink-0
+                        ${act.color === 'default' ? 'bg-gradient-to-br from-[#164e6a] to-[#4b3f68]' : ''}
+                        ${act.color === 'teal' ? 'bg-gradient-to-br from-[#0ea5b0] to-primary' : ''}
+                        ${act.color === 'amber' ? 'bg-gradient-to-br from-[#fbbf24] to-[#d97706]' : ''}
+                        ${act.color === 'red' ? 'bg-gradient-to-br from-[#f87171] to-[#ef4444]' : ''}
+                      `}>
+                        {act.initials}
+                      </div>
+                      {act.name}
+                    </div>
+                  </td>
+                  <td className="p-[12px_16px] text-text-custom align-middle">{act.role}</td>
+                  <td className="p-[12px_16px] text-text-custom align-middle">{act.dept}</td>
+                  <td className="p-[12px_16px] text-text-custom align-middle whitespace-nowrap">{act.date}</td>
+                  <td className="p-[12px_16px] text-text-custom align-middle">
+                    <span className={`inline-block p-[3px_10px] rounded-sm text-[11px] font-bold tracking-[0.02em]
+                      ${act.status === 'Active' ? 'bg-[#d1fae5] text-[#065f46]' : ''}
+                      ${act.status === 'Pending' ? 'bg-[#fef3c7] text-[#92400e]' : ''}
+                      ${act.status === 'Inactive' ? 'bg-[#f1f5f9] text-[#475569]' : ''}
+                    `}>
+                      {act.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

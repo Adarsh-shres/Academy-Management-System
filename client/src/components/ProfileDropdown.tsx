@@ -29,6 +29,11 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
     navigate('/login');
   };
 
+  const handleSettingsClick = () => {
+    setIsOpen(false);
+    navigate('/settings');
+  };
+
   // Helper to get initials
   const getInitials = (name: string) => {
     if (!name) return 'U';
@@ -68,6 +73,8 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
     </div>
   );
 
+  const canAccessSettings = user?.role === 'super_admin' || user?.role === 'admin';
+
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button 
@@ -79,6 +86,16 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-[#e7dff0] rounded-md shadow-lg z-[100] py-1">
+          {canAccessSettings && (
+            <button
+              onClick={handleSettingsClick}
+              className="w-full text-left px-4 py-2.5 text-[13px] text-[#4b3f68] hover:bg-neutral-50 font-medium transition-colors cursor-pointer flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M4.93 4.93a10 10 0 0 0 0 14.14"></path></svg>
+              Settings
+            </button>
+          )}
+          {canAccessSettings && <div className="mx-2 my-1 h-px bg-[#f1eaf7]" />}
           <button
             onClick={handleLogout}
             className="w-full text-left px-4 py-2.5 text-[13px] text-red-600 hover:bg-neutral-50 font-medium transition-colors cursor-pointer flex items-center gap-2"

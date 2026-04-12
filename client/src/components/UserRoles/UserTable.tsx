@@ -7,6 +7,7 @@ export interface UserTableProps {
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
   onBulkDelete: (ids: string[]) => void;
+  onRowClick?: (user: User) => void;
   searchPlaceholder?: string;
   roleFilter?: string;
   onRoleFilterChange?: (role: string) => void;
@@ -53,6 +54,7 @@ export default function UserTable({
   onEdit,
   onDelete,
   onBulkDelete,
+  onRowClick,
   searchPlaceholder = 'Search...',
   roleFilter = 'All',
   onRoleFilterChange,
@@ -130,9 +132,19 @@ export default function UserTable({
           filtered.map((user) => (
             <div
               key={user.id}
+              onClick={() => onRowClick?.(user)}
+              onKeyDown={(event) => {
+                if (!onRowClick) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  onRowClick(user);
+                }
+              }}
+              role={onRowClick ? 'button' : undefined}
+              tabIndex={onRowClick ? 0 : -1}
               className={`group flex items-center gap-4 px-5 py-4 transition-all duration-200 hover:bg-[#fcfaff] relative ${
                 selected.includes(user.id) ? 'bg-[#f7f2fb]' : ''
-              }`}
+              } ${onRowClick ? 'cursor-pointer' : ''}`}
             >
               <div
                 onClick={(e) => toggleOne(e, user.id)}
@@ -185,13 +197,13 @@ export default function UserTable({
                 </div>
 
                 <div className="hidden group-hover:flex items-center gap-1 animate-fade-in">
-                  <button onClick={() => onEdit(user)} className="p-2 text-[#94a3b8] hover:text-[#6a5182] transition-colors" title="Edit">
+                  <button onClick={(event) => { event.stopPropagation(); onEdit(user); }} className="p-2 text-[#94a3b8] hover:text-[#6a5182] transition-colors" title="Edit">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                       <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   </button>
-                  <button onClick={() => onDelete(user.id)} className="p-2 text-[#94a3b8] hover:text-rose-500 transition-colors" title="Delete">
+                  <button onClick={(event) => { event.stopPropagation(); onDelete(user.id); }} className="p-2 text-[#94a3b8] hover:text-rose-500 transition-colors" title="Delete">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                     </svg>

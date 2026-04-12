@@ -1,10 +1,17 @@
-
 import StatCard from './StatCard';
 import Calendar from './Calendar';
 import QuickTools from './QuickTools';
-import RecentActivity from './RecentActivity';
+import { useCourses } from '../context/CourseContext';
+import { useStudents } from '../context/StudentContext';
+import { useTeachers } from '../context/TeacherContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const { courses } = useCourses();
+  const { students } = useStudents();
+  const { teachers } = useTeachers();
+
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10 flex-1 min-w-0">
 
@@ -27,23 +34,29 @@ export default function Dashboard() {
       {/* STAT CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[18px]">
         <StatCard 
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>}
-          label="Active Entities"
-          value="1,284"
-          subContent={<><span className="text-[#10b981] font-bold">+12%</span> this month</>}
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
+          label="Students"
+          value={String(students.length)}
+          compact
+          showProgress={false}
+          onClick={() => navigate('/students')}
         />
         <StatCard 
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
-          label="Faculty Chairs"
-          value="42"
-          subContent="Stable"
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>}
+          label="Teachers"
+          value={String(teachers.length)}
+          compact
+          showProgress={false}
+          onClick={() => navigate('/teachers')}
         />
         <StatCard 
           icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
-          label="System Architects"
-          value="08"
+          label="Courses"
+          value={String(courses.length)}
           isAccent
-          subContent={<span className="text-[10.5px] font-bold text-primary bg-[#f3eff7] px-[9px] py-0.5 rounded-full tracking-wide">Audit Link</span>}
+          compact
+          showProgress={false}
+          onClick={() => navigate('/courses')}
         />
       </div>
 
@@ -52,12 +65,6 @@ export default function Dashboard() {
         <Calendar />
         <QuickTools />
       </div>
-
-      {/* RECENT ACTIVITY */}
-      <div className="mt-1">
-        <RecentActivity />
-      </div>
-
     </div>
   );
 }

@@ -79,7 +79,7 @@ export default function Calendar() {
   }, [calDate]);
 
   return (
-    <div className="bg-white border border-[#e6dfef] rounded-sm p-[22px] shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+    <div className="bg-white border border-[#e7dff0] rounded-sm p-[22px] shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
       <div className="flex items-center justify-between mb-4 gap-3">
         <h2 className="font-sans text-[15px] font-extrabold text-[#4b3f68]">Institutional Calendar</h2>
         <div className="flex items-center gap-2">
