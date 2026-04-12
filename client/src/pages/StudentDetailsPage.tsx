@@ -1,15 +1,28 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import StudentEditorModal from '../components/StudentEditorModal';
+import ConfirmActionModal from '../components/ConfirmActionModal';
 import { useStudents } from '../context/StudentContext';
 import type { StudentRecord } from '../types/student';
 
+/** Shows a single student profile with edit and delete actions. */
 export default function StudentDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getStudentById, updateStudent } = useStudents();
+  const { getStudentById, updateStudent, deleteStudent } = useStudents();
   const student = getStudentById(id || '1');
   const [editingStudent, setEditingStudent] = useState<StudentRecord | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDeleteStudent = () => {
+    if (!student) {
+      return;
+    }
+
+    deleteStudent(student.id);
+    setIsDeleteModalOpen(false);
+    navigate('/students');
+  };
 
   if (!student) {
     return (
@@ -51,16 +64,28 @@ export default function StudentDetailsPage() {
           </div>
         </div>
 
-        <button
-          onClick={() => setEditingStudent({ ...student })}
-          className="mt-2 flex shrink-0 items-center gap-2 rounded-sm bg-[#6a5182] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm transition-all hover:-translate-y-px hover:bg-[#5b4471] hover:shadow sm:mt-0"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-          </svg>
-          Edit Profile
-        </button>
+        <div className="mt-2 flex shrink-0 items-center gap-2 sm:mt-0">
+          <button
+            onClick={() => setEditingStudent({ ...student })}
+            className="flex items-center gap-2 rounded-sm bg-[#6a5182] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm transition-all hover:-translate-y-px hover:bg-[#5b4471] hover:shadow"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            Edit Profile
+          </button>
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-sm border border-rose-200 bg-rose-50 text-rose-600 transition-all hover:bg-rose-100"
+            title="Delete Student"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm md:p-8">
@@ -111,10 +136,21 @@ export default function StudentDetailsPage() {
           }}
         />
       )}
+
+      <ConfirmActionModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteStudent}
+        title="Delete Student Profile"
+        message="You're about to remove this student profile from the admin roster. Please confirm before we continue."
+        subjectLabel={`${student.firstName} ${student.lastName} • ${student.email || 'No email'}`}
+        confirmLabel="Delete Student"
+      />
     </div>
   );
 }
 
+/** Displays a labeled read-only field in the student profile view. */
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1.5 border-l-[3px] border-[#e6f7f9] pl-3">

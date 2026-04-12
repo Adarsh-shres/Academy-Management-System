@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StudentEditorModal from '../components/StudentEditorModal';
+import ConfirmActionModal from '../components/ConfirmActionModal';
 import { useStudents } from '../context/StudentContext';
 import type { StudentRecord } from '../types/student';
 
+/** Shows the full student table for admin management tasks. */
 export default function AllStudentsPage() {
   const navigate = useNavigate();
   const { students, toggleStudentStatus, deleteStudent, updateStudent } = useStudents();
   const [editingStudent, setEditingStudent] = useState<StudentRecord | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<StudentRecord | null>(null);
 
   const formatCourseDetails = (department: string, course: string) => {
     if (department && course) return { badge: department, text: course };
@@ -91,11 +94,7 @@ export default function AllStudentsPage() {
                           </button>
                           <span className="text-[#e2e8f0]">|</span>
                           <button
-                            onClick={() => {
-                              if (window.confirm('Delete this student permanently?')) {
-                                deleteStudent(student.id);
-                              }
-                            }}
+                            onClick={() => setStudentToDelete(student)}
                             className="text-[13px] font-semibold text-gray-400 transition-colors hover:text-red-600"
                             title="Delete Student"
                           >
@@ -128,6 +127,27 @@ export default function AllStudentsPage() {
           }}
         />
       )}
+
+      <ConfirmActionModal
+        isOpen={!!studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onConfirm={() => {
+          if (!studentToDelete) {
+            return;
+          }
+
+          deleteStudent(studentToDelete.id);
+          setStudentToDelete(null);
+        }}
+        title="Delete Student Profile"
+        message="You're about to remove this student profile from the admin roster. Please confirm before we continue."
+        subjectLabel={
+          studentToDelete
+            ? `${studentToDelete.firstName} ${studentToDelete.lastName} • ${studentToDelete.email || 'No email'}`
+            : ''
+        }
+        confirmLabel="Delete Student"
+      />
     </div>
   );
 }

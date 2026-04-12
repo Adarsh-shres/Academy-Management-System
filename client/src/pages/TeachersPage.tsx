@@ -6,6 +6,7 @@ import { useTeachers } from '../context/TeacherContext';
 import type { Teacher, TeacherStatus } from '../types/teacher';
 import { provisionUser } from '../lib/userProvisioning';
 import AppModal from '../components/AppModal';
+import ConfirmActionModal from '../components/ConfirmActionModal';
 
 const STATUS_STYLES: Record<TeacherStatus, { bg: string; text: string }> = {
   Active: { bg: 'bg-[#e7f8ef]', text: 'text-[#15803d]' },
@@ -27,6 +28,7 @@ function avatarTileColor(id: string) {
   return AVATAR_TILES[index];
 }
 
+/** Handles teacher list browsing, profile viewing, and profile actions. */
 export default function TeachersPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ export default function TeachersPage() {
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [teacherSearch, setTeacherSearch] = useState('');
 
   const [newName, setNewName] = useState('');
@@ -138,9 +141,20 @@ export default function TeachersPage() {
     setIsEditModalOpen(false);
   };
 
+  const handleDeleteTeacher = () => {
+    if (!selectedTeacher) {
+      return;
+    }
+
+    deleteTeacher(selectedTeacher.id);
+    setSelectedTeacher(null);
+    setIsDeleteModalOpen(false);
+  };
+
   useEffect(() => {
     const pageState = location.state as { openAddTeacher?: boolean; selectedTeacherId?: string } | null;
 
+    // Rehydrates list actions that navigate here with transient state.
     if (pageState?.selectedTeacherId) {
       const teacher = teachers.find((item) => item.id === pageState.selectedTeacherId);
 
@@ -225,12 +239,7 @@ export default function TeachersPage() {
                       Edit Profile
                     </button>
                     <button
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this teacher profile permanently?')) {
-                          deleteTeacher(selectedTeacher.id);
-                          setSelectedTeacher(null);
-                        }
-                      }}
+                      onClick={() => setIsDeleteModalOpen(true)}
                       className="flex items-center justify-center w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-sm transition-all cursor-pointer shrink-0 border border-rose-200"
                       title="Delete Profile"
                     >
@@ -501,10 +510,21 @@ export default function TeachersPage() {
           </div>
         </AppModal>
       )}
+
+      <ConfirmActionModal
+        isOpen={isDeleteModalOpen && !!selectedTeacher}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteTeacher}
+        title="Delete Teacher Profile"
+        message="You're about to remove this faculty profile from the admin view. Please confirm before we continue."
+        subjectLabel={selectedTeacher ? `${selectedTeacher.name} • ${selectedTeacher.employeeId}` : ''}
+        confirmLabel="Delete Teacher"
+      />
     </div>
   );
 }
 
+/** Displays a labeled read-only field in the teacher profile header. */
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1.5 border-l-[3px] border-[#e6f7f9] pl-3">
@@ -514,6 +534,7 @@ function DetailField({ label, value }: { label: string; value: string }) {
   );
 }
 
+/** Wraps a form label with consistent teacher modal spacing. */
 function TeacherField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid gap-2">
@@ -523,6 +544,7 @@ function TeacherField({ label, children }: { label: string; children: ReactNode 
   );
 }
 
+/** Renders a shared input used across the teacher modals. */
 function TeacherInput({
   value,
   onChange,
@@ -551,6 +573,7 @@ function TeacherInput({
   );
 }
 
+/** Renders the status picker used by teacher create and edit flows. */
 function TeacherStatusPicker({
   value,
   onChange,

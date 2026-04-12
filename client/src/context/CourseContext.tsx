@@ -1,10 +1,8 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Course } from '../types/course';
 import { MOCK_COURSES } from '../data/mockCourses';
 import { useAuth } from './AuthContext';
-
-/* ─── Context shape ─────────────────────────────────────────── */
 
 interface CourseContextValue {
   courses: Course[];
@@ -17,48 +15,48 @@ interface CourseContextValue {
 
 const CourseContext = createContext<CourseContextValue | null>(null);
 
-/* ─── Provider ──────────────────────────────────────────────── */
-
 let nextNum = MOCK_COURSES.length + 1;
-const generateCourseId = () => {
-  const id = `5cs${String(nextNum++).padStart(2, '0')}`;
-  return id;
-};
 
+/** Generates local course ids while the page still relies on mock state. */
+function generateCourseId() {
+  return `5cs${String(nextNum++).padStart(2, '0')}`;
+}
+
+/** Stores course data and exposes local course mutations. */
 export function CourseProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
 
   const myCourses = useMemo(() => {
     if (!user) return [];
+
+    // Mock views split the seeded courses by role until enrollments are wired.
     if (user.role === 'teacher') {
-      // Mock teacher teaching first 3 active courses
       return courses.slice(0, 3);
-    } else {
-      // Mock student enrolled in next 4 active courses
-      return courses.slice(3, 7);
     }
+
+    return courses.slice(3, 7);
   }, [courses, user]);
 
   const getCourseById = useCallback(
-    (id: string) => courses.find(c => c.id === id),
+    (id: string) => courses.find((course) => course.id === id),
     [courses],
   );
 
   const addCourse = useCallback((data: Omit<Course, 'id'>): Course => {
     const newCourse: Course = { ...data, id: generateCourseId() };
-    setCourses(prev => [...prev, newCourse]);
+    setCourses((prev) => [...prev, newCourse]);
     return newCourse;
   }, []);
 
   const updateCourse = useCallback((id: string, data: Partial<Course>) => {
-    setCourses(prev =>
-      prev.map(c => (c.id === id ? { ...c, ...data } : c)),
+    setCourses((prev) =>
+      prev.map((course) => (course.id === id ? { ...course, ...data } : course)),
     );
   }, []);
 
   const deleteCourse = useCallback((id: string) => {
-    setCourses(prev => prev.filter(c => c.id !== id));
+    setCourses((prev) => prev.filter((course) => course.id !== id));
   }, []);
 
   return (
@@ -68,8 +66,7 @@ export function CourseProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/* ─── Hook ──────────────────────────────────────────────────── */
-
+/** Returns the active course context. */
 export function useCourses() {
   const ctx = useContext(CourseContext);
   if (!ctx) throw new Error('useCourses must be used within <CourseProvider>');

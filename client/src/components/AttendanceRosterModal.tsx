@@ -30,9 +30,10 @@ const MOCK_STUDENTS: Omit<StudentAttendance, 'status' | 'note'>[] = [
   { id: '7', name: 'Sophia Kim', rollNo: 'CS-2024-007', initials: 'SK' },
 ];
 
+/** Shows a teacher-facing attendance sheet for a single class session. */
 export default function AttendanceRosterModal({ isOpen, onClose, date = new Date(), courseName }: AttendanceRosterModalProps) {
   const [students, setStudents] = useState<StudentAttendance[]>(
-    MOCK_STUDENTS.map(s => ({ ...s, status: 'present' })) // Default all to present
+    MOCK_STUDENTS.map(s => ({ ...s, status: 'present' }))
   );
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,7 +55,6 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
 
   const handleSave = () => {
     setIsSubmitting(true);
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       onClose();
@@ -64,16 +64,13 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
   const formattedDate = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
-      {/* Blurred Backdrop */}
-      <div className="absolute inset-0 bg-[#0d3349]/40 backdrop-blur-md transition-opacity duration-300"></div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300"></div>
 
-      {/* Modal Content */}
       <div 
-        className="relative w-full max-w-[640px] bg-white rounded-sm shadow-[0_20px_60px_rgba(13,51,73,0.15)] flex flex-col max-h-[90vh] overflow-hidden animate-fade-up transform transition-all"
+        className="relative z-10 w-full max-w-[640px] bg-white rounded-sm shadow-[0_20px_60px_rgba(13,51,73,0.15)] flex flex-col max-h-[90vh] overflow-hidden animate-fade-up transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header (Glassmorphic) */}
         <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] px-6 py-5 text-white flex items-center justify-between shrink-0 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
           
@@ -93,7 +90,6 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
           </button>
         </div>
 
-        {/* Stats Bar */}
         <div className="flex border-b border-[#e7dff0] bg-[#fbf8fe] px-6 py-3 shrink-0 gap-6">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-sm bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
@@ -110,7 +106,6 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
           <div className="ml-auto text-[12px] font-bold text-[#64748b]">Total: {students.length}</div>
         </div>
 
-        {/* List of Students */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 hide-scrollbar">
           {students.map((student, idx) => (
             <div 
@@ -123,7 +118,6 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
               `}
               style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'both' }}
             >
-              {/* Student Info */}
               <div className="flex items-center gap-3 mb-3 md:mb-0">
                 <div className={`
                     w-11 h-11 rounded-sm text-white text-[13px] font-extrabold flex items-center justify-center shrink-0 shadow-sm
@@ -141,10 +135,8 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
                 </div>
               </div>
 
-              {/* Toggles & Actions */}
               <div className="flex flex-col md:items-end gap-2">
                 <div className="flex bg-[#f3eff7] rounded-sm p-1 gap-1 border border-[#e7dff0] w-full md:w-auto relative overflow-hidden">
-                  {/* Sliding Background Indicator - implemented via selected button background for simplicity */}
                   {(['present', 'late', 'absent'] as AttendanceStatus[]).map((st) => (
                     <button
                       key={st}
@@ -164,7 +156,6 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
                   ))}
                 </div>
 
-                {/* Optional Note Toggle (Only for Late/Absent) */}
                 {student.status !== 'present' && (
                   <div className="w-full">
                     {activeNoteId === student.id ? (
@@ -194,7 +185,6 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
           ))}
         </div>
 
-        {/* Footer */}
         <div className="p-4 md:p-5 border-t border-[#e2e8f0] bg-[#fbf8fe] flex gap-3 shrink-0">
           <button 
             type="button" 

@@ -11,8 +11,8 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
   const { mySchedule } = useSchedule();
 
   const title = user?.role === 'teacher' ? 'Classes I Teach Today' : 'My Class Schedule';
-  const emptyStateText = user?.role === 'teacher' 
-    ? "You have no classes to teach today! Enjoy your day" 
+  const emptyStateText = user?.role === 'teacher'
+    ? "You have no classes to teach today! Enjoy your day"
     : "No classes scheduled for you today! Time to relax";
 
   const formattedDate = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date());
@@ -28,7 +28,7 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
           {formattedDate}
         </span>
       </div>
-      
+
       <div className="p-5 flex-1 flex flex-col gap-4 overflow-y-auto">
         {mySchedule.length > 0 ? (
           mySchedule.map((item, index) => (
@@ -54,7 +54,7 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
                   <span className="font-semibold text-primary">{item.room}</span>
                 </div>
                 {user?.role === 'teacher' && onTakeAttendance && (
-                  <button 
+                  <button
                     onClick={() => onTakeAttendance(item)}
                     className="flex items-center gap-1 bg-[#6a5182]/10 hover:bg-[#6a5182]/20 text-[#6a5182] px-2.5 py-1.5 rounded-md font-bold transition-colors cursor-pointer"
                   >

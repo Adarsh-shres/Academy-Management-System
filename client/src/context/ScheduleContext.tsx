@@ -1,10 +1,8 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ScheduleEntry } from '../types/schedule';
 import { MOCK_SCHEDULE } from '../data/mockSchedule';
 import { useAuth } from './AuthContext';
-
-/* ─── Context shape ─────────────────────────────────────────── */
 
 interface ScheduleContextValue {
   schedule: ScheduleEntry[];
@@ -17,44 +15,43 @@ interface ScheduleContextValue {
 
 const ScheduleContext = createContext<ScheduleContextValue | null>(null);
 
-/* ─── Provider ──────────────────────────────────────────────── */
-
 let nextId = MOCK_SCHEDULE.length + 1;
 
+/** Stores schedule data and exposes local schedule mutations. */
 export function ScheduleProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [schedule, setSchedule] = useState<ScheduleEntry[]>(MOCK_SCHEDULE);
 
   const mySchedule = useMemo(() => {
     if (!user) return [];
+
+    // Mock views split the seeded schedule by role until assignments are wired.
     if (user.role === 'teacher') {
-      // Mock teacher's schedule: First 4 items in the schedule
       return schedule.slice(0, 4);
-    } else {
-      // Mock student's schedule: Last 4 items in the schedule
-      return schedule.slice(-4);
     }
+
+    return schedule.slice(-4);
   }, [schedule, user]);
 
   const getEntryById = useCallback(
-    (id: number) => schedule.find(e => e.id === id),
+    (id: number) => schedule.find((entry) => entry.id === id),
     [schedule],
   );
 
   const addEntry = useCallback((data: Omit<ScheduleEntry, 'id'>): ScheduleEntry => {
     const newEntry: ScheduleEntry = { ...data, id: nextId++ };
-    setSchedule(prev => [...prev, newEntry]);
+    setSchedule((prev) => [...prev, newEntry]);
     return newEntry;
   }, []);
 
   const updateEntry = useCallback((id: number, data: Partial<ScheduleEntry>) => {
-    setSchedule(prev =>
-      prev.map(e => (e.id === id ? { ...e, ...data } : e)),
+    setSchedule((prev) =>
+      prev.map((entry) => (entry.id === id ? { ...entry, ...data } : entry)),
     );
   }, []);
 
   const deleteEntry = useCallback((id: number) => {
-    setSchedule(prev => prev.filter(e => e.id !== id));
+    setSchedule((prev) => prev.filter((entry) => entry.id !== id));
   }, []);
 
   return (
@@ -64,8 +61,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/* ─── Hook ──────────────────────────────────────────────────── */
-
+/** Returns the active schedule context. */
 export function useSchedule() {
   const ctx = useContext(ScheduleContext);
   if (!ctx) throw new Error('useSchedule must be used within <ScheduleProvider>');

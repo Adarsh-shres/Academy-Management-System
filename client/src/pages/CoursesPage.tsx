@@ -3,6 +3,7 @@ import CurriculumCard from '../components/CurriculumCard';
 import { useCourses } from '../context/CourseContext';
 import type { Course } from '../types/course';
 
+/** Shows curriculum overview and list management for courses. */
 export default function CoursesPage() {
   const { courses, addCourse, updateCourse, deleteCourse } = useCourses();
 
@@ -128,7 +129,6 @@ export default function CoursesPage() {
 
   const renderOverview = () => (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Course Curriculum</h1>
@@ -145,7 +145,6 @@ export default function CoursesPage() {
         </button>
       </div>
 
-      {/* Main Content Layout */}
       <div className="flex flex-col gap-8">
         {renderCurriculumSection(
           'Active Curriculum',
@@ -169,7 +168,6 @@ export default function CoursesPage() {
 
   const renderList = () => (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">Course Curriculum</h1>
@@ -182,9 +180,7 @@ export default function CoursesPage() {
         </button>
       </div>
 
-      {/* Table Container */}
       <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col">
-        {/* Toolbar */}
         <div className="flex items-center justify-between p-5 border-b border-[#e2e8f0]">
           <h3 className="text-[16px] font-bold text-[#0d3349]">Courses</h3>
           <div className="flex gap-3">
@@ -212,7 +208,6 @@ export default function CoursesPage() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -261,7 +256,6 @@ export default function CoursesPage() {
         </div>
       </div>
 
-      {/* Edit Modal Overlay */}
       {editingCourse && (
         <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditingCourse(null)}>
           <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -350,7 +344,6 @@ export default function CoursesPage() {
     <>
       {view === 'overview' ? renderOverview() : renderList()}
 
-      {/* New Course Modal Overlay */}
       {isNewCourseModalOpen && (
         <div className="fixed inset-0 z-[200] bg-[#0d3349]/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }}>
           <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>

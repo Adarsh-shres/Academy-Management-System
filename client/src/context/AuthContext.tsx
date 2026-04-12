@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
-
 
 export type UserRole = 'super_admin' | 'admin' | 'teacher' | 'student';
 
@@ -22,11 +21,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-
-/**
- * Fetch the user's profile row from the public `users` table.
- * Returns null when no row exists (the caller should treat this as unauthorised).
- */
+/** Loads the app profile linked to an authenticated Supabase user. */
 async function fetchUserProfile(userId: string, email?: string): Promise<AuthUser | null> {
   const { data, error } = await supabase
     .from('users')
@@ -42,17 +37,17 @@ async function fetchUserProfile(userId: string, email?: string): Promise<AuthUse
   const row = data?.[0];
   if (!row) {
     console.warn('[AuthContext] No profile row found for user', userId);
-    
-    // Fallback for mock testing where users table cannot be seeded due to RLS
+
+    // Keeps local teacher login working when the users table is not seeded.
     if (email === 'ram@s.edu') {
       return {
         id: userId,
-        email: email,
+        email,
         name: 'Ram (Teacher)',
-        role: 'teacher' as UserRole,
+        role: 'teacher',
       };
     }
-    
+
     return null;
   }
 
@@ -64,13 +59,11 @@ async function fetchUserProfile(userId: string, email?: string): Promise<AuthUse
   };
 }
 
-/*Provider */
-
+/** Provides auth state and profile-aware login helpers to the app tree. */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  /*  Bootstrap: check existing session on mount */
   useEffect(() => {
     let isMounted = true;
 
@@ -79,15 +72,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (session?.user) {
         const profile = await fetchUserProfile(session.user.id, session.user.email);
-        if (isMounted) setUser(profile);
+        if (isMounted) {
+          setUser(profile);
+        }
       }
 
-      if (isMounted) setIsLoading(false);
+      if (isMounted) {
+        setIsLoading(false);
+      }
     };
 
     bootstrap();
 
-    // Listen for sign-out and token refresh events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_OUT' || !session?.user) {
@@ -98,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (event === 'TOKEN_REFRESHED' && session?.user) {
+        if (event === 'TOKEN_REFRESHED') {
           const profile = await fetchUserProfile(session.user.id, session.user.email);
           if (isMounted) {
             setUser(profile);
@@ -114,18 +110,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Login
   const login = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string; user?: AuthUser }> => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) return { success: false, error: error.message };
+      if (error) {
+        return { success: false, error: error.message };
+      }
 
-      // Directly fetch the profile here (don't wait for onAuthStateChange)
       const profile = await fetchUserProfile(data.user.id, data.user.email);
-
       if (!profile) {
-        // Auth succeeded but no profile row — sign them out to avoid a stale session
         await supabase.auth.signOut();
         return {
           success: false,
@@ -133,14 +127,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       }
 
-      // Set user in context so the rest of the app picks it up
       setUser(profile);
       return { success: true, user: profile };
     },
     [],
   );
-/*  */
-  /* ── Logout ──────────────────────────────────────────────────── */
+
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -153,8 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/* ─── Hook ──────────────────────────────────────────────────── */
-
+/** Returns the active auth context. */
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');
