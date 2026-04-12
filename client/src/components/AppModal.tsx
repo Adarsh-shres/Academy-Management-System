@@ -29,7 +29,10 @@ export default function AppModal({ children, onClose, widthClass = 'max-w-3xl' }
 
   return createPortal(
     <div className="fixed inset-0 z-[300]">
-      <div className="absolute inset-0 bg-[rgba(15,23,42,0.28)] backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-[rgba(15,23,42,0.18)] backdrop-blur-[2px]"
+        onClick={onClose}
+      />
       <div className="absolute inset-0 overflow-y-auto">
         <div className="min-h-full flex items-start justify-center p-4 md:p-8">
           <div className={`relative w-full ${widthClass} my-6`} onClick={(event) => event.stopPropagation()}>
