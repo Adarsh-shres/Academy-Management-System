@@ -1,65 +1,27 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
-import type { Department, StudentFormData, StudentRecord } from '../types/student';
+import type { StudentFormData, StudentRecord } from '../types/student';
+import {
+  buildStudentFullName,
+  buildStudentProfileUpsert,
+  mapStudentRecord,
+  STUDENT_PROFILE_SELECT,
+  type StudentProfileRow,
+  type SupabaseStudentUserRow,
+} from '../lib/studentProfiles';
 
 interface StudentContextValue {
   students: StudentRecord[];
   getStudentById: (id: string) => StudentRecord | undefined;
   addStudent: (data: StudentFormData) => StudentRecord;
-  updateStudent: (id: string, data: Partial<StudentRecord>) => void;
+  updateStudent: (id: string, data: Partial<StudentRecord>) => Promise<void>;
   deleteStudent: (id: string) => void;
   toggleStudentStatus: (id: string) => void;
   refreshStudents: () => Promise<void>;
 }
 
-interface SupabaseUserRow {
-  id: string;
-  email: string | null;
-  name: string | null;
-  role: string | null;
-}
-
 const StudentContext = createContext<StudentContextValue | null>(null);
-
-function splitName(name: string) {
-  const trimmed = name.trim();
-  if (!trimmed) {
-    return { firstName: 'Unnamed', lastName: 'Student' };
-  }
-
-  const [firstName, ...rest] = trimmed.split(/\s+/);
-  return {
-    firstName,
-    lastName: rest.join(' ') || 'Student',
-  };
-}
-
-function mapStudent(row: SupabaseUserRow): StudentRecord | null {
-  if (row.role !== 'student') {
-    return null;
-  }
-
-  const { firstName, lastName } = splitName(row.name ?? '');
-
-  return {
-    id: row.id,
-    firstName,
-    lastName,
-    fatherName: '',
-    dateOfBirth: '',
-    mobileNo: '',
-    email: row.email ?? '',
-    password: '',
-    gender: 'Male',
-    department: '' as Department,
-    course: '',
-    city: '',
-    address: '',
-    isActive: true,
-    dateEnrolled: '',
-  };
-}
 
 export function StudentProvider({ children }: { children: ReactNode }) {
   const [students, setStudents] = useState<StudentRecord[]>([]);
@@ -76,15 +38,36 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const mapped = (data as SupabaseUserRow[])
-      .map(mapStudent)
+    const studentRows = (data as SupabaseStudentUserRow[]) ?? [];
+    let profileMap = new Map<string, StudentProfileRow>();
+
+    if (studentRows.length > 0) {
+      const { data: profileRows, error: profileError } = await supabase
+        .from('student_profiles')
+        .select(STUDENT_PROFILE_SELECT)
+        .in(
+          'student_id',
+          studentRows.map((student) => student.id),
+        );
+
+      if (profileError) {
+        if (profileError.code !== '42P01') {
+          console.error('[StudentContext] Failed to load student profiles:', profileError.message);
+        }
+      } else {
+        profileMap = new Map((profileRows as StudentProfileRow[]).map((profile) => [profile.student_id, profile]));
+      }
+    }
+
+    const mapped = studentRows
+      .map((row) => mapStudentRecord(row, profileMap.get(row.id)))
       .filter((student): student is StudentRecord => Boolean(student));
 
     setStudents(mapped);
   }, []);
 
   useEffect(() => {
-    refreshStudents();
+    void refreshStudents();
   }, [refreshStudents]);
 
   const getStudentById = useCallback(
@@ -103,9 +86,44 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     return newStudent;
   }, []);
 
-  const updateStudent = useCallback((id: string, data: Partial<StudentRecord>) => {
-    setStudents((prev) => prev.map((student) => (student.id === id ? { ...student, ...data } : student)));
-  }, []);
+  const updateStudent = useCallback(
+    async (id: string, data: Partial<StudentRecord>) => {
+      const currentStudent = students.find((student) => student.id === id);
+
+      if (!currentStudent) {
+        return;
+      }
+
+      const nextStudent: StudentRecord = {
+        ...currentStudent,
+        ...data,
+        id,
+        email: currentStudent.email,
+      };
+
+      const { error: userError } = await supabase
+        .from('users')
+        .update({
+          name: buildStudentFullName(nextStudent),
+        })
+        .eq('id', id);
+
+      if (userError) {
+        throw new Error(userError.message);
+      }
+
+      const { error: profileError } = await supabase
+        .from('student_profiles')
+        .upsert(buildStudentProfileUpsert(nextStudent), { onConflict: 'student_id' });
+
+      if (profileError) {
+        throw new Error(profileError.message);
+      }
+
+      setStudents((prev) => prev.map((student) => (student.id === id ? nextStudent : student)));
+    },
+    [students],
+  );
 
   const deleteStudent = useCallback((id: string) => {
     setStudents((prev) => prev.filter((student) => student.id !== id));

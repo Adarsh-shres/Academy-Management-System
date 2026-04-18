@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { buildStudentAvatar, STUDENT_PROFILE_SELECT, type StudentProfileRow } from '../lib/studentProfiles';
 
-// Define the mapped frontend types we need to build for the UI
 export interface CourseData {
   id: string;
   name: string;
   code: string;
   instructor: string;
   credits: number;
-  attendance: number;       // calculated %
-  totalClasses: number;     // calculated count
-  attendedClasses: number;  // calculated count
+  attendance: number;
+  totalClasses: number;
+  attendedClasses: number;
   color: string;
   schedule: string;
 }
@@ -23,7 +23,7 @@ export interface AssignmentData {
   courseCode: string;
   deadline: string;
   status: 'pending' | 'submitted';
-  marks: string; 
+  marks: string;
   grade: string | null;
   submittedOn: string | null;
   isPending: boolean;
@@ -46,16 +46,14 @@ export interface StudentProfileData {
 
 export function useStudentData() {
   const { user } = useAuth();
-  
+
   const [courses, setCourses] = useState<CourseData[]>([]);
   const [assignments, setAssignments] = useState<AssignmentData[]>([]);
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
-  
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Helper colors for UI matching the brand
-  const uiColors = ["#6a5182", "#8b6ca8", "#4b3f68", "#b096cc", "#778196"];
+  const uiColors = ['#6a5182', '#8b6ca8', '#4b3f68', '#b096cc', '#778196'];
 
   useEffect(() => {
     if (!user) {
@@ -63,80 +61,92 @@ export function useStudentData() {
       return;
     }
 
+    const currentUser = user;
+
     async function fetchData() {
       setIsLoading(true);
       setError(null);
-      
+
       try {
-        // 1. Fetch Profile Info (from users table, joining anything extra if available)
-        // Since student_profiles doesn't exist, we map what we can from user.
+        const { data: studentProfileRow, error: profileError } = await supabase
+          .from('student_profiles')
+          .select(STUDENT_PROFILE_SELECT)
+          .eq('student_id', currentUser.id)
+          .maybeSingle();
+
+        if (profileError && profileError.code !== '42P01') {
+          console.error('Fetch Student Profile Error:', profileError);
+        }
+
+        const profileRow = (studentProfileRow as StudentProfileRow | null) ?? null;
+        const enrolledYear = profileRow?.date_enrolled ? new Date(profileRow.date_enrolled).getFullYear() : null;
+
         setProfile({
-          id: user!.id,
-          name: user!.name || 'Student',
-          email: user!.email || '',
-          avatar: (user!.name || 'S').substring(0, 2).toUpperCase(),
-          course: 'Bachelor of Computer Science', // mocked fallback
-          semester: '5th Semester', // mocked fallback
-          rollNo: 'STD-' + user!.id.substring(0, 4).toUpperCase(),
-          department: 'Computer Science',
-          batch: '2023-2027',
-          phone: 'N/A'
+          id: currentUser.id,
+          name: currentUser.name || 'Student',
+          email: currentUser.email || '',
+          avatar: buildStudentAvatar(currentUser.name || 'Student'),
+          course: profileRow?.course || 'Course not set yet',
+          semester: 'Semester not set',
+          rollNo: `STD-${currentUser.id.substring(0, 4).toUpperCase()}`,
+          department: profileRow?.department || 'Department not set yet',
+          batch: enrolledYear ? `${enrolledYear}-${enrolledYear + 4}` : 'Batch not set',
+          phone: profileRow?.mobile_no || 'N/A',
         });
 
-        // 2. Fetch Enrollments (joined with courses) + Attendance
-        // NOTE: These operations rely on the new schema tables you create.
-        
-        // Fetch enrollments
         const { data: enrollmentsData, error: enrollError } = await supabase
           .from('enrollments')
           .select('*, courses(*)')
-          .eq('student_id', user!.id);
-          
-        if (enrollError && enrollError.code !== '42P01') console.error('Fetch Enrollments Error:', enrollError);
+          .eq('student_id', currentUser.id);
 
-        // Fetch attendance for these courses
+        if (enrollError && enrollError.code !== '42P01') {
+          console.error('Fetch Enrollments Error:', enrollError);
+        }
+
         const { data: attendanceData, error: attError } = await supabase
           .from('attendance')
           .select('*')
-          .eq('student_id', user!.id);
-          
-        if (attError && attError.code !== '42P01') console.error('Fetch Attendance Error:', attError);
+          .eq('student_id', currentUser.id);
+
+        if (attError && attError.code !== '42P01') {
+          console.error('Fetch Attendance Error:', attError);
+        }
 
         const mappedCourses: CourseData[] = (enrollmentsData || []).map((enr: any, idx: number) => {
           const course = enr.courses;
-          // Calculate attendance metrics
           const courseAttendance = (attendanceData || []).filter((a: any) => a.course_id === course.id);
           const totalClasses = courseAttendance.length;
           const attendedClasses = courseAttendance.filter((a: any) => a.status === 'Present').length;
           const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
-          
+          const scheduleDays = Array.isArray(course.schedule_days) ? course.schedule_days.join(', ') : '';
+
           return {
             id: course.id,
             name: course.name || 'Unknown Course',
             code: course.course_code || '---',
             instructor: course.faculty_lead || 'Unknown',
-            credits: 3, // Missing from schema, default 3
+            credits: 3,
             attendance: attendancePercent,
-            totalClasses: totalClasses || 0,
-            attendedClasses: attendedClasses || 0,
+            totalClasses,
+            attendedClasses,
             color: uiColors[idx % uiColors.length],
-            schedule: (course.schedule_days || []).join(', ') + ' — TBD'
+            schedule: scheduleDays ? `${scheduleDays} - TBD` : 'Schedule not set',
           };
         });
-        
+
         setCourses(mappedCourses);
 
-        // 3. Fetch Assignment Submissions (joined with assignments)
         const { data: submissionsData, error: subError } = await supabase
           .from('assignment_submissions')
           .select('*, assignments(*)')
-          .eq('student_id', user!.id);
+          .eq('student_id', currentUser.id);
 
-        if (subError && subError.code !== '42P01') console.error('Fetch Submissions Error:', subError);
+        if (subError && subError.code !== '42P01') {
+          console.error('Fetch Submissions Error:', subError);
+        }
 
         const mappedAssignments: AssignmentData[] = (submissionsData || []).map((sub: any) => {
           const assign = sub.assignments;
-          const isPending = sub.status === 'pending';
           return {
             id: sub.id,
             title: assign.title || 'Untitled',
@@ -147,14 +157,13 @@ export function useStudentData() {
             marks: sub.marks_awarded ? `${sub.marks_awarded} marks` : 'Pending',
             grade: sub.grade || null,
             submittedOn: sub.submitted_at || null,
-            isPending,
+            isPending: sub.status === 'pending',
             description: assign.description,
-            fileUrl: sub.file_url
+            fileUrl: sub.file_url,
           };
         });
-        
-        setAssignments(mappedAssignments.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()));
 
+        setAssignments(mappedAssignments.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()));
       } catch (err: any) {
         console.error('Data loading error:', err);
         setError(err.message || 'An error occurred while loading data.');
@@ -163,7 +172,7 @@ export function useStudentData() {
       }
     }
 
-    fetchData();
+    void fetchData();
   }, [user]);
 
   return {
@@ -171,6 +180,6 @@ export function useStudentData() {
     assignments,
     profile,
     isLoading,
-    error
+    error,
   };
 }

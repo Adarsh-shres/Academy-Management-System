@@ -5,7 +5,7 @@ import type { StudentRecord } from '../types/student';
 interface StudentEditorModalProps {
   student: StudentRecord;
   onClose: () => void;
-  onSave: (student: StudentRecord) => void;
+  onSave: (student: StudentRecord) => void | Promise<void>;
 }
 
 function SectionTitle({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
@@ -114,7 +114,13 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div className="grid gap-2">
                   <FieldLabel>Email</FieldLabel>
-                  <input type="email" className={inputClassName()} value={draft.email} onChange={(e) => setField('email', e.target.value)} />
+                  <input
+                    type="email"
+                    className={`${inputClassName()} cursor-not-allowed bg-[#f8fafc] text-[#64748b]`}
+                    value={draft.email}
+                    readOnly
+                    title="Student email is managed when the account is created."
+                  />
                 </div>
                 <div className="grid gap-2">
                   <FieldLabel>Mobile No</FieldLabel>

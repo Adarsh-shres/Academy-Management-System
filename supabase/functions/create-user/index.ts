@@ -36,6 +36,15 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+function readProfileString(profile: Record<string, unknown>, key: string) {
+  const value = profile[key];
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function readStudentGender(profile: Record<string, unknown>) {
+  return profile.gender === 'Female' ? 'Female' : 'Male';
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -144,6 +153,29 @@ serve(async (req) => {
     if (upsertError) {
       await supabaseAdmin.auth.admin.deleteUser(createdUser.id);
       throw upsertError;
+    }
+
+    if (targetRole === 'student') {
+      const { error: studentProfileError } = await supabaseAdmin.from('student_profiles').upsert(
+        {
+          student_id: createdUser.id,
+          father_name: readProfileString(profile, 'father_name'),
+          date_of_birth: readProfileString(profile, 'date_of_birth') || null,
+          mobile_no: readProfileString(profile, 'mobile_no'),
+          gender: readStudentGender(profile),
+          department: readProfileString(profile, 'department'),
+          course: readProfileString(profile, 'course'),
+          city: readProfileString(profile, 'city'),
+          address: readProfileString(profile, 'address'),
+        },
+        { onConflict: 'student_id' },
+      );
+
+      if (studentProfileError) {
+        await supabaseAdmin.from('users').delete().eq('id', createdUser.id);
+        await supabaseAdmin.auth.admin.deleteUser(createdUser.id);
+        throw studentProfileError;
+      }
     }
 
     return jsonResponse({

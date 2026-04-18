@@ -11,6 +11,7 @@ export default function AllStudentsPage() {
   const { students, toggleStudentStatus, deleteStudent, updateStudent } = useStudents();
   const [editingStudent, setEditingStudent] = useState<StudentRecord | null>(null);
   const [studentToDelete, setStudentToDelete] = useState<StudentRecord | null>(null);
+  const [saveError, setSaveError] = useState('');
 
   const formatCourseDetails = (department: string, course: string) => {
     if (department && course) return { badge: department, text: course };
@@ -29,6 +30,11 @@ export default function AllStudentsPage() {
       </div>
 
       <div className="mt-4 flex flex-col overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-sm">
+        {saveError && (
+          <div className="border-b border-rose-200 bg-rose-50 px-6 py-3 text-[13.5px] font-semibold text-rose-700">
+            {saveError}
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[14px] text-[#1e293b]">
             <thead className="border-b border-[#e2e8f0] bg-[#f8fafc] text-[13px] font-semibold uppercase tracking-wide text-[#64748b]">
@@ -121,9 +127,15 @@ export default function AllStudentsPage() {
         <StudentEditorModal
           student={editingStudent}
           onClose={() => setEditingStudent(null)}
-          onSave={(updatedStudent) => {
-            updateStudent(updatedStudent.id, updatedStudent);
-            setEditingStudent(null);
+          onSave={async (updatedStudent) => {
+            try {
+              setSaveError('');
+              await updateStudent(updatedStudent.id, updatedStudent);
+              setEditingStudent(null);
+            } catch (error) {
+              const message = error instanceof Error ? error.message : 'Failed to save student changes.';
+              setSaveError(message);
+            }
           }}
         />
       )}

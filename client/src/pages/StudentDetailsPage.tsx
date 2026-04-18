@@ -13,6 +13,7 @@ export default function StudentDetailsPage() {
   const student = getStudentById(id || '1');
   const [editingStudent, setEditingStudent] = useState<StudentRecord | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const handleDeleteStudent = () => {
     if (!student) {
@@ -93,6 +94,12 @@ export default function StudentDetailsPage() {
           Personal & Academic Information
         </h2>
 
+        {saveError && (
+          <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13.5px] font-semibold text-rose-700">
+            {saveError}
+          </div>
+        )}
+
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex shrink-0 flex-col items-center gap-3">
             <div className="flex h-40 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#e2e8f0] bg-[#f1f5f9] text-[40px] font-bold text-[#64748b]">
@@ -130,9 +137,15 @@ export default function StudentDetailsPage() {
         <StudentEditorModal
           student={editingStudent}
           onClose={() => setEditingStudent(null)}
-          onSave={(updatedStudent) => {
-            updateStudent(updatedStudent.id, updatedStudent);
-            setEditingStudent(null);
+          onSave={async (updatedStudent) => {
+            try {
+              setSaveError('');
+              await updateStudent(updatedStudent.id, updatedStudent);
+              setEditingStudent(null);
+            } catch (error) {
+              const message = error instanceof Error ? error.message : 'Failed to save student changes.';
+              setSaveError(message);
+            }
           }}
         />
       )}
