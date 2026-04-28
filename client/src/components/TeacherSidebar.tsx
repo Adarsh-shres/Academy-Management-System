@@ -1,11 +1,11 @@
-import { LayoutDashboard, ClipboardList, Users, Calendar, Settings } from './icons';
+import { LayoutDashboard, ClipboardList, Users, Calendar } from './icons';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', id: 'Dashboard', icon: <LayoutDashboard size={16} /> },
   { name: 'Assignment', id: 'Assignment', icon: <ClipboardList size={16} /> },
   { name: 'Classes', id: 'Classes', icon: <Users size={16} /> },
   { name: 'Schedule', id: 'Schedule', icon: <Calendar size={16} /> },
-  { name: 'Settings', id: 'Settings', icon: <Settings size={16} /> },
+
 ];
 
 interface TeacherSidebarProps {

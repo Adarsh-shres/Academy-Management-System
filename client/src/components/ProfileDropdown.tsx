@@ -31,7 +31,11 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
 
   const handleSettingsClick = () => {
     setIsOpen(false);
-    navigate('/settings');
+    if (user?.role === 'teacher') {
+      navigate('/teacher/settings');
+    } else {
+      navigate('/settings');
+    }
   };
 
   // Helper to get initials
@@ -73,7 +77,7 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
     </div>
   );
 
-  const canAccessSettings = user?.role === 'super_admin' || user?.role === 'admin';
+  const canAccessSettings = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'teacher';
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Search, Bell, Mail, ChevronLeft, ChevronRight, PlusCircle, ClipboardList, Users, Calendar, Settings, FileText, CheckCircle } from '../components/icons';
+import { Bell, Mail, ChevronLeft, ChevronRight, PlusCircle, ClipboardList, Users, Calendar, FileText, CheckCircle } from '../components/icons';
 import TeacherSidebar from '../components/TeacherSidebar';
 import TeacherStatCard from '../components/TeacherStatCard';
 import PersonalizedSchedule from '../components/PersonalizedSchedule';
@@ -160,14 +160,10 @@ export default function TeacherDashboardPage() {
           .limit(5);
 
         if (!recent || recent.length === 0) {
-           setTotalAssignments(12);
-           setRecentAssignments([
-             { id: 'm1', title: 'Midterm Project', due_date: new Date(Date.now() + 86400000 * 3).toISOString() },
-             { id: 'm2', title: 'Chapter 5 Quiz', due_date: new Date(Date.now() + 86400000 * 1).toISOString() },
-             { id: 'm3', title: 'Homework 1', due_date: new Date(Date.now() - 86400000 * 2).toISOString() }
-           ]);
-           setPendingGradesCount(5);
-        } else {
+            setTotalAssignments(0);
+            setRecentAssignments([]);
+            setPendingGradesCount(0);
+         } else {
            setTotalAssignments(assignCount || 0);
            setRecentAssignments(recent);
            
@@ -291,7 +287,6 @@ export default function TeacherDashboardPage() {
       case 'Assignment': return <TeacherAssignmentPage />;
       case 'Classes': return <TeacherClassesPage />;
       case 'Schedule': return <TeacherSchedulePage />;
-      case 'Settings': return renderPlaceholder('Settings', Settings);
       default: return renderDashboardContent();
     }
   };
@@ -303,14 +298,6 @@ export default function TeacherDashboardPage() {
       <main className="flex-1 ml-[210px] flex flex-col min-h-screen max-w-full overflow-x-hidden">
         
         <header className="h-[58px] bg-white border-b border-[#e7dff0] px-7 flex items-center gap-3.5 sticky top-0 z-50 shrink-0">
-          <div className="flex-1 max-w-[420px] relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] pointer-events-none" size={15} />
-            <input 
-              type="text" 
-              placeholder="Search something here..." 
-              className="w-full py-2 pr-3.5 pl-9 bg-[#f6f2fb] border border-transparent rounded-full text-[13px] text-[#1e293b] outline-none transition-all duration-200 focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 placeholder:text-[#94a3b8]"
-            />
-          </div>
 
           <div className="flex items-center gap-4 ml-auto">
             <button className="relative text-[#64748b] hover:text-primary transition-colors cursor-pointer">
@@ -322,7 +309,7 @@ export default function TeacherDashboardPage() {
             
             <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
             
-            <ProfileDropdown useSimpleIcon={true} />
+            <ProfileDropdown />
           </div>
         </header>
 

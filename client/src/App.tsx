@@ -15,6 +15,7 @@ import TeachersPage from './pages/TeachersPage.tsx';
 import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
+import TeacherSettingsPage from './pages/TeacherSettingsPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
 import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
@@ -75,6 +76,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherClassDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/settings"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherSettingsPage />
             </ProtectedRoute>
           }
         />
