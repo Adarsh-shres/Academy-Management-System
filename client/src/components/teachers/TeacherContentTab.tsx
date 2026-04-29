@@ -2,33 +2,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Plus, Trash2, ChevronDown, ChevronRight, FileText, Video, Users, File } from '../shared/icons';
 
-const MOCK_WEEKS: Week[] = [
-  {
-    id: 'Week 1: Introduction',
-    title: 'Week 1: Introduction',
-    items: [
-      { id: 'c1', title: 'Course Syllabus', type: 'Study Material', fileName: 'syllabus.pdf' },
-      { id: 'c2', title: 'Introductory Lecture', type: 'Lecture', description: 'Overview of the course and objectives.' }
-    ]
-  },
-  {
-    id: 'Week 2: Fundamentals',
-    title: 'Week 2: Fundamentals',
-    items: [
-      { id: 'c3', title: 'Chapter 1 Readings', type: 'Study Material', fileName: 'chapter1.pdf' },
-      { id: 'c4', title: 'Discussion Workshop', type: 'Workshop' }
-    ]
-  }
-];
+
 
 interface ContentItem {
   id: string;
   title: string;
-  type: 'Lecture' | 'Tutorial' | 'Workshop' | 'Study Material';
+  type: 'Lecture' | 'Tutorial' | 'Workshop' | 'Assignment' | 'Other';
   description?: string;
   fileUrl?: string;
   fileName?: string;
-  week_number?: string | number;
+  week_number?: number;
 }
 
 interface Week {
@@ -38,12 +21,12 @@ interface Week {
 }
 
 interface TeacherContentTabProps {
+  courseId?: string;
   classId?: string;
-  teacherId?: string;
 }
 
 /** Manages weekly course materials for a teacher's class. */
-export default function TeacherContentTab({ classId, teacherId }: TeacherContentTabProps) {
+export default function TeacherContentTab({ courseId, classId }: TeacherContentTabProps) {
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [expandedWeeks, setExpandedWeeks] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -55,9 +38,10 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
 
   const [newWeekTitle, setNewWeekTitle] = useState('');
   const [activeWeekId, setActiveWeekId] = useState<string | null>(null);
+  const [activeWeekNumber, setActiveWeekNumber] = useState<number>(1);
   
   const [contentTitle, setContentTitle] = useState('');
-  const [contentType, setContentType] = useState<'Lecture' | 'Tutorial' | 'Workshop' | 'Study Material'>('Lecture');
+  const [contentType, setContentType] = useState<'Lecture' | 'Tutorial' | 'Workshop' | 'Assignment' | 'Other'>('Lecture');
   const [contentDesc, setContentDesc] = useState('');
   const [contentFile, setContentFile] = useState<File | null>(null);
   const [contentFileError, setContentFileError] = useState('');
@@ -67,56 +51,39 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
     setIsLoading(true);
     try {
       const { data } = await supabase
-        .from('assignments')
+        .from('course_content')
         .select('*')
         .eq('class_id', classId)
-        .in('type', ['lecture', 'tutorial', 'workshop', 'study_material'])
+        .order('week_number', { ascending: true })
         .order('created_at', { ascending: true });
 
-      if (data) {
-        const weeksMap: Record<string, Week> = {};
-        
+      if (data && data.length > 0) {
+        const weeksMap: Record<number, Week> = {};
         data.forEach((item: any) => {
-          const wKey = item.week_number ? String(item.week_number) : 'Uncategorized Week';
-          if (!weeksMap[wKey]) {
-             weeksMap[wKey] = {
-               id: wKey,
-               title: wKey,
-               items: []
-             };
+          const wNum = item.week_number || 0;
+          if (!weeksMap[wNum]) {
+            weeksMap[wNum] = {
+              id: String(wNum),
+              title: wNum > 0 ? `Week ${wNum}` : 'Uncategorized',
+              items: []
+            };
           }
-          let mappedType = 'Study Material';
-          if (item.type === 'lecture') mappedType = 'Lecture';
-          if (item.type === 'tutorial') mappedType = 'Tutorial';
-          if (item.type === 'workshop') mappedType = 'Workshop';
-
-          weeksMap[wKey].items.push({
-             id: item.id,
-             title: item.title,
-             type: mappedType as any,
-             description: item.description,
-             fileUrl: item.attachment_url,
-             fileName: item.attachment_url?.split('/').pop() || '',
-             week_number: item.week_number
+          weeksMap[wNum].items.push({
+            id: item.id,
+            title: item.title,
+            type: (item.material_type || 'Other') as any,
+            description: item.description,
+            fileUrl: item.file_url,
+            fileName: item.file_url?.split('/').pop() || '',
+            week_number: wNum
           });
         });
-
-        const mergedWeeks = [...weeks];
-        
-        if (Object.keys(weeksMap).length === 0 && weeks.length === 0) {
-           setWeeks(MOCK_WEEKS);
-        } else {
-           Object.values(weeksMap).forEach(fetchedWeek => {
-              const existingIdx = mergedWeeks.findIndex(w => w.title === fetchedWeek.title);
-              if (existingIdx >= 0) {
-                 mergedWeeks[existingIdx].items = fetchedWeek.items;
-              } else {
-                 mergedWeeks.push(fetchedWeek);
-              }
-           });
-           setWeeks(mergedWeeks);
-        }
+        const sorted = Object.keys(weeksMap).map(Number).sort((a, b) => a - b);
+        setWeeks(sorted.map(k => weeksMap[k]));
+      } else {
+        setWeeks([]);
       }
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -135,9 +102,13 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
   const handleAddWeek = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWeekTitle.trim()) return;
+    // Extract week number from title or auto-increment
+    const numMatch = newWeekTitle.trim().match(/\d+/);
+    const weekNum = numMatch ? parseInt(numMatch[0]) : weeks.length + 1;
+    const weekTitle = newWeekTitle.trim();
     const newWeek: Week = {
-      id: newWeekTitle.trim(),
-      title: newWeekTitle.trim(),
+      id: String(weekNum),
+      title: weekTitle,
       items: []
     };
     if (weeks.find(w => w.title === newWeek.title)) return;
@@ -173,22 +144,18 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
          publicUrl = await handleFileUpload(contentFile);
        }
 
-       let dbType = 'study_material';
-       if (contentType === 'Lecture') dbType = 'lecture';
-       if (contentType === 'Tutorial') dbType = 'tutorial';
-       if (contentType === 'Workshop') dbType = 'workshop';
+       const { data: { user } } = await supabase.auth.getUser();
+       if (!user) throw new Error('Not authenticated');
 
-       const { error } = await supabase.from('assignments').insert({
+       const { error } = await supabase.from('course_content').insert({
          class_id: classId,
-         teacher_id: teacherId,
+         course_id: courseId,
+         teacher_id: user.id,
          title: contentTitle,
          description: contentDesc,
-         type: dbType,
-         week_number: activeWeekId,
-         attachment_url: publicUrl,
-         portal_open: false,
-         due_date: null,
-         due_time: null
+         file_url: publicUrl,
+         week_number: activeWeekNumber,
+         material_type: contentType
        });
        
        if (error) throw error;
@@ -208,17 +175,35 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
     }
   };
 
-  const handleDeleteWeek = () => {
+  const handleDeleteWeek = async () => {
     if (!deleteWeekId) return;
-    setWeeks(weeks.filter(w => w.id !== deleteWeekId));
-    // Empty weeks are local-only until a dedicated weeks table exists.
-    setDeleteWeekId(null);
+    try {
+      const weekNum = parseInt(deleteWeekId);
+      if (!isNaN(weekNum) && classId) {
+        // Delete all materials for this week from Supabase
+        const query = supabase
+          .from('course_content')
+          .delete()
+          .eq('week_number', weekNum)
+          .eq('class_id', classId);
+        if (courseId) query.eq('course_id', courseId);
+        await query;
+      }
+      // Remove from local state and refresh
+      setWeeks(weeks.filter(w => w.id !== deleteWeekId));
+      setDeleteWeekId(null);
+      await loadContent();
+    } catch (err: any) {
+      console.error(err);
+      alert('Failed to delete week.');
+      setDeleteWeekId(null);
+    }
   };
 
   const handleDeleteContent = async () => {
     if (!deleteContentId) return;
     try {
-      await supabase.from('assignments').delete().eq('id', deleteContentId.contentId);
+      await supabase.from('course_content').delete().eq('id', deleteContentId.contentId);
       await loadContent();
     } catch (err: any) {
       alert("Failed to delete content");
@@ -229,6 +214,8 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
 
   const openAddContentModal = (weekId: string) => {
     setActiveWeekId(weekId);
+    const numMatch = weekId.match(/\d+/);
+    setActiveWeekNumber(numMatch ? parseInt(numMatch[0]) : 1);
     setContentFile(null);
     setContentFileError('');
     setIsAddContentOpen(true);
@@ -296,7 +283,8 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
       case 'Lecture': return <Video size={16} />;
       case 'Tutorial': return <Users size={16} />;
       case 'Workshop': return <Users size={16} />;
-      case 'Study Material': return <File size={16} />;
+      case 'Assignment': return <FileText size={16} />;
+      case 'Other': return <File size={16} />;
       default: return <FileText size={16} />;
     }
   };
@@ -306,7 +294,8 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
       case 'Lecture': return 'bg-[#e0f2fe] text-[#0284c7] border-[#bae6fd]';
       case 'Tutorial': return 'bg-[#fce7f3] text-[#db2777] border-[#fbcfe8]';
       case 'Workshop': return 'bg-[#fef3c7] text-[#d97706] border-[#fde68a]';
-      case 'Study Material': return 'bg-[#dcfce7] text-[#16a34a] border-[#bbf7d0]';
+      case 'Assignment': return 'bg-[#dcfce7] text-[#16a34a] border-[#bbf7d0]';
+      case 'Other': return 'bg-[#f3eff7] text-[#6a5182] border-[#d8c8e9]';
       default: return 'bg-[#f3eff7] text-[#6a5182] border-[#d8c8e9]';
     }
   };
@@ -483,7 +472,8 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
                   <option value="Lecture">Lecture</option>
                   <option value="Tutorial">Tutorial</option>
                   <option value="Workshop">Workshop</option>
-                  <option value="Study Material">Study Material</option>
+                  <option value="Assignment">Assignment</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div>

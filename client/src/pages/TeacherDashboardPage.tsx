@@ -108,9 +108,7 @@ export default function TeacherDashboardPage() {
   };
 
   /* ─── Announcements state ──────────────────────────────────── */
-  const announcements = [
-    { id: 1, author: 'Super Admin', initials: 'SA', time: '2 hours ago', text: 'Please make sure all final grades for this semester are submitted by Friday at 5:00 PM. The system will be locked for grading review over the weekend. Thank you for your hard work!' },
-  ];
+  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [isLoadingCounters, setIsLoadingCounters] = useState(true);
   const [totalAssignments, setTotalAssignments] = useState(0);
   const [pendingGradesCount, setPendingGradesCount] = useState(0);
@@ -123,6 +121,26 @@ export default function TeacherDashboardPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         
+        // Fetch announcements from notifications table
+        const { data: announcementData } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('type', 'announcement')
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (announcementData && announcementData.length > 0) {
+          setAnnouncements(announcementData.map((n: any) => ({
+            id: n.id,
+            author: n.sender_name || 'Admin',
+            initials: (n.sender_name || 'AD').substring(0, 2).toUpperCase(),
+            time: getRelativeTime(n.created_at),
+            text: n.message || n.content || '',
+          })));
+        } else {
+          setAnnouncements([]);
+        }
+
         const { count: assignCount } = await supabase
           .from('assignments')
           .select('id', { count: 'exact', head: true })

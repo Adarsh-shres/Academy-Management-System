@@ -12,9 +12,11 @@ import TeacherContentTab from '../components/teachers/TeacherContentTab';
 export default function TeacherClassDetailPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
-  
+
   const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades'>('content');
   const [course, setCourse] = useState<any>(null);
+  const [realClassId, setRealClassId] = useState<string | null>(null);
+  const [className, setClassName] = useState<string>('');
   const [students, setStudents] = useState<any[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
 
@@ -36,7 +38,7 @@ export default function TeacherClassDetailPage() {
           .select('*')
           .eq('id', classId)
           .single();
-          
+
         if (error || !data) {
           navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
           return;
@@ -46,6 +48,18 @@ export default function TeacherClassDetailPage() {
           room: data.department || 'Virtual',
           course_code: data.course_code || 'N/A'
         });
+
+        // Look up the actual class_id and name from classes table for this course
+        const { data: classData } = await supabase
+          .from('classes')
+          .select('id, name')
+          .eq('course_id', classId)
+          .limit(1)
+          .single();
+        if (classData) {
+          setRealClassId(classData.id);
+          setClassName(classData.name || '');
+        }
       } catch (err) {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
@@ -54,30 +68,59 @@ export default function TeacherClassDetailPage() {
   }, [classId, navigate]);
 
   useEffect(() => {
-    if (!course) return;
+    if (!course || !classId) return;
 
     async function fetchStudents() {
       setIsLoadingStudents(true);
       try {
-        const { data, error } = await supabase
+        // Step 1: Get student IDs from enrollments using course_id
+        const { data: enrollmentData, error: enrollError } = await supabase
+          .from('enrollments')
+          .select('student_id')
+          .eq('course_id', classId);
+
+        console.log('Enrollment data:', enrollmentData, 'Error:', enrollError);
+
+        if (enrollError) {
+          console.error('Enrollment fetch error:', enrollError.message);
+          setStudents([]);
+          return;
+        }
+
+        if (!enrollmentData || enrollmentData.length === 0) {
+          console.log('No enrollments found for course_id:', classId);
+          setStudents([]);
+          return;
+        }
+
+        // Step 2: Get student details from users table
+        const studentIds = enrollmentData.map((e: any) => e.student_id);
+        console.log('Student IDs:', studentIds);
+
+        const { data: studentsData, error: studentsError } = await supabase
           .from('users')
           .select('id, name, email')
-          .eq('role', 'student');
+          .in('id', studentIds);
 
-        if (!error && data && data.length > 0) {
-          setStudents(data);
-        } else {
+        console.log('Students data:', studentsData, 'Error:', studentsError);
+
+        if (studentsError) {
+          console.error('Students fetch error:', studentsError.message);
           setStudents([]);
+          return;
         }
+
+        setStudents(studentsData || []);
       } catch (err: any) {
         console.error('Failed to fetch students:', err.message);
+        setStudents([]);
       } finally {
         setIsLoadingStudents(false);
       }
     }
 
     fetchStudents();
-  }, [course]);
+  }, [course, classId]);
 
   // Load Submissions dynamically when entering grades view
   const loadSubmissions = async () => {
@@ -87,14 +130,14 @@ export default function TeacherClassDetailPage() {
         .from('submissions')
         .select('*, users!inner(name), assignments!inner(title, class_id)')
         .eq('assignments.class_id', classId);
-      
+
       if (!error && data && data.length > 0) {
         setSubmissions(data);
       } else {
         setSubmissions([]);
       }
     } catch (err: any) {
-       console.error('Failed to fetch submissions', err);
+      console.error('Failed to fetch submissions', err);
     } finally {
       setIsLoadingGrades(false);
     }
@@ -124,15 +167,15 @@ export default function TeacherClassDetailPage() {
       if (!user) throw new Error("Not logged in");
 
       const { error } = await supabase.from('notifications').insert({
-        class_id: classId,
+        class_id: realClassId || classId,
         teacher_id: user.id,
         message: `${title.toUpperCase()}\n\n${message}`,
-        type: 'announcement',
+        type: 'manual',
         created_at: new Date().toISOString()
       });
 
       if (error) throw error;
-      
+
       alert('Notification broadcasted to all enrolled students!');
       setTitle('');
       setMessage('');
@@ -150,10 +193,10 @@ export default function TeacherClassDetailPage() {
       <TeacherSidebar activeTab="Classes" onTabChange={handleTabChange} />
 
       <main className="flex-1 ml-[210px] flex flex-col min-w-0 bg-[#f9f8fa] overflow-y-auto hide-scrollbar">
-        
+
         <header className="h-[68px] bg-white/80 backdrop-blur-md border-b border-[#e7dff0] px-6 md:px-8 flex items-center shrink-0 sticky top-0 z-40">
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => handleTabChange('Classes')}
               className="text-[#64748b] hover:text-[#4b3f68] transition-colors p-1.5 rounded-sm hover:bg-[#fbf8fe]"
               title="Back to My Classes"
@@ -178,7 +221,7 @@ export default function TeacherClassDetailPage() {
         </header>
 
         <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1200px] mx-auto w-full">
-          
+
           <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden mb-6">
             <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] h-3"></div>
             <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
@@ -206,56 +249,52 @@ export default function TeacherClassDetailPage() {
           <div className="flex space-x-6 border-b border-[#e7dff0] mb-6 px-2 overflow-x-auto">
             <button
               onClick={() => setActiveSubTab('content')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${
-                activeSubTab === 'content' 
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]' 
+              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'content'
+                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
                   : 'text-[#64748b] hover:text-[#4b3f68]'
-              }`}
+                }`}
             >
               Course Content
             </button>
             <button
               onClick={() => setActiveSubTab('students')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${
-                activeSubTab === 'students' 
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]' 
+              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'students'
+                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
                   : 'text-[#64748b] hover:text-[#4b3f68]'
-              }`}
+                }`}
             >
               Enrolled Students
             </button>
             <button
               onClick={() => setActiveSubTab('grades')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${
-                activeSubTab === 'grades' 
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]' 
+              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'grades'
+                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
                   : 'text-[#64748b] hover:text-[#4b3f68]'
-              }`}
+                }`}
             >
               Assignments & Grades
             </button>
             <button
               onClick={() => setActiveSubTab('notifications')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${
-                activeSubTab === 'notifications' 
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]' 
+              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'notifications'
+                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
                   : 'text-[#64748b] hover:text-[#4b3f68]'
-              }`}
+                }`}
             >
               Broadcast Notification
             </button>
           </div>
 
           {activeSubTab === 'content' && (
-            <TeacherContentTab classId={classId} teacherId={course.faculty_lead} />
+            <TeacherContentTab courseId={course.id} classId={realClassId || undefined} />
           )}
 
           {activeSubTab === 'students' && (
             <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)] animate-fade-in">
               {isLoadingStudents ? (
-                 <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
-                   <p className="text-[14px] font-medium animate-pulse">Loading enrollments...</p>
-                 </div>
+                <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
+                  <p className="text-[14px] font-medium animate-pulse">Loading enrollments...</p>
+                </div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -276,11 +315,11 @@ export default function TeacherClassDetailPage() {
                     {students.length === 0 && (
                       <tr>
                         <td colSpan={3} className="py-16 text-center">
-                           <div className="flex flex-col items-center">
-                             <Users size={32} className="text-[#cbd5e1] mb-3" />
-                             <p className="text-[14px] font-semibold text-[#4b3f68]">No Active Enrollments</p>
-                             <p className="text-[13px] text-[#64748b] mt-1">There are currently no students mapped to this Class ID.</p>
-                           </div>
+                          <div className="flex flex-col items-center">
+                            <Users size={32} className="text-[#cbd5e1] mb-3" />
+                            <p className="text-[14px] font-semibold text-[#4b3f68]">No Active Enrollments</p>
+                            <p className="text-[13px] text-[#64748b] mt-1">There are currently no students mapped to this Class ID.</p>
+                          </div>
                         </td>
                       </tr>
                     )}
@@ -293,9 +332,9 @@ export default function TeacherClassDetailPage() {
           {activeSubTab === 'grades' && (
             <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)] animate-fade-in">
               {isLoadingGrades ? (
-                 <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
-                   <p className="text-[14px] font-medium animate-pulse">Loading submissions...</p>
-                 </div>
+                <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
+                  <p className="text-[14px] font-medium animate-pulse">Loading submissions...</p>
+                </div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -316,32 +355,31 @@ export default function TeacherClassDetailPage() {
                           {sub.users?.name || 'Unknown Student'}
                         </td>
                         <td className="py-4 px-6">
-                           <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${
-                             sub.grade !== null 
-                              ? 'bg-[#dcfce7] text-[#16a34a]' 
+                          <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${sub.grade !== null
+                              ? 'bg-[#dcfce7] text-[#16a34a]'
                               : 'bg-[#fef9c3] text-[#ca8a04]'
-                           }`}>
-                             {sub.grade !== null ? 'GRADED' : 'SUBMITTED'}
-                           </span>
+                            }`}>
+                            {sub.grade !== null ? 'GRADED' : 'SUBMITTED'}
+                          </span>
                         </td>
                         <td className="py-4 px-6 text-right">
-                           <button 
-                             onClick={() => setSelectedSubmission(sub)}
-                             className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
-                           >
-                             {sub.grade !== null ? 'REGRADE' : 'GRADE'}
-                           </button>
+                          <button
+                            onClick={() => setSelectedSubmission(sub)}
+                            className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
+                          >
+                            {sub.grade !== null ? 'REGRADE' : 'GRADE'}
+                          </button>
                         </td>
                       </tr>
                     ))}
                     {submissions.length === 0 && (
                       <tr>
                         <td colSpan={4} className="py-16 text-center">
-                           <div className="flex flex-col items-center">
-                             <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
-                             <p className="text-[14px] font-semibold text-[#4b3f68]">No Submissions Found</p>
-                             <p className="text-[13px] text-[#64748b] mt-1">Students have not yet submitted assignments to this class.</p>
-                           </div>
+                          <div className="flex flex-col items-center">
+                            <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
+                            <p className="text-[14px] font-semibold text-[#4b3f68]">No Submissions Found</p>
+                            <p className="text-[13px] text-[#64748b] mt-1">Students have not yet submitted assignments to this class.</p>
+                          </div>
                         </td>
                       </tr>
                     )}
@@ -353,57 +391,57 @@ export default function TeacherClassDetailPage() {
 
           {activeSubTab === 'notifications' && (
             <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-6 md:p-8 animate-fade-in">
-               <div className="mb-6 border-b border-[#e7dff0] pb-4">
-                  <h3 className="text-[18px] font-extrabold text-[#4b3f68]">Push Notification to {course.name}</h3>
-                  <p className="text-[13px] text-[#64748b] mt-1">
-                    Notifications sent here will be broadcasted to all {students.length} currently enrolled students.
-                  </p>
-               </div>
-               
-               <form onSubmit={handleSendNotification} className="max-w-[600px] flex flex-col gap-5">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Title *</label>
-                    <input 
-                      type="text" 
-                      placeholder="E.g. Important Update Regarding Midterms"
-                      value={title}
-                      onChange={e => setTitle(e.target.value)}
-                      className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
-                    />
-                  </div>
+              <div className="mb-6 border-b border-[#e7dff0] pb-4">
+                <h3 className="text-[18px] font-extrabold text-[#4b3f68]">Push Notification to {course.name}</h3>
+                <p className="text-[13px] text-[#64748b] mt-1">
+                  Sending to: <strong className="text-[#4b3f68]">{className || 'Class'}</strong> ({course.name}) — {students.length} enrolled students.
+                </p>
+              </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Message Details *</label>
-                    <textarea 
-                      rows={5}
-                      placeholder="Write your broadcast message here..."
-                      value={message}
-                      onChange={e => setMessage(e.target.value)}
-                      className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none"
-                    />
-                  </div>
+              <form onSubmit={handleSendNotification} className="max-w-[600px] flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Title *</label>
+                  <input
+                    type="text"
+                    placeholder="E.g. Important Update Regarding Midterms"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
+                  />
+                </div>
 
-                  <div className="pt-2">
-                    <button 
-                      type="submit" 
-                      disabled={isSending}
-                      className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-bold tracking-wide rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed uppercase"
-                    >
-                      {isSending ? (
-                        <>Processing...</>
-                      ) : (
-                        <><Send size={16} /> Broadcast Now</>
-                      )}
-                    </button>
-                  </div>
-               </form>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Message Details *</label>
+                  <textarea
+                    rows={5}
+                    placeholder="Write your broadcast message here..."
+                    value={message}
+                    onChange={e => setMessage(e.target.value)}
+                    className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-bold tracking-wide rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed uppercase"
+                  >
+                    {isSending ? (
+                      <>Processing...</>
+                    ) : (
+                      <><Send size={16} /> Broadcast Now</>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           )}
 
         </div>
       </main>
 
-      <TeacherGradeModal 
+      <TeacherGradeModal
         isOpen={!!selectedSubmission}
         onClose={() => setSelectedSubmission(null)}
         submission={selectedSubmission}
