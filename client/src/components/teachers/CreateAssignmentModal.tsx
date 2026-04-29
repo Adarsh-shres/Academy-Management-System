@@ -11,24 +11,24 @@ interface CreateAssignmentModalProps {
 /** Handles assignment creation, file upload, and assignment submission. */
 export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: CreateAssignmentModalProps) {
   const { user } = useAuth();
-  
+
   const [courses, setCourses] = useState<{ id: string; name: string; course_code?: string }[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(false);
   const [courseName, setCourseName] = useState('');
-  
+
   const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
   const [isLoadingClasses, setIsLoadingClasses] = useState(false);
   const [classId, setClassId] = useState('');
-  
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
-  
+
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
   useEffect(() => {
     if (!isOpen || !user) return;
-    
+
     resetForm();
 
     async function fetchCourses() {
@@ -94,7 +94,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
         .from('classes')
         .select('id, name')
         .eq('course_id', selectedCourse.id);
-        
+
       if (!err) {
         setClasses(data || []);
         if (data && data.length > 0) setClassId(data[0].id);
@@ -106,7 +106,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
       }
       setIsLoadingClasses(false);
     }
-    
+
     if (isOpen) {
       fetchClasses();
     }
@@ -119,19 +119,19 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     const { data, error: uploadError } = await supabase.storage
       .from('assignments')
       .upload(fileName, file, { upsert: true });
-    
+
     if (uploadError) throw new Error(uploadError.message);
-    
+
     const { data: urlData } = supabase.storage
       .from('assignments')
       .getPublicUrl(data.path);
-    
+
     return urlData.publicUrl;
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     if (!courseName || !classId || !title || !description || !dueDate || !dueTime || !file) {
       alert('Please fill in all required fields');
       return;
@@ -140,8 +140,6 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     setIsSubmitting(true);
     try {
       const fileUrl = await handleFileUpload(file);
-
-      const combined = new Date(`${dueDate}T${dueTime}:00`).toISOString();
 
       const selectedCourse = courses.find(c => c.name === courseName);
       const { error: insertError } = await supabase
@@ -152,10 +150,9 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
           class_id: classId,
           title: title,
           description: description,
-          due_date: combined,
-          file_url: fileUrl,
-          type: 'assignment',
-          status: 'active',
+          due_date: dueDate,
+          due_time: dueTime,
+          attachment_url: fileUrl,
           portal_open: false,
           created_at: new Date().toISOString()
         });
@@ -180,7 +177,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
         <div className="p-5 border-b border-[#e7dff0] flex justify-between items-center bg-[#fbf8fe] rounded-t-md">
           <h3 className="text-[18px] font-bold text-[#4b3f68]">Create Assignment</h3>
           <button onClick={() => { resetForm(); onClose(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
 
@@ -188,7 +185,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
           <form id="assignment-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Course *</label>
-              <select 
+              <select
                 value={courseName}
                 onChange={e => setCourseName(e.target.value)}
                 className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
@@ -204,7 +201,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Class *</label>
-              <select 
+              <select
                 value={classId}
                 onChange={e => setClassId(e.target.value)}
                 className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
@@ -221,8 +218,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Title *</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="E.g. Chapter 4 Exercises"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
@@ -232,7 +229,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Description *</label>
-              <textarea 
+              <textarea
                 rows={3}
                 placeholder="Instructions..."
                 value={description}
@@ -244,8 +241,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
             <div className="flex gap-4">
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Date *</label>
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   value={dueDate}
                   onChange={e => setDueDate(e.target.value)}
                   className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
@@ -253,8 +250,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
               </div>
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Time *</label>
-                <input 
-                  type="time" 
+                <input
+                  type="time"
                   value={dueTime}
                   onChange={e => setDueTime(e.target.value)}
                   className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
@@ -289,7 +286,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                 {file ? (
                   <div className="flex items-center justify-center gap-2 text-[#6a5182]">
                     <span className="text-[13px] font-semibold">{file.name}</span>
-                    <button 
+                    <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setFile(null); }}
                       className="text-rose-400 hover:text-rose-600 font-bold ml-2"
@@ -298,9 +295,9 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                 ) : (
                   <div className="flex flex-col items-center gap-2 text-[#94a3b8]">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
                     <span className="text-[13px] font-medium">
                       Click or drag file to upload
@@ -314,16 +311,16 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
         </div>
 
         <div className="p-5 border-t border-[#e7dff0] bg-[#fbf8fe] flex justify-end gap-3 rounded-b-md">
-          <button 
-            type="button" 
-            onClick={() => { resetForm(); onClose(); }} 
+          <button
+            type="button"
+            onClick={() => { resetForm(); onClose(); }}
             disabled={isSubmitting}
             className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-50"
           >
             Cancel
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             form="assignment-form"
             disabled={isSubmitting}
             className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
