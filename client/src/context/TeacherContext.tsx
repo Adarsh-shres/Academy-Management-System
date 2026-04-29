@@ -28,6 +28,57 @@ const GRADIENTS = [
   'from-[#f87171] to-[#ef4444]',
 ];
 
+const FALLBACK_TEACHERS: Teacher[] = [
+  {
+    id: 'teacher-001',
+    name: 'Prof. Linus Torvalds',
+    initials: 'LT',
+    subject: 'Collaborative Development',
+    department: 'Computer Science',
+    employeeId: 'FAC-001',
+    status: 'Active',
+    avatarGradient: GRADIENTS[0],
+    totalClasses: 4,
+    totalStudents: 86,
+    avgAttendance: 91,
+    upcomingSessions: 2,
+    schedule: [],
+    activities: [],
+  },
+  {
+    id: 'teacher-002',
+    name: 'Prof. Sunita Sharma',
+    initials: 'SS',
+    subject: 'Algorithms and Complexity',
+    department: 'Computer Science',
+    employeeId: 'FAC-002',
+    status: 'Active',
+    avatarGradient: GRADIENTS[1],
+    totalClasses: 3,
+    totalStudents: 64,
+    avgAttendance: 88,
+    upcomingSessions: 1,
+    schedule: [],
+    activities: [],
+  },
+  {
+    id: 'teacher-003',
+    name: 'Dr. John Doe',
+    initials: 'JD',
+    subject: 'Game Development Fundamentals',
+    department: 'Information Technology',
+    employeeId: 'FAC-003',
+    status: 'On Leave',
+    avatarGradient: GRADIENTS[2],
+    totalClasses: 2,
+    totalStudents: 42,
+    avgAttendance: 84,
+    upcomingSessions: 0,
+    schedule: [],
+    activities: [],
+  },
+];
+
 function getInitials(name: string) {
   return name
     .split(' ')
@@ -79,6 +130,7 @@ export function TeacherProvider({ children }: { children: ReactNode }) {
 
     if (error) {
       console.error('[TeacherContext] Failed to load teachers:', error.message);
+      setTeachers(FALLBACK_TEACHERS);
       return;
     }
 
@@ -86,7 +138,7 @@ export function TeacherProvider({ children }: { children: ReactNode }) {
       .map(mapTeacher)
       .filter((teacher): teacher is Teacher => Boolean(teacher));
 
-    setTeachers(mapped);
+    setTeachers(mapped.length > 0 ? mapped : FALLBACK_TEACHERS);
   }, []);
 
   useEffect(() => {

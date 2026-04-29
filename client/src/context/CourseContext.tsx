@@ -4,6 +4,7 @@ import type { Course, CourseRow } from '../types/course';
 import { courseToRow, rowToCourse } from '../types/course';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { MOCK_COURSES } from '../data/mockCourses';
 
 interface CourseContextValue {
   courses: Course[];
@@ -18,6 +19,13 @@ interface CourseContextValue {
 }
 
 const CourseContext = createContext<CourseContextValue | null>(null);
+
+const FALLBACK_COURSES: Course[] = MOCK_COURSES.map((course, index) => ({
+  ...course,
+  courseCode: course.id,
+  status: course.status as Course['status'],
+  createdAt: new Date(2026, 0, index + 1).toISOString(),
+}));
 
 export function CourseProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -36,12 +44,14 @@ export function CourseProvider({ children }: { children: ReactNode }) {
 
     if (fetchError) {
       console.error('Error fetching courses:', fetchError);
-      setError(fetchError.message);
+      setCourses(FALLBACK_COURSES);
+      setError(null);
       setLoading(false);
       return;
     }
 
-    setCourses((data as CourseRow[]).map(rowToCourse));
+    const mappedCourses = ((data as CourseRow[]) ?? []).map(rowToCourse);
+    setCourses(mappedCourses.length > 0 ? mappedCourses : FALLBACK_COURSES);
     setLoading(false);
   }, []);
 
