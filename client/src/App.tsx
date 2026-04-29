@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/shared/ProtectedRoute';
 import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import DashboardPage from './pages/DashboardPage.tsx';
-import Dashboard from './components/Dashboard.tsx';
+import Dashboard from './components/dashboard/Dashboard.tsx';
 import StudentsPage from './pages/StudentsPage.tsx';
 import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';

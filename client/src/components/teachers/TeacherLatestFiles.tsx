@@ -1,4 +1,4 @@
-import { MoreVertical, FileText, FileSpreadsheet, Presentation } from './icons';
+import { MoreVertical, FileText, FileSpreadsheet, Presentation } from '../shared/icons';
 
 interface FileItem {
   id: string;

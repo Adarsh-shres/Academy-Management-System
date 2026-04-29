@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import StudentEditorModal from '../components/StudentEditorModal';
-import ConfirmActionModal from '../components/ConfirmActionModal';
+import StudentEditorModal from '../components/students/StudentEditorModal';
+import ConfirmActionModal from '../components/shared/ConfirmActionModal';
 import { useStudents } from '../context/StudentContext';
 import type { StudentRecord } from '../types/student';
 

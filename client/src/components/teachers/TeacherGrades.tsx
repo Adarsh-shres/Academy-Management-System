@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Award, Plus } from './icons';
+import { Award, Plus } from '../shared/icons';
 
 interface GradeItem {
   id: string;

@@ -69,8 +69,11 @@ const ResetPasswordPage: React.FC = () => {
   };
 
   return (
+    /* Main reset password page container */
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
+      {/* Reset password card wrapper */}
       <div className="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-5xl flex">
+        {/* Left information section, visible on medium and larger screens */}
         <div className="hidden md:flex w-1/2 bg-brand-blue flex-col items-center justify-center p-12 text-white">
           <h1 className="text-4xl font-bold mb-3">Choose a New Password</h1>
           <h2 className="text-xl font-medium tracking-wide">Academic Management System</h2>
@@ -79,10 +82,12 @@ const ResetPasswordPage: React.FC = () => {
           </p>
         </div>
 
+        {/* New password form section */}
         <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
           <h3 className="text-3xl font-semibold text-neutral-900 mb-2">Reset Password</h3>
           <p className="text-neutral-600 mb-10">Enter and confirm your new password below.</p>
 
+          {/* Warns users when they did not open the page from a valid reset link */}
           {!isRecoveryReady && (
             <div className="mb-6 p-3 bg-amber-100 border border-amber-300 text-amber-800 rounded-md text-sm">
               Open this page from the reset link sent to your email. A recovery session is required before you can
@@ -91,18 +96,21 @@ const ResetPasswordPage: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Displays validation or update errors */}
             {error && (
               <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
                 {error}
               </div>
             )}
 
+            {/* Displays confirmation after the password is updated */}
             {message && (
               <div className="p-3 bg-emerald-100 border border-emerald-400 text-emerald-700 rounded-md text-sm">
                 {message}
               </div>
             )}
 
+            {/* New password input field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
                 New Password
@@ -118,6 +126,7 @@ const ResetPasswordPage: React.FC = () => {
               />
             </div>
 
+            {/* Confirm password input field */}
             <div>
               <label htmlFor="confirm-password" className="block text-sm font-medium text-neutral-700 mb-2">
                 Confirm Password
@@ -133,6 +142,7 @@ const ResetPasswordPage: React.FC = () => {
               />
             </div>
 
+            {/* Submit button for updating the password */}
             <div>
               <button
                 type="submit"
@@ -144,6 +154,7 @@ const ResetPasswordPage: React.FC = () => {
             </div>
           </form>
 
+          {/* Navigation link back to the login page */}
           <p className="mt-8 text-sm text-neutral-600">
             Want to go back?{' '}
             <Link to="/login" className="font-medium text-brand-blue hover:text-blue-700">

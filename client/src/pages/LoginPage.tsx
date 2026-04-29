@@ -11,7 +11,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  /* ── If already logged in (e.g. returning visit), redirect immediately ── */
+  /* Redirect to appropriate dashboard if already logged in */
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
       const target = ROLE_ROUTE_MAP[user.role] ?? '/dashboard';
@@ -45,24 +45,29 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
+      {/* Login card wrapper */}
       <div className="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-5xl flex">
+        {/* Left branding section, visible on medium and larger screens */}
         <div className="hidden md:flex w-1/2 bg-brand-blue flex-col items-center justify-center p-12 text-white">
           <h1 className="text-4xl font-bold mb-3">Academic</h1>
           <h2 className="text-xl font-medium tracking-wide">Management System</h2>
           <p className="mt-8 text-sm text-neutral-200 text-center">Nepal&apos;s modern educational backbone.</p>
         </div>
 
+        {/* Login form section */}
         <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
           <h3 className="text-3xl font-semibold text-neutral-900 mb-2">Welcome Back</h3>
           <p className="text-neutral-600 mb-10">Sign in to manage the academic lifecycle.</p>
 
           <form onSubmit={handleLogin} className="space-y-6">
+            {/* Displays login error messages returned from authentication */}
             {error && (
               <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
                 {error}
               </div>
             )}
 
+            {/* Email input field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
                 School Email
@@ -78,6 +83,7 @@ const LoginPage: React.FC = () => {
               />
             </div>
 
+            {/* Password input field with forgot password navigation */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
@@ -98,6 +104,7 @@ const LoginPage: React.FC = () => {
               />
             </div>
 
+            {/* Remember me option for the login form */}
             <div className="flex items-center">
               <input
                 id="remember_me"
@@ -109,6 +116,7 @@ const LoginPage: React.FC = () => {
               </label>
             </div>
 
+            {/* Login submit button */}
             <div>
               <button
                 type="submit"

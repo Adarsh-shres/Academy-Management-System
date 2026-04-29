@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import RegisterStudentForm from '../components/RegisterStudentForm';
+import RegisterStudentForm from '../components/students/RegisterStudentForm';
 
 export default function RegisterStudentsPage() {
   const navigate = useNavigate();

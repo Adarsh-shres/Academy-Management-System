@@ -1,4 +1,4 @@
-import { MoreVertical, FileText } from './icons';
+import { MoreVertical, FileText } from '../shared/icons';
 
 interface TeacherWhatsDueProps {
   recentAssignments: any[];

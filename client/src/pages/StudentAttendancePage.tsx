@@ -1,6 +1,6 @@
 import { useStudentData } from "../hooks/useStudentData";
-import StudentAttendanceCard from "../components/StudentAttendanceCard";
-import StatCard from "../components/StatCard";
+import StudentAttendanceCard from "../components/students/StudentAttendanceCard";
+import StatCard from "../components/dashboard/StatCard";
 
 export default function StudentAttendancePage() {
   const { courses, isLoading, error } = useStudentData();
@@ -16,12 +16,6 @@ export default function StudentAttendancePage() {
   const avg = courses.length > 0 ? Math.round(courses.reduce((s, c) => s + c.attendance, 0) / courses.length) : 100;
   const atRisk = courses.filter((c) => c.attendance < 80);
   const good = courses.filter((c) => c.attendance >= 90);
-
-  const getComparisonBarColor = (pct: number) => {
-    if (pct >= 90) return "#6a5182"; 
-    if (pct >= 80) return "#8b6ca8"; 
-    return "#4b3f68"; 
-  };
 
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full">

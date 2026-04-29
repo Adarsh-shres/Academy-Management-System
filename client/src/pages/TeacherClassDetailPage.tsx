@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Search, Bell, Mail, ChevronLeft, Users, Send, ClipboardList } from '../components/icons';
-import ProfileDropdown from '../components/ProfileDropdown';
-import TeacherSidebar from '../components/TeacherSidebar';
-import TeacherGradeModal from '../components/TeacherGradeModal';
-import TeacherContentTab from '../components/TeacherContentTab';
+import { Bell, Mail, ChevronLeft, Users, Send, ClipboardList } from '../components/shared/icons';
+import ProfileDropdown from '../components/shared/ProfileDropdown';
+import TeacherSidebar from '../components/teachers/TeacherSidebar';
+import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
+import TeacherContentTab from '../components/teachers/TeacherContentTab';
 
 // Fallbacks for empty states
 const MOCK_STUDENTS: any[] = [

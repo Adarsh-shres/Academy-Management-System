@@ -1,4 +1,4 @@
-import { CalendarCheck2, MapPin } from './icons';
+import { CalendarCheck2, MapPin } from '../shared/icons';
 
 interface ScheduleItem {
   id: string;

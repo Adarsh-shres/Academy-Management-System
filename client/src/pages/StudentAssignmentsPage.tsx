@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useStudentData } from "../hooks/useStudentData";
-import StudentAssignmentCard from "../components/StudentAssignmentCard";
-import type { Assignment } from "../components/StudentAssignmentCard";
+import StudentAssignmentCard from "../components/students/StudentAssignmentCard";
+import type { Assignment } from "../components/students/StudentAssignmentCard";
 
 export default function StudentAssignmentsPage() {
   const { assignments, isLoading, error } = useStudentData();

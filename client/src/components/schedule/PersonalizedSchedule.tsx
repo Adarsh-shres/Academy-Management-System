@@ -1,6 +1,6 @@
-import { CalendarCheck2, MapPin } from './icons';
-import { useAuth } from '../context/AuthContext';
-import { useSchedule } from '../context/ScheduleContext';
+import { CalendarCheck2, MapPin } from '../shared/icons';
+import { useAuth } from '../../context/AuthContext';
+import { useSchedule } from '../../context/ScheduleContext';
 
 interface PersonalizedScheduleProps {
   onTakeAttendance?: (course: any) => void;

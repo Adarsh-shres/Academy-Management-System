@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
-import { Users, MapPin, Calendar } from '../components/icons';
+import { Users, MapPin, Calendar } from '../components/shared/icons';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -16,7 +15,6 @@ const MOCK_SCHEDULE: any[] = [
 
 /** Shows the weekly teaching schedule grouped by day. */
 export default function TeacherSchedulePage() {
-  const { user } = useAuth();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -1,9 +1,9 @@
 import StatCard from './StatCard';
 import Calendar from './Calendar';
 import QuickTools from './QuickTools';
-import { useCourses } from '../context/CourseContext';
-import { useStudents } from '../context/StudentContext';
-import { useTeachers } from '../context/TeacherContext';
+import { useCourses } from '../../context/CourseContext';
+import { useStudents } from '../../context/StudentContext';
+import { useTeachers } from '../../context/TeacherContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {

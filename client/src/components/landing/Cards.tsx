@@ -1,4 +1,4 @@
-import StatCard from '../StatCard';
+import StatCard from '../dashboard/StatCard';
 
 export default function Cards() {
   return (

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import StatCard from '../components/StatCard';
+import StatCard from '../components/dashboard/StatCard';
 import { useTeachers } from '../context/TeacherContext';
 import type { Teacher, TeacherStatus } from '../types/teacher';
 import { provisionUser } from '../lib/userProvisioning';
-import AppModal from '../components/AppModal';
-import ConfirmActionModal from '../components/ConfirmActionModal';
+import AppModal from '../components/shared/AppModal';
+import ConfirmActionModal from '../components/shared/ConfirmActionModal';
 
 const STATUS_STYLES: Record<TeacherStatus, { bg: string; text: string }> = {
   Active: { bg: 'bg-[#e7f8ef]', text: 'text-[#15803d]' },
@@ -44,7 +44,6 @@ export default function TeachersPage() {
   const [newPassword, setNewPassword] = useState('');
   const [newSubject, setNewSubject] = useState('');
   const [newDept, setNewDept] = useState('');
-  const [newStatus, setNewStatus] = useState<TeacherStatus>('Active');
   const [isCreatingTeacher, setIsCreatingTeacher] = useState(false);
   const [createTeacherError, setCreateTeacherError] = useState('');
   const [createTeacherSuccess, setCreateTeacherSuccess] = useState('');
@@ -60,7 +59,6 @@ export default function TeachersPage() {
     setNewPassword('');
     setNewSubject('');
     setNewDept('');
-    setNewStatus('Active');
     setCreateTeacherError('');
     setCreateTeacherSuccess('');
   };
@@ -88,7 +86,7 @@ export default function TeachersPage() {
         profile: {
           subject: newSubject || 'General Studies',
           department: newDept || 'Dept. of General Studies',
-          status: newStatus,
+          status: 'Active',
         },
       });
 
@@ -420,8 +418,10 @@ export default function TeachersPage() {
                     <TeacherField label="Temporary Password">
                       <TeacherInput value={newPassword} onChange={setNewPassword} placeholder="Minimum 8 characters" type="password" minLength={8} required />
                     </TeacherField>
-                    <TeacherField label="Status">
-                      <TeacherStatusPicker value={newStatus} onChange={setNewStatus} />
+                    <TeacherField label="Initial Status">
+                      <div className="flex min-h-[62px] items-center rounded-2xl border border-[#dbe4f0] bg-[#f8fafc] px-4 py-3 text-[14px] font-semibold text-[#475569]">
+                        Active
+                      </div>
                     </TeacherField>
                   </div>
                 </section>

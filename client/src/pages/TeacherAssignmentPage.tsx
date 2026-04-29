@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
-import { PlusCircle, Search, FileText } from '../components/icons';
-import AssignmentCard from '../components/AssignmentCard';
-import CreateAssignmentModal from '../components/CreateAssignmentModal';
-import ViewSubmissionsModal from '../components/ViewSubmissionsModal';
+import { PlusCircle, Search, FileText } from '../components/shared/icons';
+import AssignmentCard from '../components/teachers/AssignmentCard';
+import CreateAssignmentModal from '../components/teachers/CreateAssignmentModal';
+import ViewSubmissionsModal from '../components/teachers/ViewSubmissionsModal';
 
 const MOCK_ASSIGNMENTS: any[] = [
   { id: 'm1', title: 'Midterm Project', course: 'Advanced Algorithms', due_date: new Date(Date.now() + 86400000 * 3).toISOString(), created_at: new Date().toISOString(), status: 'pending', class_id: null },
@@ -14,7 +13,6 @@ const MOCK_ASSIGNMENTS: any[] = [
 
 /** Shows assignment tracking and submission status for teachers. */
 export default function TeacherAssignmentPage() {
-  const { user } = useAuth();
   const [assignments, setAssignments] = useState<any[]>([]);
   const [submissionsCountMap, setSubmissionsCountMap] = useState<Record<string, number>>({});
   const [totalStudents, setTotalStudents] = useState(0);
@@ -89,8 +87,6 @@ export default function TeacherAssignmentPage() {
 
   const processedAssignments = assignments.map(a => {
     const submitted = submissionsCountMap[a.id] || 0;
-    const currentTotal = a.totalStudents || totalStudents;
-
     let statusLabel = 'PENDING';
     if (a.status === 'graded') statusLabel = 'GRADED';
     else if (submitted > 0) statusLabel = 'READY';

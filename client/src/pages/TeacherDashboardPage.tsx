@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Search, Bell, Mail, ChevronLeft, ChevronRight, PlusCircle, ClipboardList, Users, Calendar, Settings, FileText, CheckCircle } from '../components/icons';
-import TeacherSidebar from '../components/TeacherSidebar';
-import TeacherStatCard from '../components/TeacherStatCard';
-import PersonalizedSchedule from '../components/PersonalizedSchedule';
-import EnrolledCoursesList from '../components/EnrolledCoursesList';
-import TeacherWhatsDue from '../components/TeacherWhatsDue';
-import ProfileDropdown from '../components/ProfileDropdown';
-import AttendanceRosterModal from '../components/AttendanceRosterModal';
+import { Search, Bell, Mail, ChevronLeft, ChevronRight, ClipboardList, Settings, FileText } from '../components/shared/icons';
+import TeacherSidebar from '../components/teachers/TeacherSidebar';
+import PersonalizedSchedule from '../components/schedule/PersonalizedSchedule';
+import EnrolledCoursesList from '../components/courses/EnrolledCoursesList';
+import TeacherWhatsDue from '../components/teachers/TeacherWhatsDue';
+import ProfileDropdown from '../components/shared/ProfileDropdown';
+import AttendanceRosterModal from '../components/teachers/AttendanceRosterModal';
 import TeacherAssignmentPage from './TeacherAssignmentPage';
 import TeacherClassesPage from './TeacherClassesPage';
 import TeacherSchedulePage from './TeacherSchedulePage';
@@ -109,32 +108,9 @@ export default function TeacherDashboardPage() {
   };
 
   /* ─── Announcements state ──────────────────────────────────── */
-  const [announcements, setAnnouncements] = useState([
+  const announcements = [
     { id: 1, author: 'Super Admin', initials: 'SA', time: '2 hours ago', text: 'Please make sure all final grades for this semester are submitted by Friday at 5:00 PM. The system will be locked for grading review over the weekend. Thank you for your hard work!' },
-  ]);
-  const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
-  const [announcementText, setAnnouncementText] = useState('');
-
-  const handleAddAnnouncement = () => {
-    const trimmed = announcementText.trim();
-    if (!trimmed) return;
-    setAnnouncements(prev => [{
-      id: prev.length + 1,
-      author: 'You (Teacher)',
-      initials: 'YT',
-      time: 'Just now',
-      text: trimmed,
-    }, ...prev]);
-    setAnnouncementText('');
-    setIsAnnouncementModalOpen(false);
-  };
-
-  const deleteAnnouncement = (id: number | string) => {
-    if (window.confirm('Delete this announcement?')) {
-      setAnnouncements(announcements.filter(a => a.id !== id));
-    }
-  };
-
+  ];
   const [isLoadingCounters, setIsLoadingCounters] = useState(true);
   const [totalAssignments, setTotalAssignments] = useState(0);
   const [pendingGradesCount, setPendingGradesCount] = useState(0);

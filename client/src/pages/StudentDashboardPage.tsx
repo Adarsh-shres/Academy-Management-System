@@ -2,12 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { recentActivity } from '../data/studentMockData';
 import { useStudentData } from '../hooks/useStudentData';
-import StudentAssignmentCard from '../components/StudentAssignmentCard';
-import StatCard from '../components/StatCard';
+import StudentAssignmentCard from '../components/students/StudentAssignmentCard';
+import StatCard from '../components/dashboard/StatCard';
 
-import EnrolledCoursesList from '../components/EnrolledCoursesList';
+import EnrolledCoursesList from '../components/courses/EnrolledCoursesList';
 
-import AcademyCalendar from '../components/AcademyCalendar';
+import AcademyCalendar from '../components/schedule/AcademyCalendar';
 
 function ActivityItem({ item }: { item: { icon: string, text: string, time: string } }) {
   const iconMap: Record<string, React.ReactNode> = {

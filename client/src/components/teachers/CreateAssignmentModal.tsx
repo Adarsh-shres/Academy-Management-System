@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 interface CreateAssignmentModalProps {
   isOpen: boolean;
@@ -30,7 +30,6 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
@@ -46,7 +45,6 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     setDueDate('');
     setDueTime('');
     setFile(null);
-    setError('');
     setIsDragging(false);
   };
 
@@ -140,8 +138,6 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     }
 
     setIsSubmitting(true);
-    setError('');
-    
     try {
       const fileUrl = await handleFileUpload(file);
 

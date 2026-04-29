@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Calendar, FileText, CheckCircle } from './icons';
+import { supabase } from '../../lib/supabase';
+import { Calendar, FileText } from '../shared/icons';
 
 interface Assignment {
   id: string;
@@ -30,7 +30,6 @@ export default function AssignmentCard({
 }: AssignmentCardProps) {
   const [openingPortal, setOpeningPortal] = useState(false);
 
-  const isPending = submittedCount === 0;
   const isGraded = submittedCount === totalStudents && totalStudents > 0;
   const isReady = submittedCount > 0 && submittedCount < totalStudents;
 

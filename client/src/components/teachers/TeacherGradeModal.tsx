@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 interface TeacherGradeModalProps {
   isOpen: boolean;
@@ -11,7 +10,6 @@ interface TeacherGradeModalProps {
 
 /** Lets a teacher review a submission and save a grade. */
 export default function TeacherGradeModal({ isOpen, onClose, submission, onGraded }: TeacherGradeModalProps) {
-  const { user } = useAuth();
   const [grade, setGrade] = useState<number | ''>('');
   const [feedback, setFeedback] = useState('');
   const [isSaving, setIsSaving] = useState(false);

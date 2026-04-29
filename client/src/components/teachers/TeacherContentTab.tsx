@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Plus, Trash2, ChevronDown, ChevronRight, FileText, Video, Users, File } from './icons';
+import { supabase } from '../../lib/supabase';
+import { Plus, Trash2, ChevronDown, ChevronRight, FileText, Video, Users, File } from '../shared/icons';
 
 const MOCK_WEEKS: Week[] = [
   {
@@ -59,14 +59,14 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
   const [contentTitle, setContentTitle] = useState('');
   const [contentType, setContentType] = useState<'Lecture' | 'Tutorial' | 'Workshop' | 'Study Material'>('Lecture');
   const [contentDesc, setContentDesc] = useState('');
-  const [contentFile, setContentFile] = useState<window.File | null>(null);
+  const [contentFile, setContentFile] = useState<File | null>(null);
   const [contentFileError, setContentFileError] = useState('');
 
   const loadContent = async () => {
     if (!classId) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('assignments')
         .select('*')
         .eq('class_id', classId)
@@ -147,7 +147,7 @@ export default function TeacherContentTab({ classId, teacherId }: TeacherContent
     setNewWeekTitle('');
   };
 
-  const handleFileUpload = async (fileToUpload: window.File): Promise<string> => {
+  const handleFileUpload = async (fileToUpload: File): Promise<string> => {
     const fileNameSafe = `${Date.now()}_${fileToUpload.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
     const { data, error } = await supabase.storage
       .from('assignments')

@@ -1,4 +1,4 @@
-import ProfileDropdown from '../components/ProfileDropdown';
+import ProfileDropdown from '../components/shared/ProfileDropdown';
 
 export default function Topbar() {
   return (

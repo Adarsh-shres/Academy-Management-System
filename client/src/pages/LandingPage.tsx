@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import StatCard from '../components/StatCard';
-import RecentActivity from '../components/RecentActivity';
+import StatCard from '../components/dashboard/StatCard';
+import RecentActivity from '../components/dashboard/RecentActivity';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function LandingPage() {

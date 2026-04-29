@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent, ReactNode } from 'react';
-import { useStudents } from '../context/StudentContext';
-import { provisionUser } from '../lib/userProvisioning';
-import type { Department, Gender, StudentFormData } from '../types/student';
+import { useStudents } from '../../context/StudentContext';
+import { provisionUser } from '../../lib/userProvisioning';
+import type { Department, Gender, StudentFormData } from '../../types/student';
 
 const departments: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
 const courses = ['B.Tech', 'M.Tech', 'BCA', 'MCA', 'MBA'];

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useStudentData } from "../hooks/useStudentData";
-import StudentCourseCard from "../components/StudentCourseCard";
-import type { Course } from "../components/StudentCourseCard";
+import StudentCourseCard from "../components/students/StudentCourseCard";
+import type { Course } from "../components/students/StudentCourseCard";
 
 export default function StudentCoursesPage() {
   const { courses, isLoading, error } = useStudentData();

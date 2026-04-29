@@ -1,6 +1,6 @@
-import { FileText } from './icons';
-import { useAuth } from '../context/AuthContext';
-import { useCourses } from '../context/CourseContext';
+import { FileText } from '../shared/icons';
+import { useAuth } from '../../context/AuthContext';
+import { useCourses } from '../../context/CourseContext';
 
 export default function EnrolledCoursesList({ courses }: { courses?: any[] }) {
   const { user } = useAuth();

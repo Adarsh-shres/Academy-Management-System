@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardList, Users, Calendar, Settings } from './icons';
+import { LayoutDashboard, ClipboardList, Users, Calendar, Settings } from '../shared/icons';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', id: 'Dashboard', icon: <LayoutDashboard size={16} /> },

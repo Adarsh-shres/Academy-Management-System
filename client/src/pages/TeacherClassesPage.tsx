@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { Users, Presentation } from '../components/icons';
+import { Users, Presentation } from '../components/shared/icons';
 
 const MOCK_CLASSES: any[] = [
   { id: '1', course_code: 'CS-401', name: 'Advanced Algorithms', students: 32, room: 'Room 3A', attendance: 92, completed_lessons: 8, total_lessons: 12 },

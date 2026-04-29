@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import AppModal from './AppModal';
-import type { StudentRecord } from '../types/student';
+import AppModal from '../shared/AppModal';
+import type { StudentRecord } from '../../types/student';
 
 interface StudentEditorModalProps {
   student: StudentRecord;

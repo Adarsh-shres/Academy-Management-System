@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../layouts/Sidebar';
 import Topbar from '../layouts/Topbar';
-import TodoList from '../components/TodoList';
+import TodoList from '../components/dashboard/TodoList';
 
 export default function DashboardPage() {
   const location = useLocation();
