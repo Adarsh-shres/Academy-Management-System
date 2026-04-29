@@ -1,4 +1,5 @@
 import { LayoutDashboard, ClipboardList, Users, Calendar, Settings } from '../shared/icons';
+import { useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', id: 'Dashboard', icon: <LayoutDashboard size={16} /> },
@@ -14,6 +15,17 @@ interface TeacherSidebarProps {
 }
 
 export default function TeacherSidebar({ activeTab, onTabChange }: TeacherSidebarProps) {
+  const navigate = useNavigate();
+
+  const handleNavClick = (tabId: string) => {
+    if (tabId === 'Settings') {
+      navigate('/teacher/settings');
+      return;
+    }
+
+    onTabChange(tabId);
+  };
+
   return (
     <aside className="fixed top-0 left-0 bottom-0 w-[210px] bg-white/95 backdrop-blur border-r border-[#e7dff0] flex flex-col z-[100] transition-all duration-200 shadow-[0_0_30px_rgba(57,31,86,0.06)]">
       
@@ -30,7 +42,7 @@ export default function TeacherSidebar({ activeTab, onTabChange }: TeacherSideba
           return (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className={`w-full flex items-center gap-2.5 p-[10px_16px] text-[13.5px] font-medium cursor-pointer border-l-[3px] transition-all duration-200 text-left
                 ${isActive 
                   ? 'text-[#6a5182] bg-[#f3eff7] border-[#6a5182] font-semibold' 

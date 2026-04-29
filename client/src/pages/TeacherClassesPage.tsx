@@ -4,12 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Users, Presentation } from '../components/shared/icons';
 
-const MOCK_CLASSES: any[] = [
-  { id: '1', course_code: 'CS-401', name: 'Advanced Algorithms', students: 32, room: 'Room 3A', attendance: 92, completed_lessons: 8, total_lessons: 12 },
-  { id: '2', course_code: 'CS-405', name: 'Database Systems', students: 28, room: 'Room 2B', attendance: 88, completed_lessons: 5, total_lessons: 10 },
-  { id: '3', course_code: 'CS-410', name: 'Web Development', students: 45, room: 'Lab 1', attendance: 95, completed_lessons: 10, total_lessons: 15 },
-  { id: '4', course_code: 'MTH-104', name: 'Math 104', students: 15, room: 'Room 1d', attendance: 85, completed_lessons: 1, total_lessons: 4 },
-];
+
 
 export default function TeacherClassesPage() {
   const { user } = useAuth();
@@ -30,7 +25,7 @@ export default function TeacherClassesPage() {
         if (data && data.length > 0) {
           setCourses(data);
         } else {
-          setCourses(MOCK_CLASSES);
+          setCourses([]);
         }
       } catch (err) {
         console.error('Failed to load courses', err);

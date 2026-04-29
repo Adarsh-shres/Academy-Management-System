@@ -7,25 +7,7 @@ import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
 
-// Fallbacks for empty states
-const MOCK_STUDENTS: any[] = [
-  { id: 's1', name: 'Alex Johnson', email: 'alex.j@academy.edu' },
-  { id: 's2', name: 'Maria Garcia', email: 'maria.g@academy.edu' },
-  { id: 's3', name: 'James Smith', email: 'james.s@academy.edu' },
-];
 
-const MOCK_SUBMISSIONS: any[] = [
-  { id: 'sub1', assignments: { title: 'Midterm Project' }, users: { name: 'Alex Johnson' }, grade: null },
-  { id: 'sub2', assignments: { title: 'Weekly Quiz 4' }, users: { name: 'Maria Garcia' }, grade: 'A' },
-  { id: 'sub3', assignments: { title: 'Homework 1' }, users: { name: 'James Smith' }, grade: 'B+' },
-];
-
-const MOCK_CLASSES: any[] = [
-  { id: '1', course_code: 'CS-401', name: 'Advanced Algorithms', department: 'Room 3A', faculty_lead: 'Unknown' },
-  { id: '2', course_code: 'CS-405', name: 'Database Systems', department: 'Room 2B', faculty_lead: 'Unknown' },
-  { id: '3', course_code: 'CS-410', name: 'Web Development', department: 'Lab 1', faculty_lead: 'Unknown' },
-  { id: '4', course_code: 'MTH-104', name: 'Math 104', department: 'Room 1d', faculty_lead: 'Unknown' },
-];
 
 export default function TeacherClassDetailPage() {
   const { classId } = useParams();
@@ -56,15 +38,6 @@ export default function TeacherClassDetailPage() {
           .single();
           
         if (error || !data) {
-          const mockCourse = MOCK_CLASSES.find(c => c.id === classId);
-          if (mockCourse) {
-            setCourse({
-              ...mockCourse,
-              room: mockCourse.department || 'Virtual',
-              course_code: mockCourse.course_code || 'N/A'
-            });
-            return;
-          }
           navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
           return;
         }
@@ -74,15 +47,6 @@ export default function TeacherClassDetailPage() {
           course_code: data.course_code || 'N/A'
         });
       } catch (err) {
-        const mockCourse = MOCK_CLASSES.find(c => c.id === classId);
-        if (mockCourse) {
-          setCourse({
-            ...mockCourse,
-            room: mockCourse.department || 'Virtual',
-            course_code: mockCourse.course_code || 'N/A'
-          });
-          return;
-        }
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
     }
@@ -103,7 +67,7 @@ export default function TeacherClassDetailPage() {
         if (!error && data && data.length > 0) {
           setStudents(data);
         } else {
-          setStudents(MOCK_STUDENTS);
+          setStudents([]);
         }
       } catch (err: any) {
         console.error('Failed to fetch students:', err.message);
@@ -127,7 +91,7 @@ export default function TeacherClassDetailPage() {
       if (!error && data && data.length > 0) {
         setSubmissions(data);
       } else {
-        setSubmissions(MOCK_SUBMISSIONS);
+        setSubmissions([]);
       }
     } catch (err: any) {
        console.error('Failed to fetch submissions', err);
@@ -209,7 +173,7 @@ export default function TeacherClassDetailPage() {
               <Bell size={18} />
             </button>
             <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
-            <ProfileDropdown useSimpleIcon={true} />
+            <ProfileDropdown />
           </div>
         </header>
 

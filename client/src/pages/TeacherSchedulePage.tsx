@@ -4,14 +4,7 @@ import { Users, MapPin, Calendar } from '../components/shared/icons';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const MOCK_SCHEDULE: any[] = [
-  { id: '1', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Monday', timeRange: "09:00AM - 10:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
-  { id: '2', name: 'Math 102', course_code: 'MTH-102', schedule_days: 'Monday', timeRange: "11:00AM - 12:00PM", room: "Room 3b", students: 23, sessionType: "TUTORIAL" },
-  { id: '3', name: 'Math 103', course_code: 'MTH-103', schedule_days: 'Tuesday', timeRange: "09:00AM - 10:00AM", room: "Room 2c", students: 30, sessionType: "WORKSHOP" },
-  { id: '4', name: 'Math 101', course_code: 'MTH-101', schedule_days: 'Wednesday', timeRange: "10:00AM - 11:00AM", room: "Room 4a", students: 25, sessionType: "LECTURE" },
-  { id: '5', name: 'Math 104', course_code: 'MTH-104', schedule_days: 'Thursday', timeRange: "02:00PM - 03:00PM", room: "Room 1d", students: 15, sessionType: "TUTORIAL" },
-  { id: '6', name: 'Math 102', course_code: 'MTH-102', schedule_days: 'Friday', timeRange: "01:00PM - 02:00PM", room: "Room 3b", students: 23, sessionType: "WORKSHOP" },
-];
+
 
 /** Shows the weekly teaching schedule grouped by day. */
 export default function TeacherSchedulePage() {
@@ -43,11 +36,11 @@ export default function TeacherSchedulePage() {
            }));
            setCourses(structuredSchedule);
         } else {
-           setCourses(MOCK_SCHEDULE);
+           setCourses([]);
         }
       } catch (err) {
          console.error('Failed to load schedule', err);
-         setCourses(MOCK_SCHEDULE);
+         setCourses([]);
       } finally {
          setIsLoading(false);
       }
@@ -114,7 +107,6 @@ export default function TeacherSchedulePage() {
               <div className="p-6 flex-1 bg-white">
                 {isSunday ? (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-6 md:py-8">
-                    <span className="text-[40px] leading-none drop-shadow-sm">🏖️</span>
                     <div>
                       <h4 className="text-[16px] font-bold text-[#4e5d78] mb-0.5">Weekend Holiday</h4>
                       <p className="text-[13.5px] text-[#8a94a6] font-medium">Weekend Holiday — Enjoy your break from the curriculum!</p>
