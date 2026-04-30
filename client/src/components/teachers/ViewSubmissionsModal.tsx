@@ -25,16 +25,31 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
     async function fetchData() {
       setIsLoading(true);
       try {
-        // Fetch ALL users WHERE role = 'student'
-        // TODO: filter by actual enrollment when table is added
+        // Step 1: Get enrolled student IDs for this course
+        const { data: enrollmentData, error: enrollErr } = await supabase
+          .from('enrollments')
+          .select('student_id')
+          .eq('course_id', assignment.course_id);
+
+        if (enrollErr) throw enrollErr;
+
+        if (!enrollmentData || enrollmentData.length === 0) {
+          setStudents([]);
+          setSubmissions([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Step 2: Get student details for enrolled students only
+        const studentIds = enrollmentData.map((e: any) => e.student_id);
         const { data: usersData, error: usersErr } = await supabase
           .from('users')
           .select('id, name')
-          .eq('role', 'student');
+          .in('id', studentIds);
 
         if (usersErr) throw usersErr;
 
-        // Fetch submissions for this assignment
+        // Step 3: Fetch submissions for this assignment
         const { data: subData, error: subErr } = await supabase
           .from('submissions')
           .select('id, student_id, file_url, submitted_at, status')
@@ -56,33 +71,77 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
 
   if (!isOpen || !assignment) return null;
 
-  const formattedDueDate = new Intl.DateTimeFormat('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit'
-  }).format(new Date(assignment.due_date));
+  // Safe due date formatting
+  const formatDueDate = () => {
+    try {
+      if (!assignment.due_date) return 'N/A';
+      const dateStr = assignment.due_date.includes('T')
+        ? assignment.due_date
+        : `${assignment.due_date}T${assignment.due_time || '23:59:00'}`;
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return 'N/A';
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      }).format(date);
+    } catch {
+      return 'N/A';
+    }
+  };
 
   const totalStudents = students.length;
   const submittedCount = submissions.length;
   const pendingCount = totalStudents - submittedCount;
 
+  // Open file in browser tab instead of downloading
+  const handleViewFile = async (fileUrl: string) => {
+    try {
+      const ext = fileUrl.split('.').pop()?.split('?')[0]?.toLowerCase() || '';
+      const officeExts = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'];
+      
+      // Use Google Docs viewer for Microsoft Office files so they render inline
+      if (officeExts.includes(ext)) {
+        window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}`, '_blank', 'noopener,noreferrer');
+        return;
+      }
+
+      const response = await fetch(fileUrl);
+      const rawBlob = await response.blob();
+      
+      let mimeType = rawBlob.type;
+      if (!mimeType || mimeType === 'application/octet-stream') {
+        if (ext === 'pdf') mimeType = 'application/pdf';
+        else if (['jpg', 'jpeg'].includes(ext)) mimeType = 'image/jpeg';
+        else if (ext === 'png') mimeType = 'image/png';
+        else if (ext === 'txt') mimeType = 'text/plain';
+      }
+
+      const blob = new Blob([rawBlob], { type: mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 bg-white rounded-md w-full max-w-[800px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-        
+
         {/* Header */}
         <div className="p-6 border-b border-[#e7dff0] flex justify-between items-start bg-[#fbf8fe] relative">
           <div className="pr-10">
             <h2 className="text-[20px] font-bold text-[#4b3f68] mb-1">{assignment.title}</h2>
             <div className="flex flex-wrap gap-x-4 gap-y-2 text-[13px] text-[#64748b] font-medium">
               <span><strong className="text-[#4b3f68]">Course:</strong> {assignment.course}</span>
-              <span><strong className="text-[#4b3f68]">Due:</strong> {formattedDueDate}</span>
+              <span><strong className="text-[#4b3f68]">Due:</strong> {formatDueDate()}</span>
             </div>
             {assignment.file_url && (
               <div className="mt-4">
-                <a 
-                  href={assignment.file_url} 
-                  target="_blank" 
+                <a
+                  href={assignment.file_url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#6a5182] text-[12px] font-semibold underline hover:text-[#4b3f68]"
                 >
@@ -92,7 +151,7 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
             )}
           </div>
           <button onClick={onClose} className="absolute top-6 right-6 text-[#94a3b8] hover:text-[#0d3349] transition-colors cursor-pointer bg-white rounded-full p-1.5 shadow-sm border border-[#e2d9ed]">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
 
@@ -146,15 +205,22 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
                         </td>
                         <td className="py-3.5 px-5">
                           {submission?.file_url ? (
-                            <a 
-                              href={submission.file_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-[#6a5182] hover:text-[#5b4471] hover:underline flex items-center gap-1.5 font-semibold text-[13px] transition-colors"
-                            >
-                              <FileText size={14} />
-                              View Work
-                            </a>
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => handleViewFile(submission.file_url)}
+                                className="text-[#6a5182] hover:text-[#5b4471] hover:underline flex items-center gap-1.5 font-semibold text-[13px] transition-colors cursor-pointer"
+                              >
+                                <FileText size={14} />
+                                View Work
+                              </button>
+                              <a
+                                href={submission.file_url}
+                                download
+                                className="text-[#64748b] hover:text-[#4b3f68] hover:underline font-semibold text-[13px] transition-colors"
+                              >
+                                Download
+                              </a>
+                            </div>
                           ) : (
                             <span className="text-[#94a3b8]">—</span>
                           )}
@@ -165,7 +231,7 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
                   {students.length === 0 && (
                     <tr>
                       <td colSpan={4} className="py-8 text-center text-[#64748b] text-[13px]">
-                        No students found for this course.
+                        No students enrolled in this course yet.
                       </td>
                     </tr>
                   )}
