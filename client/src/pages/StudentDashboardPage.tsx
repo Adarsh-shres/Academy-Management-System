@@ -32,7 +32,7 @@ function ActivityItem({ item }: { item: { icon: string, text: string, time: stri
 
 export default function StudentDashboardPage() {
   const navigate = useNavigate();
-  const { courses, assignments, profile: studentProfile, isLoading, error } = useStudentData();
+  const { courses, assignments, profile: studentProfile, isLoading, error, refetch } = useStudentData();
 
   if (isLoading) {
     return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Dashboard...</div>;
@@ -123,7 +123,7 @@ export default function StudentDashboardPage() {
           </div>
           <div className="space-y-4">
             {upcomingAssignments.map((a) => (
-              <StudentAssignmentCard key={a.id} assignment={a} compact={false} />
+              <StudentAssignmentCard key={a.id} assignment={a} compact={false} onSubmitted={refetch} />
             ))}
           </div>
           

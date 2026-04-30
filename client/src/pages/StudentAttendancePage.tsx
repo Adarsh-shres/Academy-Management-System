@@ -1,6 +1,6 @@
 import { useStudentData } from "../hooks/useStudentData";
 import StudentAttendanceCard from "../components/students/StudentAttendanceCard";
-import StatCard from "../components/dashboard/StatCard";
+
 
 export default function StudentAttendancePage() {
   const { courses, isLoading, error } = useStudentData();
@@ -29,28 +29,7 @@ export default function StudentAttendancePage() {
         </div>
       </div>
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <StatCard 
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>}
-          label="Attendance Average"
-          value={`${avg}%`}
-          subContent={<span className="text-primary font-semibold">Stable performance</span>}
-        />
-        <StatCard 
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20m10-10H2"/></svg>}
-          label="Good Standing"
-          value={good.length.toString()}
-          subContent="Above 90% threshold"
-        />
-        <StatCard 
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
-          label="At Risk"
-          value={atRisk.length.toString()}
-          isAccent
-          subContent={<span className="text-[#4b3f68] font-semibold">Requires attention</span>}
-        />
-      </div>
+
 
       {/* Threshold Alert if any at risk */}
       {atRisk.length > 0 && (

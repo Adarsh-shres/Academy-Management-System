@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useStudentData } from "../hooks/useStudentData";
 import StudentCourseCard from "../components/students/StudentCourseCard";
 import type { Course } from "../components/students/StudentCourseCard";
@@ -68,7 +69,7 @@ export default function StudentCoursesPage() {
       </div>
 
       {/* Course detail modal */}
-      {selectedCourse && (
+      {selectedCourse && createPortal(
         <div
           className="fixed inset-0 bg-[#391f56]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setSelectedCourse(null)}
@@ -78,10 +79,10 @@ export default function StudentCoursesPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="p-7 border-b border-[#f3eff7] bg-gradient-to-br from-[#f5effa] to-white relative">
+            <div className="px-8 pt-10 pb-7 border-b border-[#f3eff7] bg-gradient-to-br from-[#f5effa] to-white relative">
                <button
                 onClick={() => setSelectedCourse(null)}
-                className="absolute top-5 right-5 w-8 h-8 rounded-[8px] bg-white border border-[#e7dff0] flex items-center justify-center text-[#7c8697] hover:text-[#4b3f68] hover:shadow-sm transition-all"
+                className="absolute top-6 right-6 w-8 h-8 rounded-[8px] bg-white border border-[#e7dff0] flex items-center justify-center text-[#7c8697] hover:text-[#4b3f68] hover:shadow-sm transition-all"
                >
                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -92,7 +93,7 @@ export default function StudentCoursesPage() {
                <p className="text-[13px] font-semibold text-primary tracking-wide uppercase mt-1">{selectedCourse.code}</p>
             </div>
 
-            <div className="p-7 space-y-4">
+            <div className="px-8 py-7 space-y-4">
               {[
                 { label: "Instructor", value: selectedCourse.instructor },
                 { label: "Schedule", value: selectedCourse.schedule },
@@ -101,13 +102,13 @@ export default function StudentCoursesPage() {
                 { label: "Attended", value: selectedCourse.attendedClasses },
                 { label: "Attendance", value: `${selectedCourse.attendance}%` },
               ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-center py-2 border-b border-dashed border-[#e7dff0] last:border-0 hover:bg-[#faf8fc] px-2 transition-colors rounded-[6px]">
+                <div key={label} className="flex justify-between items-center py-2.5 border-b border-dashed border-[#e7dff0] last:border-0 hover:bg-[#faf8fc] px-2 transition-colors rounded-[6px]">
                   <span className="text-[12px] font-semibold text-[#778196] uppercase tracking-wide">{label}</span>
                   <span className="text-[13px] font-medium text-[#4b3f68]">{value}</span>
                 </div>
               ))}
 
-              <div className="pt-4">
+              <div className="pt-6">
                 <button
                   onClick={() => setSelectedCourse(null)}
                   className="w-full py-3 rounded-[8px] text-[13px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity uppercase tracking-wider"
@@ -117,7 +118,8 @@ export default function StudentCoursesPage() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

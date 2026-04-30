@@ -55,16 +55,14 @@ export function useStudentData() {
 
   const uiColors = ['#6a5182', '#8b6ca8', '#4b3f68', '#b096cc', '#778196'];
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (!user) {
       setIsLoading(false);
       return;
     }
 
     const currentUser = user;
-
-    async function fetchData() {
-      setIsLoading(true);
+    setIsLoading(true);
       setError(null);
 
       try {
@@ -170,8 +168,9 @@ export function useStudentData() {
       } finally {
         setIsLoading(false);
       }
-    }
+  };
 
+  useEffect(() => {
     void fetchData();
   }, [user]);
 
@@ -181,5 +180,6 @@ export function useStudentData() {
     profile,
     isLoading,
     error,
+    refetch: fetchData,
   };
 }
