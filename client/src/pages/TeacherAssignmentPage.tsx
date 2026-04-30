@@ -34,12 +34,9 @@ export default function TeacherAssignmentPage() {
 
       if (!assignmentsData) return;
 
-      // Placeholder until enrollment counts are available.
       setTotalStudents(1);
 
       const mappedAssignments = assignmentsData.map((a: any) => {
-        // Build a parseable date string from due_date (+ optional due_time).
-        // due_date from Supabase may be a full ISO string or YYYY-MM-DD.
         let dueDateStr = '';
         if (a.due_date) {
           const raw = String(a.due_date);
@@ -56,9 +53,12 @@ export default function TeacherAssignmentPage() {
           title: a.title,
           course: a.courses?.name || 'Unknown Course',
           due_date: dueDateStr,
+          due_time: a.due_time || '',
           created_at: a.created_at,
           class_id: a.class_id,
+          course_id: a.course_id,  // ✅ added course_id
           portal_open: a.portal_open || false,
+          attachment_url: a.attachment_url || '',
         };
       });
 
@@ -71,7 +71,6 @@ export default function TeacherAssignmentPage() {
       });
 
       if (expiredOpenPortals.length > 0) {
-        // Close all expired portals in Supabase
         await Promise.all(
           expiredOpenPortals.map(a =>
             supabase
@@ -80,7 +79,6 @@ export default function TeacherAssignmentPage() {
               .eq('id', a.id)
           )
         );
-        // Update local state to reflect closed portals
         expiredOpenPortals.forEach(a => { a.portal_open = false; });
       }
 
@@ -92,7 +90,7 @@ export default function TeacherAssignmentPage() {
           .from('submissions')
           .select('assignment_id, id')
           .in('assignment_id', assignIds)
-          .not('attachment_url', 'is', null); // Fixed: was 'file_url', now 'attachment_url'
+          .not('file_url', 'is', null); // Fixed: use file_url not attachment_url
 
         const countMap: Record<string, number> = {};
         if (subData) {
@@ -112,7 +110,6 @@ export default function TeacherAssignmentPage() {
   useEffect(() => {
     fetchAssignmentsData();
 
-    // Re-check every 60 seconds to auto-close expired portals
     const intervalId = setInterval(() => {
       fetchAssignmentsData();
     }, 60000);
@@ -142,9 +139,9 @@ export default function TeacherAssignmentPage() {
 
   const now = new Date();
   const activeAssignmentsList = processedAssignments.filter(a => {
-    if (!a.due_date) return true; // No due date → treat as active
+    if (!a.due_date) return true;
     const d = new Date(a.due_date);
-    return isNaN(d.getTime()) || d >= now; // Invalid date → treat as active
+    return isNaN(d.getTime()) || d >= now;
   });
   const otherAssignmentsList = processedAssignments.filter(a => {
     if (!a.due_date) return false;

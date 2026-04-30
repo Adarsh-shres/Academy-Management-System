@@ -8,9 +8,12 @@ interface Assignment {
   course: string;
   description?: string;
   due_date: string;
+  due_time?: string;
   file_url?: string;
+  attachment_url?: string;
   portal_open?: boolean;
   class_id?: string;
+  course_id?: string; // ✅ added course_id
 }
 
 interface AssignmentCardProps {
@@ -55,7 +58,6 @@ export default function AssignmentCard({
   const handleTogglePortal = async () => {
     if (togglingPortal) return;
 
-    // If portal is currently open → close it directly
     if (assignment.portal_open) {
       setTogglingPortal(true);
       try {
@@ -74,7 +76,6 @@ export default function AssignmentCard({
       return;
     }
 
-    // If due date has passed → show reopen modal to set new date/time
     if (isDuePassed) {
       setNewDueDate('');
       setNewDueTime('');
@@ -82,7 +83,6 @@ export default function AssignmentCard({
       return;
     }
 
-    // Active assignment (due date in future) → open portal directly
     setTogglingPortal(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -237,11 +237,10 @@ export default function AssignmentCard({
           <button
             onClick={handleTogglePortal}
             disabled={togglingPortal}
-            className={`flex-1 border rounded-sm text-[12px] font-bold py-2.5 transition-colors shadow-sm active:scale-[0.99] cursor-pointer ${
-              assignment.portal_open
+            className={`flex-1 border rounded-sm text-[12px] font-bold py-2.5 transition-colors shadow-sm active:scale-[0.99] cursor-pointer ${assignment.portal_open
                 ? 'bg-white border-[#fca5a5] text-[#dc2626] hover:bg-[#fef2f2] hover:border-[#dc2626]'
                 : 'bg-white border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] hover:border-[#6a5182]'
-            }`}
+              }`}
           >
             {togglingPortal
               ? (assignment.portal_open ? 'CLOSING...' : 'OPENING...')
@@ -257,7 +256,6 @@ export default function AssignmentCard({
         </div>
       </div>
 
-      {/* Reopen Portal Modal — shown when opening an expired assignment */}
       {showReopenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowReopenModal(false)} />
@@ -265,7 +263,7 @@ export default function AssignmentCard({
             <div className="p-5 border-b border-[#e7dff0] flex justify-between items-center bg-[#fbf8fe] rounded-t-md">
               <h3 className="text-[16px] font-bold text-[#4b3f68]">Reopen Assignment</h3>
               <button onClick={() => setShowReopenModal(false)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
               </button>
             </div>
             <div className="p-5 flex flex-col gap-4">
