@@ -31,8 +31,8 @@ export default function TeacherSidebar({ activeTab, onTabChange }: TeacherSideba
       
       {/* Logo */}
       <div className="flex items-center justify-center gap-2 px-4 border-b border-[#e7dff0] min-h-[58px] bg-[#fbf8fe]">
-        <img src="/image - Edited.png" alt="Yogify Logo" className="h-10 w-10 object-contain" style={{ mixBlendMode: 'multiply' }} />
-        <span className="font-extrabold text-[#4b3f68] text-lg tracking-wide uppercase">YOGIFY</span>
+        <img src="/image - Edited.png" alt="Learnify Logo" className="h-10 w-10 object-contain" style={{ mixBlendMode: 'multiply' }} />
+        <span className="font-extrabold text-[#4b3f68] text-lg tracking-wide uppercase">LEARNIFY</span>
       </div>
 
       {/* Nav */}

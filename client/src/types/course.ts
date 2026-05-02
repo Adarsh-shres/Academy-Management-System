@@ -9,7 +9,6 @@ export interface CourseRow {
   department: string;
   faculty_lead: string;
   description: string;
-  schedule_days: string[];
   created_at: string;
 }
 
@@ -22,7 +21,6 @@ export interface Course {
   department: string;
   facultyLead: string;
   description: string;
-  scheduleDays: string[];
   createdAt: string;
 }
 
@@ -36,7 +34,6 @@ export function rowToCourse(row: CourseRow): Course {
     department: row.department,
     facultyLead: row.faculty_lead,
     description: row.description,
-    scheduleDays: row.schedule_days,
     createdAt: row.created_at,
   };
 }
@@ -51,6 +48,5 @@ export function courseToRow(
   if (course.department !== undefined) row.department = course.department;
   if (course.facultyLead !== undefined) row.faculty_lead = course.facultyLead;
   if (course.description !== undefined) row.description = course.description;
-  if (course.scheduleDays !== undefined) row.schedule_days = course.scheduleDays;
   return row;
 }

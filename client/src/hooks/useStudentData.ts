@@ -118,8 +118,6 @@ export function useStudentData() {
           const totalClasses = courseAttendance.length;
           const attendedClasses = courseAttendance.filter((a: any) => a.status === 'Present').length;
           const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
-          const scheduleDays = Array.isArray(course.schedule_days) ? course.schedule_days.join(', ') : '';
-
           return {
             id: course.id,
             name: course.name || 'Unknown Course',
@@ -130,7 +128,7 @@ export function useStudentData() {
             totalClasses,
             attendedClasses,
             color: uiColors[idx % uiColors.length],
-            schedule: scheduleDays ? `${scheduleDays} - TBD` : 'Schedule not set',
+            schedule: 'See assigned class schedule',
           };
         });
 

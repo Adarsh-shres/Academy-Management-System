@@ -14,19 +14,40 @@ export default function TeacherClassesPage() {
 
   useEffect(() => {
     async function loadCourses() {
-      if (!user?.name) return;
+      if (!user?.name || !user?.id) return;
       setIsLoading(true);
       try {
-        const { data } = await supabase
+        // 1. Get courses where teacher is faculty lead
+        const { data: facultyLeadCourses } = await supabase
           .from('courses')
           .select('*')
           .eq('faculty_lead', user.name);
-        
-        if (data && data.length > 0) {
-          setCourses(data);
-        } else {
-          setCourses([]);
+
+        // 2. Get courses from classes where they are the teacher
+        const { data: teacherClasses } = await supabase
+          .from('classes')
+          .select('course_id')
+          .eq('teacher_id', user.id);
+
+        let classCourses: any[] = [];
+        if (teacherClasses && teacherClasses.length > 0) {
+          const courseIds = [...new Set(teacherClasses.map((c: any) => c.course_id))];
+          const { data } = await supabase
+            .from('courses')
+            .select('*')
+            .in('id', courseIds);
+          if (data) classCourses = data;
         }
+
+        // Combine and deduplicate
+        const allCoursesMap = new Map();
+        if (facultyLeadCourses) {
+          facultyLeadCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
+        }
+        classCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
+
+        const combinedCourses = Array.from(allCoursesMap.values());
+        setCourses(combinedCourses);
       } catch (err) {
         console.error('Failed to load courses', err);
       } finally {
@@ -42,8 +63,8 @@ export default function TeacherClassesPage() {
     <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1400px] mx-auto w-full">
       {/* Header section */}
       <div className="mb-8">
-        <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">My Classes</h1>
-        <p className="text-[#64748b] font-medium mt-1">{totalClassesCount} active classes this semester</p>
+        <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">My Courses</h1>
+        <p className="text-[#64748b] font-medium mt-1">{totalClassesCount} active courses this semester</p>
       </div>
 
       {/* Classes Grid */}
@@ -61,7 +82,7 @@ export default function TeacherClassesPage() {
             return (
               <div 
                 key={course.id} 
-                onClick={() => navigate(`/teacher/classes/${course.id}`)}
+                onClick={() => navigate(`/teacher/courses/${course.id}/classes`)}
                 className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col hover:border-[#6a5182] hover:shadow-md transition-all cursor-pointer transform hover:-translate-y-1"
               >
                 <div className="p-6">

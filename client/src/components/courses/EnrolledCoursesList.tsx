@@ -34,7 +34,7 @@ export default function EnrolledCoursesList({ courses }: { courses?: any[] }) {
                   {course.name}
                 </h4>
                 <p className="text-[11.5px] text-[#64748b] mt-0.5 border-b border-[#e2d9ed]/50 pb-1">
-                  {course.department || course.schedule || (course.scheduleDays && course.scheduleDays.join(', '))}
+                  {course.department || course.schedule || course.code || 'Course details'}
                 </p>
                 {user?.role === 'student' && (
                   <p className="text-[11px] text-[#475569] mt-1.5 font-medium">

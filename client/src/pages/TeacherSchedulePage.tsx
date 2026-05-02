@@ -19,19 +19,20 @@ export default function TeacherSchedulePage() {
         
         setIsLoading(true);
         const { data } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('faculty_lead', user.user_metadata?.name || user.email?.split('@')[0]);
+          .from('classes')
+          .select('id, name, room, schedule_days, schedule_time, student_ids, courses(name, course_code)')
+          .eq('teacher_id', user.id);
         
         if (data && data.length > 0) {
-           const structuredSchedule = data.map(course => ({
-              id: course.id,
-              name: course.name,
-              course_code: course.course_code,
-              schedule_days: course.schedule_days || ['Monday', 'Wednesday'],
-              timeRange: course.schedule_time || '10:00AM - 11:30AM',
-              room: course.department ? `Dept: ${course.department}` : 'Virtual',
-              students: course.enrolled_students || '--',
+           const structuredSchedule = data.map((classRow: any) => ({
+              id: classRow.id,
+              name: classRow.courses?.name || classRow.name,
+              className: classRow.name,
+              course_code: classRow.courses?.course_code,
+              schedule_days: classRow.schedule_days || [],
+              timeRange: classRow.schedule_time || 'Time not set',
+              room: classRow.room || 'Room not set',
+              students: Array.isArray(classRow.student_ids) ? classRow.student_ids.length : '--',
               sessionType: 'LECTURE'
            }));
            setCourses(structuredSchedule);
@@ -139,7 +140,8 @@ export default function TeacherSchedulePage() {
                               </span>
                             </div>
 
-                            <h4 className="text-[15px] font-bold text-[#4b3f68] mb-3 leading-tight group-hover:text-[#6a5182] transition-colors">{course.name}</h4>
+                            <h4 className="text-[15px] font-bold text-[#4b3f68] mb-1 leading-tight group-hover:text-[#6a5182] transition-colors">{course.name}</h4>
+                            <p className="text-[12px] font-semibold text-[#64748b] mb-3">{course.className}</p>
 
                             <div className="flex flex-col gap-2 mt-auto">
                               <div className="flex items-center gap-2 text-[12px] font-medium text-[#475569]">
