@@ -124,6 +124,14 @@ export default function TeacherDashboardPage() {
     setIsAttendanceModalOpen(true);
   };
 
+  const getRelativeTime = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const diff = Math.floor((new Date().getTime() - d.getTime()) / 60000); // minutes
+    if (diff < 60) return `${diff}m ago`;
+    if (diff < 1440) return `${Math.floor(diff/60)}h ago`;
+    return `${Math.floor(diff/1440)}d ago`;
+  };
+
   /* ─── Announcements state ──────────────────────────────────── */
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [isLoadingCounters, setIsLoadingCounters] = useState(true);
