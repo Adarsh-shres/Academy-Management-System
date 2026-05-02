@@ -6,10 +6,23 @@ import Toast from '../components/UserRoles/Toast.tsx';
 import { useUsers } from '../hooks/useUsers.ts';
 import { type User, ROLES } from '../data/mockUsers.ts';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function UserRolesPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { users, addUser, updateUser, deleteUser, bulkDelete } = useUsers();
+
+  if (user?.role !== 'admin' && user?.role !== 'super_admin') {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <div className="text-center">
+          <h2 className="text-[24px] font-bold text-[#4b3f68]">Access Denied</h2>
+          <p className="text-[#64748b] mt-2">You do not have permission to view the User Roles dashboard.</p>
+        </div>
+      </div>
+    );
+  }
 
   const [roleFilter, setRoleFilter] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,4 +1,5 @@
 import ProfileDropdown from '../components/shared/ProfileDropdown';
+import NotificationBell from '../components/shared/NotificationBell';
 
 export default function Topbar() {
   return (
@@ -16,10 +17,8 @@ export default function Topbar() {
 
       {/* Topbar Right */}
       <div className="flex items-center gap-2 ml-auto">
-
-        
+        <NotificationBell />
         <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
-        
         <ProfileDropdown />
       </div>
       

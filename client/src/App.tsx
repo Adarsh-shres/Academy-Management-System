@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/shared/ProtectedRoute';
+import { NotificationProvider } from './context/NotificationContext';
 import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
@@ -21,6 +22,10 @@ import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
+import NotificationsPage from './pages/NotificationsPage.tsx';
+import SendNotificationPage from './pages/SendNotificationPage.tsx';
+import StudentFoldersPage from './pages/StudentFoldersPage.tsx';
+import FolderContentsPage from './pages/FolderContentsPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -33,8 +38,9 @@ function UnderDevelopment() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <NotificationProvider>
+      <Router>
+        <Routes>
         {/* ── Public routes ──────────────────────────────────────── */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -58,6 +64,8 @@ function App() {
           <Route path="/teachers" element={<TeachersPage />} />
           <Route path="/user-roles" element={<UserRolesPage />} />
           <Route path="/userroles" element={<UserRolesPage />} />
+          <Route path="/admin/users" element={<UserRolesPage />} />
+          <Route path="/send-notification" element={<SendNotificationPage />} />
           <Route path="/under-development" element={<UnderDevelopment />} />
           <Route path="*" element={<UnderDevelopment />} />
         </Route>
@@ -101,9 +109,13 @@ function App() {
           <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
           <Route path="/student/attendance" element={<StudentAttendancePage />} />
           <Route path="/student/profile" element={<StudentProfilePage />} />
+          <Route path="/student/notifications" element={<NotificationsPage />} />
+          <Route path="/student/folders" element={<StudentFoldersPage />} />
+          <Route path="/student/folders/:folderId" element={<FolderContentsPage />} />
         </Route>
       </Routes>
     </Router>
+    </NotificationProvider>
   );
 }
 

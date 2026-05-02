@@ -77,30 +77,65 @@ export const useUsers = () => {
     };
   }, [users]);
 
-  const addUser = (userData: Omit<User, 'id' | 'joinDate' | 'avatar'>) => {
-    const newUser: User = {
-      ...userData,
-      id: generateId(),
-      joinDate: new Date().toISOString().split('T')[0],
-      avatar: userData.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase(),
-    };
-    setUsers((prev) => [newUser, ...prev]);
+  const addUser = async (userData: Omit<User, 'id' | 'joinDate' | 'avatar'>) => {
+    try {
+      const response = await fetch('http://localhost:5000/users', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-role': 'admin' // In a real app, this would come from useAuth
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          name: userData.name,
+          role: userData.role === ROLES.TEACHER ? 'teacher' : 'student'
+        })
+      });
+      if (!response.ok) throw new Error('Failed to create user');
+      await loadUsers();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const updateUser = (updatedUser: User) => {
-    setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+  const updateUser = async (updatedUser: User) => {
+    try {
+      const response = await fetch(`http://localhost:5000/users/${updatedUser.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-role': 'admin'
+        },
+        body: JSON.stringify({
+          email: updatedUser.email,
+          name: updatedUser.name,
+          role: updatedUser.role === ROLES.TEACHER ? 'teacher' : 'student'
+        })
+      });
+      if (!response.ok) throw new Error('Failed to update user');
+      await loadUsers();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const deleteUser = (id: string) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+  const deleteUser = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:5000/users/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-user-role': 'admin' }
+      });
+      if (!response.ok) throw new Error('Failed to delete user');
+      await loadUsers();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const bulkDelete = (ids: string[]) => {
-    setUsers((prev) => prev.filter((u) => !ids.includes(u.id)));
+  const bulkDelete = async (ids: string[]) => {
+    for (const id of ids) {
+      await deleteUser(id);
+    }
   };
 
   return {
