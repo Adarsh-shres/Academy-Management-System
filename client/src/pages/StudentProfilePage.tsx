@@ -79,22 +79,13 @@ export default function StudentProfilePage() {
       {/* Security card */}
       <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.02)] p-8">
         <h3 className="font-sans text-[19px] font-bold text-[#4b3f68] tracking-tight mb-6">Security</h3>
-        <div className="flex items-center justify-between pb-4 border-b border-[#f3eff7] mb-4">
+        <div className="flex items-center justify-between">
           <div>
             <p className="text-[14px] font-semibold text-[#4b3f68]">Account Password</p>
             <p className="text-[12px] font-medium text-[#7c8697] mt-0.5">Last changed 2 months ago</p>
           </div>
           <button className="text-[11.5px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] px-4 py-2 rounded-[6px] uppercase tracking-wider transition-colors border border-transparent">
             Update
-          </button>
-        </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[14px] font-semibold text-[#4b3f68]">Two-Factor Authentication</p>
-            <p className="text-[12px] font-medium text-[#7c8697] mt-0.5">Currently disabled</p>
-          </div>
-          <button className="text-[11.5px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] border border-transparent px-4 py-2 rounded-[6px] uppercase tracking-wider transition-colors">
-            Enable
           </button>
         </div>
       </div>
