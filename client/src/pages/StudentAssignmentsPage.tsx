@@ -4,7 +4,7 @@ import StudentAssignmentCard from "../components/students/StudentAssignmentCard"
 import type { Assignment } from "../components/students/StudentAssignmentCard";
 
 export default function StudentAssignmentsPage() {
-  const { assignments, isLoading, error } = useStudentData();
+  const { assignments, isLoading, error, refetch } = useStudentData();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all"); // all | pending | submitted
   const [subjectFilter, setSubjectFilter] = useState("all");
@@ -139,7 +139,7 @@ export default function StudentAssignmentsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {assignmentsInSubject.map((a) => (
-                <StudentAssignmentCard key={a.id} assignment={a} />
+                <StudentAssignmentCard key={a.id} assignment={a} onSubmitted={refetch} />
               ))}
             </div>
           </div>

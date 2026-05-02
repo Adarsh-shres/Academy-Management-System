@@ -1,4 +1,6 @@
-
+import { useState } from "react";
+import SubmitAssignmentModal from "./SubmitAssignmentModal";
+import ViewStudentSubmissionModal from "./ViewStudentSubmissionModal";
 
 export interface Assignment {
   id: string;
@@ -11,14 +13,18 @@ export interface Assignment {
   marks: string;
   submittedOn?: string | null;
   grade?: string | null;
+  fileUrl?: string;
 }
 
 interface StudentAssignmentCardProps {
   assignment: Assignment;
   compact?: boolean;
+  onSubmitted?: () => void;
 }
 
-export default function StudentAssignmentCard({ assignment, compact = false }: StudentAssignmentCardProps) {
+export default function StudentAssignmentCard({ assignment, compact = false, onSubmitted }: StudentAssignmentCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const { title, course, courseCode, deadline, status, marks, submittedOn, grade } = assignment;
 
   const isPending = status === "pending";
@@ -94,20 +100,42 @@ export default function StudentAssignmentCard({ assignment, compact = false }: S
         <div className="mt-5 flex gap-3">
           {isPending ? (
             <button 
-              onClick={() => window.alert(`Opening submission flow for: ${title}`)}
+              onClick={() => setIsModalOpen(true)}
               className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity cursor-pointer"
             >
               Submit Assignment
             </button>
           ) : (
             <button 
-              onClick={() => window.alert(`Opening report flow for: ${title}`)}
+              onClick={() => setIsReportOpen(true)}
               className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors cursor-pointer"
             >
               View Report
             </button>
           )}
         </div>
+      )}
+
+      {/* Submission Modal */}
+      {isModalOpen && (
+        <SubmitAssignmentModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          assignment={assignment}
+          onSubmitted={() => {
+            setIsModalOpen(false);
+            if (onSubmitted) onSubmitted();
+          }}
+        />
+      )}
+
+      {/* Report Modal */}
+      {isReportOpen && (
+        <ViewStudentSubmissionModal
+          isOpen={isReportOpen}
+          onClose={() => setIsReportOpen(false)}
+          assignment={assignment}
+        />
       )}
     </div>
   );
