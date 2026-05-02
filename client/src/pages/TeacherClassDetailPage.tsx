@@ -7,15 +7,14 @@ import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
 
-
-
 export default function TeacherClassDetailPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
 
   const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades'>('content');
   const [course, setCourse] = useState<any>(null);
-  const [realClassId, setRealClassId] = useState<string | null>(null);
+  const [classDetails, setClassDetails] = useState<any>(null);
+  const [teacherName, setTeacherName] = useState<string>('');
   const [className, setClassName] = useState<string>('');
   const [students, setStudents] = useState<any[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
@@ -31,78 +30,69 @@ export default function TeacherClassDetailPage() {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
 
   useEffect(() => {
-    async function loadCourse() {
+    async function loadClassAndCourse() {
+      if (!classId) return;
       try {
-        const { data, error } = await supabase
-          .from('courses')
+        const { data: classData, error: classError } = await supabase
+          .from('classes')
           .select('*')
           .eq('id', classId)
           .single();
 
-        if (error || !data) {
+        if (classError || !classData) {
           navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
           return;
         }
-        setCourse({
-          ...data,
-          room: data.department || 'Virtual',
-          course_code: data.course_code || 'N/A'
-        });
 
-        // Look up the actual class_id and name from classes table for this course
-        const { data: classData } = await supabase
-          .from('classes')
-          .select('id, name')
-          .eq('course_id', classId)
-          .limit(1)
+        setClassDetails(classData);
+        setClassName(classData.name || '');
+
+        const { data: courseData } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('id', classData.course_id)
           .single();
-        if (classData) {
-          setRealClassId(classData.id);
-          setClassName(classData.name || '');
+
+        if (courseData) {
+          setCourse({
+            ...courseData,
+            course_code: courseData.course_code || 'N/A'
+          });
+        }
+
+        const { data: teacherData } = await supabase
+          .from('users')
+          .select('name')
+          .eq('id', classData.teacher_id)
+          .single();
+        
+        if (teacherData) {
+          setTeacherName(teacherData.name);
         }
       } catch (err) {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
     }
-    if (classId) loadCourse();
+    loadClassAndCourse();
   }, [classId, navigate]);
 
   useEffect(() => {
-    if (!course || !classId) return;
+    if (!classDetails || !classId) return;
 
     async function fetchStudents() {
       setIsLoadingStudents(true);
       try {
-        // Step 1: Get student IDs from enrollments using course_id
-        const { data: enrollmentData, error: enrollError } = await supabase
-          .from('enrollments')
-          .select('student_id')
-          .eq('course_id', classId);
+        const studentIds = classDetails.student_ids || [];
 
-        console.log('Enrollment data:', enrollmentData, 'Error:', enrollError);
-
-        if (enrollError) {
-          console.error('Enrollment fetch error:', enrollError.message);
+        if (studentIds.length === 0) {
           setStudents([]);
           return;
         }
-
-        if (!enrollmentData || enrollmentData.length === 0) {
-          console.log('No enrollments found for course_id:', classId);
-          setStudents([]);
-          return;
-        }
-
-        // Step 2: Get student details from users table
-        const studentIds = enrollmentData.map((e: any) => e.student_id);
-        console.log('Student IDs:', studentIds);
 
         const { data: studentsData, error: studentsError } = await supabase
           .from('users')
           .select('id, name, email')
           .in('id', studentIds);
-
-        console.log('Students data:', studentsData, 'Error:', studentsError);
 
         if (studentsError) {
           console.error('Students fetch error:', studentsError.message);
@@ -120,7 +110,7 @@ export default function TeacherClassDetailPage() {
     }
 
     fetchStudents();
-  }, [course, classId]);
+  }, [classDetails, classId]);
 
   // Load Submissions dynamically when entering grades view
   const loadSubmissions = async () => {
@@ -167,7 +157,7 @@ export default function TeacherClassDetailPage() {
       if (!user) throw new Error("Not logged in");
 
       const { error } = await supabase.from('notifications').insert({
-        class_id: realClassId || classId,
+        class_id: classId,
         teacher_id: user.id,
         message: `${title.toUpperCase()}\n\n${message}`,
         type: 'manual',
@@ -229,9 +219,9 @@ export default function TeacherClassDetailPage() {
                 <span className="bg-[#f3eff7] text-[#6a5182] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#d8c8e9] inline-block mb-3">
                   {course.course_code}
                 </span>
-                <h2 className="text-[28px] font-extrabold text-[#4b3f68] mb-1 leading-tight tracking-tight">{course.name}</h2>
+                <h2 className="text-[28px] font-extrabold text-[#4b3f68] mb-1 leading-tight tracking-tight">{course.name} - {className}</h2>
                 <div className="flex flex-wrap items-center gap-4 text-[#64748b] text-[13.5px] font-medium mt-3">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#cbd5e1]"></div> Room: <strong className="text-[#4b3f68]">{course.room}</strong></div>
+                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#cbd5e1]"></div> Teacher: <strong className="text-[#4b3f68]">{teacherName || 'Assigned Teacher'}</strong></div>
                 </div>
               </div>
               <div className="bg-[#fbf8fe] border border-[#e7dff0] p-4 rounded-sm flex items-center justify-between gap-6 md:w-auto w-full">
@@ -286,7 +276,7 @@ export default function TeacherClassDetailPage() {
           </div>
 
           {activeSubTab === 'content' && (
-            <TeacherContentTab courseId={course.id} classId={realClassId || undefined} />
+            <TeacherContentTab courseId={course.id} classId={classId} />
           )}
 
           {activeSubTab === 'students' && (

@@ -11,9 +11,12 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
+import CourseClassesPage from './pages/CourseClassesPage.tsx';
+import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
+import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
 import TeacherSettingsPage from './pages/TeacherSettingsPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
@@ -55,6 +58,8 @@ function App() {
           <Route path="/register-students" element={<RegisterStudentsPage />} />
           <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
+          <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
           <Route path="/teachers" element={<TeachersPage />} />
           <Route path="/user-roles" element={<UserRolesPage />} />
           <Route path="/userroles" element={<UserRolesPage />} />
@@ -68,6 +73,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/courses/:courseId/classes"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherCourseClassesPage />
             </ProtectedRoute>
           }
         />

@@ -26,8 +26,8 @@ export default function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 bottom-0 w-[210px] bg-white/95 backdrop-blur border-r border-[#e7dff0] flex flex-col z-[100] transition-all duration-200 shadow-[0_0_30px_rgba(57,31,86,0.06)]">
       <div className="flex items-center justify-center gap-2 px-4 border-b border-[#e7dff0] min-h-[58px] bg-[#fbf8fe]">
-        <img src="/image - Edited.png" alt="Yogify Logo" className="h-10 w-10 object-contain" style={{ mixBlendMode: 'multiply' }} />
-        <span className="font-extrabold text-[#4b3f68] text-lg tracking-wide uppercase">YOGIFY</span>
+        <img src="/image - Edited.png" alt="Learnify Logo" className="h-10 w-10 object-contain" style={{ mixBlendMode: 'multiply' }} />
+        <span className="font-extrabold text-[#4b3f68] text-lg tracking-wide uppercase">LEARNIFY</span>
       </div>
 
       <nav className="flex-1 py-[14px] overflow-y-auto">

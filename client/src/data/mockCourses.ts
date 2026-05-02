@@ -11,7 +11,6 @@ export const MOCK_COURSES = [
     department: 'CSE',
     facultyLead: 'Prof. Linus Torvalds',
     description: 'Team-based software development practices including version control, code review, and agile methodologies.',
-    scheduleDays: ['Mon', 'Wed', 'Fri'],
   },
   {
     id: '5cs02',
@@ -20,7 +19,6 @@ export const MOCK_COURSES = [
     department: 'CSE',
     facultyLead: 'Prof. Sunita Sharma',
     description: 'End-to-end web application development covering React, Node.js, databases, and deployment.',
-    scheduleDays: ['Tue', 'Thu'],
   },
   {
     id: '5cs03',
@@ -29,7 +27,6 @@ export const MOCK_COURSES = [
     department: 'CSE',
     facultyLead: 'Prof. Sunita Sharma',
     description: 'Advanced algorithmic techniques, complexity analysis, NP-completeness, and optimization.',
-    scheduleDays: ['Mon', 'Wed'],
   },
   {
     id: '5cs05',
@@ -38,7 +35,6 @@ export const MOCK_COURSES = [
     department: 'IT',
     facultyLead: 'Dr. Guido Rossum',
     description: 'Introduction to Python programming covering syntax, data structures, and basic scripting.',
-    scheduleDays: ['Mon', 'Wed', 'Fri'],
   },
   {
     id: '5cs06',
@@ -47,7 +43,6 @@ export const MOCK_COURSES = [
     department: 'CSE',
     facultyLead: 'Dr. Alan Turing',
     description: 'Fundamentals of Java programming, OOP principles, collections, and exception handling.',
-    scheduleDays: ['Tue', 'Thu'],
   },
   {
     id: '5cs07',
@@ -56,7 +51,6 @@ export const MOCK_COURSES = [
     department: 'CSE',
     facultyLead: 'Prof. Linus Torvalds',
     description: 'Modern React development with hooks, context, routing, and component patterns.',
-    scheduleDays: ['Wed', 'Fri'],
   },
   {
     id: '5cs08',
@@ -65,7 +59,6 @@ export const MOCK_COURSES = [
     department: 'IT',
     facultyLead: 'Dr. John Doe',
     description: 'Introduction to game development concepts, 2D rendering, physics engines, and game loops.',
-    scheduleDays: ['Sat'],
   },
   {
     id: '5cs09',
@@ -74,7 +67,6 @@ export const MOCK_COURSES = [
     department: 'CSE',
     facultyLead: 'Prof. Linus Torvalds',
     description: 'Core JavaScript from variables and functions to async programming and DOM manipulation.',
-    scheduleDays: ['Mon', 'Thu'],
   },
   {
     id: '5cs10',
@@ -83,6 +75,5 @@ export const MOCK_COURSES = [
     department: 'IT',
     facultyLead: 'Dr. John Doe',
     description: 'HTML, CSS, JavaScript, and responsive design for building modern web interfaces.',
-    scheduleDays: ['Tue', 'Wed', 'Fri'],
   },
 ];
