@@ -13,12 +13,11 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   const { user } = useAuth();
 
   const [courses, setCourses] = useState<{ id: string; name: string; course_code?: string }[]>([]);
-  const [isLoadingCourses, setIsLoadingCourses] = useState(false);
-  const [courseName, setCourseName] = useState('');
+  const [courseId, setCourseId] = useState('');
 
-  const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
-  const [isLoadingClasses, setIsLoadingClasses] = useState(false);
+  const [allClasses, setAllClasses] = useState<{ id: string; name: string; course_id: string }[]>([]);
   const [classId, setClassId] = useState('');
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -31,6 +30,17 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const today = new Date();
+  const minDate = today.toISOString().split('T')[0];
+  const isToday = dueDate === minDate;
+  const minTime = isToday ? today.toTimeString().slice(0, 5) : undefined;
+
+  const isDateTimeInvalid = () => {
+    if (!dueDate || !dueTime) return false;
+    const selectedDateTime = new Date(`${dueDate}T${dueTime}`);
+    return selectedDateTime <= new Date();
+  };
+
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = 'unset';
@@ -38,7 +48,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   }, [isOpen]);
 
   const resetForm = () => {
-    setCourseName(courses.length > 0 ? courses[0].name : '');
+    setCourseId('');
     setClassId('');
     setTitle('');
     setDescription('');
@@ -49,68 +59,77 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   };
 
   useEffect(() => {
-    if (!isOpen || !user) return;
+    if (!isOpen || !user?.id) return;
 
     resetForm();
 
-    async function fetchCourses() {
-      if (!user?.name) {
-        setCourses([]);
-        return;
-      }
-
-      setIsLoadingCourses(true);
+    async function fetchClassesAndCourses() {
+      setIsLoadingData(true);
       try {
-        const { data: coursesData, error: err } = await supabase
-          .from('courses')
-          .select('id, name, course_code')
-          .eq('faculty_lead', user.name);
+        const { data, error: err } = await supabase
+          .from('classes')
+          .select(`
+            id,
+            name,
+            course_id,
+            courses (
+              id,
+              name,
+              course_code
+            )
+          `)
+          .eq('teacher_id', user.id);
 
         if (err) {
-          console.error('Courses fetch error:', err.message);
-        } else {
-          setCourses(coursesData || []);
-          if (coursesData && coursesData.length > 0) {
-            setCourseName(coursesData[0].name);
+          console.error('Fetch error:', err.message);
+        } else if (data) {
+          const uniqueCourses = new Map();
+          const fetchedClasses: { id: string; name: string; course_id: string }[] = [];
+
+          data.forEach((cls: any) => {
+            if (cls.courses) {
+              const course = Array.isArray(cls.courses) ? cls.courses[0] : cls.courses;
+              if (course && !uniqueCourses.has(course.id)) {
+                uniqueCourses.set(course.id, course);
+              }
+              if (course) {
+                fetchedClasses.push({ id: cls.id, name: cls.name, course_id: course.id });
+              }
+            }
+          });
+
+          const coursesList = Array.from(uniqueCourses.values());
+          setCourses(coursesList);
+          setAllClasses(fetchedClasses);
+
+          if (coursesList.length > 0) {
+            const firstCourseId = coursesList[0].id;
+            setCourseId(firstCourseId);
+            const initialClasses = fetchedClasses.filter(c => c.course_id === firstCourseId);
+            if (initialClasses.length > 0) {
+              setClassId(initialClasses[0].id);
+            }
+          } else {
+            setCourseId('');
+            setClassId('');
           }
         }
       } finally {
-        setIsLoadingCourses(false);
+        setIsLoadingData(false);
       }
     }
-    fetchCourses();
-  }, [isOpen, user]);
+    fetchClassesAndCourses();
+  }, [isOpen, user?.id]);
 
-  useEffect(() => {
-    async function fetchClasses() {
-      const selectedCourse = courses.find(c => c.name === courseName);
-      if (!selectedCourse?.id) {
-        setClasses([]);
-        setClassId('');
-        return;
-      }
-      setIsLoadingClasses(true);
-      const { data, error: err } = await supabase
-        .from('classes')
-        .select('id, name')
-        .eq('course_id', selectedCourse.id);
-
-      if (!err) {
-        setClasses(data || []);
-        if (data && data.length > 0) setClassId(data[0].id);
-        else setClassId('');
-      } else {
-        console.error('Classes fetch error:', err.message);
-        setClasses([]);
-        setClassId('');
-      }
-      setIsLoadingClasses(false);
+  const handleCourseChange = (newCourseId: string) => {
+    setCourseId(newCourseId);
+    const filteredClasses = allClasses.filter(c => c.course_id === newCourseId);
+    if (filteredClasses.length > 0) {
+      setClassId(filteredClasses[0].id);
+    } else {
+      setClassId('');
     }
-
-    if (isOpen) {
-      fetchClasses();
-    }
-  }, [courseName, courses, isOpen]);
+  };
 
   if (!isOpen) return null;
 
@@ -132,8 +151,14 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!courseName || !classId || !title || !description || !dueDate || !dueTime || !file) {
+    if (!courseId || !classId || !title || !description || !dueDate || !dueTime || !file) {
       alert('Please fill in all required fields');
+      return;
+    }
+
+    const selectedDateTime = new Date(`${dueDate}T${dueTime}`);
+    if (selectedDateTime <= new Date()) {
+      alert('Due date must be in the future');
       return;
     }
 
@@ -141,19 +166,18 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     try {
       const fileUrl = await handleFileUpload(file);
 
-      const selectedCourse = courses.find(c => c.name === courseName);
       const { error: insertError } = await supabase
         .from('assignments')
         .insert({
           teacher_id: user?.id,
-          course_id: selectedCourse?.id,
+          course_id: courseId,
           class_id: classId,
           title: title,
           description: description,
           due_date: dueDate,
           due_time: dueTime,
           attachment_url: fileUrl,
-          portal_open: false,
+          portal_open: true,
           created_at: new Date().toISOString()
         });
 
@@ -169,6 +193,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
       setIsSubmitting(false);
     }
   };
+
+  const filteredClasses = allClasses.filter(c => c.course_id === courseId);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -186,15 +212,15 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Course *</label>
               <select
-                value={courseName}
-                onChange={e => setCourseName(e.target.value)}
+                value={courseId}
+                onChange={e => handleCourseChange(e.target.value)}
                 className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
-                disabled={isLoadingCourses || courses.length === 0}
+                disabled={isLoadingData || courses.length === 0}
               >
-                {isLoadingCourses && <option value="" disabled>Loading courses...</option>}
-                {!isLoadingCourses && courses.length === 0 && <option value="" disabled>No courses assigned</option>}
-                {!isLoadingCourses && courses.map(c => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
+                {isLoadingData && <option value="" disabled>Loading courses...</option>}
+                {!isLoadingData && courses.length === 0 && <option value="" disabled>No courses assigned</option>}
+                {!isLoadingData && courses.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
@@ -205,12 +231,12 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                 value={classId}
                 onChange={e => setClassId(e.target.value)}
                 className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
-                disabled={!courseName || isLoadingClasses || classes.length === 0}
+                disabled={!courseId || isLoadingData || filteredClasses.length === 0}
               >
-                {!courseName && <option value="" disabled>Select a course first</option>}
-                {courseName && isLoadingClasses && <option value="" disabled>Loading classes...</option>}
-                {courseName && !isLoadingClasses && classes.length === 0 && <option value="" disabled>No classes found</option>}
-                {courseName && !isLoadingClasses && classes.map(c => (
+                {!courseId && <option value="" disabled>Select a course first</option>}
+                {courseId && isLoadingData && <option value="" disabled>Loading classes...</option>}
+                {courseId && !isLoadingData && filteredClasses.length === 0 && <option value="" disabled>No classes found</option>}
+                {courseId && !isLoadingData && filteredClasses.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
@@ -238,25 +264,40 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
               />
             </div>
 
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Date *</label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={e => setDueDate(e.target.value)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
-                />
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-4">
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Date *</label>
+                  <input
+                    type="date"
+                    value={dueDate}
+                    min={minDate}
+                    onChange={e => setDueDate(e.target.value)}
+                    className={`bg-[#f6f2fb] border rounded-sm px-4 py-2.5 text-[14px] w-full outline-none transition-all text-[#1e293b] ${
+                      isDateTimeInvalid() 
+                        ? 'border-red-500 focus:bg-white focus:ring-[3px] focus:ring-red-500/10' 
+                        : 'border-transparent focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10'
+                    }`}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Time *</label>
+                  <input
+                    type="time"
+                    value={dueTime}
+                    min={minTime}
+                    onChange={e => setDueTime(e.target.value)}
+                    className={`bg-[#f6f2fb] border rounded-sm px-4 py-2.5 text-[14px] w-full outline-none transition-all text-[#1e293b] ${
+                      isDateTimeInvalid() 
+                        ? 'border-red-500 focus:bg-white focus:ring-[3px] focus:ring-red-500/10' 
+                        : 'border-transparent focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10'
+                    }`}
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Time *</label>
-                <input
-                  type="time"
-                  value={dueTime}
-                  onChange={e => setDueTime(e.target.value)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
-                />
-              </div>
+              {isDateTimeInvalid() && (
+                <span className="text-red-500 text-[11px] font-semibold mt-1">Due date must be in the future</span>
+              )}
             </div>
 
             <div className="flex flex-col gap-1.5 mt-2">
@@ -332,3 +373,4 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     </div>
   );
 }
+
