@@ -139,24 +139,24 @@ export default function TeacherAssignmentPage() {
 
   const now = new Date();
   const activeAssignmentsList = processedAssignments.filter(a => {
-    if (!a.due_date) return true;
-    const d = new Date(a.due_date);
-    return isNaN(d.getTime()) || d >= now;
+    const d = a.due_date ? new Date(a.due_date) : null;
+    const isDuePassed = d && !isNaN(d.getTime()) && d < now;
+    return a.portal_open && !isDuePassed;
   });
   const otherAssignmentsList = processedAssignments.filter(a => {
-    if (!a.due_date) return false;
-    const d = new Date(a.due_date);
-    return !isNaN(d.getTime()) && d < now;
+    const d = a.due_date ? new Date(a.due_date) : null;
+    const isDuePassed = d && !isNaN(d.getTime()) && d < now;
+    return !a.portal_open || isDuePassed;
   });
 
   const openCount = assignments.filter(a => {
-    const dueDate = a.due_date ? new Date(a.due_date) : null;
-    const isDuePassed = dueDate && !isNaN(dueDate.getTime()) && dueDate < now;
+    const d = a.due_date ? new Date(a.due_date) : null;
+    const isDuePassed = d && !isNaN(d.getTime()) && d < now;
     return a.portal_open && !isDuePassed;
   }).length;
   const closedCount = assignments.filter(a => {
-    const dueDate = a.due_date ? new Date(a.due_date) : null;
-    const isDuePassed = dueDate && !isNaN(dueDate.getTime()) && dueDate < now;
+    const d = a.due_date ? new Date(a.due_date) : null;
+    const isDuePassed = d && !isNaN(d.getTime()) && d < now;
     return !a.portal_open || isDuePassed;
   }).length;
   const gradedCount = assignments.filter(a => {
@@ -257,7 +257,7 @@ export default function TeacherAssignmentPage() {
 
           <section>
             <div className="flex items-center gap-3 mb-6 border-b border-[#e7dff0] pb-2">
-              <h2 className="text-[16px] font-bold text-[#4b3f68]">Other Assignments</h2>
+              <h2 className="text-[16px] font-bold text-[#4b3f68]">Closed Assignments</h2>
               <span className="bg-[#e2e8f0] text-[#475569] text-[11px] font-bold px-2 py-0.5 rounded-sm">
                 {otherAssignmentsList.length}
               </span>
