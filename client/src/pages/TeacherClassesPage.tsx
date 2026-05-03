@@ -14,14 +14,26 @@ export default function TeacherClassesPage() {
 
   useEffect(() => {
     async function loadCourses() {
-      if (!user?.name) return;
       setIsLoading(true);
       try {
-        const { data } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('faculty_lead', user.name);
-        
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) return;
+
+        const { data, error } = await supabase
+          .from('classes')
+          .select(`
+            *,
+            courses (
+              id,
+              name,
+              description,
+              course_code
+            )
+          `)
+          .eq('teacher_id', authUser.id);
+
+        if (error) throw error;
+
         if (data && data.length > 0) {
           setCourses(data);
         } else {
@@ -34,7 +46,7 @@ export default function TeacherClassesPage() {
       }
     }
     loadCourses();
-  }, [user]);
+  }, []);
 
   const totalClassesCount = courses.length;
 
@@ -55,26 +67,26 @@ export default function TeacherClassesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course, idx) => {
             const randomProgress = course.completed_lessons ? (course.completed_lessons / (course.total_lessons || 1)) * 100 : 0;
-            const courseRoom = course.department || 'Virtual';
-            const courseTotalStudents = 0; // Temporarily
+            const courseRoom = course.room || 'Virtual';
+            const courseTotalStudents = course.student_ids ? course.student_ids.length : 0;
 
             return (
-              <div 
-                key={course.id} 
+              <div
+                key={course.id}
                 onClick={() => navigate(`/teacher/classes/${course.id}`)}
                 className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col hover:border-[#6a5182] hover:shadow-md transition-all cursor-pointer transform hover:-translate-y-1"
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <span className="bg-[#f1f5f9] text-[#4b3f68] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#e2e8f0]">
-                      {course.course_code || `CRS-${idx + 1}`}
+                      {course.courses?.course_code || `CRS-${idx + 1}`}
                     </span>
                     <span className="bg-[#dcfce7] text-[#16a34a] rounded-sm px-2.5 py-1 text-[11px] font-bold">
                       {course.attendance || 100}% Attend.
                     </span>
                   </div>
 
-                  <h3 className="text-[18px] font-bold text-[#4b3f68] mb-2 leading-tight">{course.name}</h3>
+                  <h3 className="text-[18px] font-bold text-[#4b3f68] mb-2 leading-tight">{course.courses?.name || course.name}</h3>
                   <p className="text-[13px] font-medium text-[#64748b] flex items-center gap-3">
                     <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {courseTotalStudents} Students</span>
                     <span className="w-1 h-1 rounded-full bg-[#cbd5e1]"></span>
@@ -83,14 +95,14 @@ export default function TeacherClassesPage() {
 
                   <div className="mt-6">
                     <div className="flex justify-between text-[11.5px] font-bold text-[#64748b] mb-2 uppercase">
-                       <span>Course Progress</span>
-                       <span className="text-[#6a5182]">{Math.round(randomProgress)}%</span>
+                      <span>Course Progress</span>
+                      <span className="text-[#6a5182]">{Math.round(randomProgress)}%</span>
                     </div>
                     <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
-                       <div className="h-full bg-[#6a5182] rounded-full transition-all duration-500" style={{ width: `${randomProgress}%` }}></div>
+                      <div className="h-full bg-[#6a5182] rounded-full transition-all duration-500" style={{ width: `${randomProgress}%` }}></div>
                     </div>
                     <p className="text-[11.5px] text-[#94a3b8] font-medium mt-2">
-                       {course.completed_lessons || 0} / {course.total_lessons || 'N'} Units Completed
+                      {course.completed_lessons || 0} / {course.total_lessons || 'N'} Units Completed
                     </p>
                   </div>
                 </div>

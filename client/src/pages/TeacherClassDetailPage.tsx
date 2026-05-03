@@ -7,8 +7,6 @@ import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
 
-
-
 export default function TeacherClassDetailPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
@@ -20,12 +18,10 @@ export default function TeacherClassDetailPage() {
   const [students, setStudents] = useState<any[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
 
-  // Notification form states
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  // Grades states
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [isLoadingGrades, setIsLoadingGrades] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
@@ -33,33 +29,24 @@ export default function TeacherClassDetailPage() {
   useEffect(() => {
     async function loadCourse() {
       try {
-        const { data, error } = await supabase
-          .from('courses')
-          .select('*')
+        const { data: classData, error: classError } = await supabase
+          .from('classes')
+          .select('*, courses(*)')
           .eq('id', classId)
           .single();
 
-        if (error || !data) {
+        if (classError || !classData) {
           navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
           return;
         }
-        setCourse({
-          ...data,
-          room: data.department || 'Virtual',
-          course_code: data.course_code || 'N/A'
-        });
 
-        // Look up the actual class_id and name from classes table for this course
-        const { data: classData } = await supabase
-          .from('classes')
-          .select('id, name')
-          .eq('course_id', classId)
-          .limit(1)
-          .single();
-        if (classData) {
-          setRealClassId(classData.id);
-          setClassName(classData.name || '');
-        }
+        setRealClassId(classData.id);
+        setClassName(classData.name || '');
+        setCourse({
+          ...classData.courses,
+          room: classData.courses?.department || 'Virtual',
+          course_code: classData.courses?.course_code || 'N/A'
+        });
       } catch (err) {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
@@ -68,51 +55,34 @@ export default function TeacherClassDetailPage() {
   }, [classId, navigate]);
 
   useEffect(() => {
-    if (!course || !classId) return;
+    if (!classId) return;
 
     async function fetchStudents() {
       setIsLoadingStudents(true);
       try {
-        // Step 1: Get student IDs from enrollments using course_id
-        const { data: enrollmentData, error: enrollError } = await supabase
-          .from('enrollments')
-          .select('student_id')
-          .eq('course_id', classId);
+        const { data: classData, error } = await supabase
+          .from('classes')
+          .select('student_ids')
+          .eq('id', classId)
+          .single();
 
-        console.log('Enrollment data:', enrollmentData, 'Error:', enrollError);
-
-        if (enrollError) {
-          console.error('Enrollment fetch error:', enrollError.message);
+        if (error || !classData?.student_ids?.length) {
           setStudents([]);
           return;
         }
-
-        if (!enrollmentData || enrollmentData.length === 0) {
-          console.log('No enrollments found for course_id:', classId);
-          setStudents([]);
-          return;
-        }
-
-        // Step 2: Get student details from users table
-        const studentIds = enrollmentData.map((e: any) => e.student_id);
-        console.log('Student IDs:', studentIds);
 
         const { data: studentsData, error: studentsError } = await supabase
           .from('users')
           .select('id, name, email')
-          .in('id', studentIds);
-
-        console.log('Students data:', studentsData, 'Error:', studentsError);
+          .in('id', classData.student_ids);
 
         if (studentsError) {
-          console.error('Students fetch error:', studentsError.message);
           setStudents([]);
           return;
         }
 
         setStudents(studentsData || []);
       } catch (err: any) {
-        console.error('Failed to fetch students:', err.message);
         setStudents([]);
       } finally {
         setIsLoadingStudents(false);
@@ -120,22 +90,39 @@ export default function TeacherClassDetailPage() {
     }
 
     fetchStudents();
-  }, [course, classId]);
+  }, [classId]);
 
-  // Load Submissions dynamically when entering grades view
   const loadSubmissions = async () => {
     setIsLoadingGrades(true);
     try {
+      const { data: assignments, error: aError } = await supabase
+        .from('assignments')
+        .select('id, title')
+        .eq('class_id', classId);
+
+      if (aError || !assignments?.length) {
+        setSubmissions([]);
+        return;
+      }
+
+      const assignmentIds = assignments.map((a: any) => a.id);
+
       const { data, error } = await supabase
         .from('submissions')
-        .select('*, users!inner(name), assignments!inner(title, class_id)')
-        .eq('assignments.class_id', classId);
+        .select('*, users(name)')
+        .in('assignment_id', assignmentIds);
 
-      if (!error && data && data.length > 0) {
-        setSubmissions(data);
-      } else {
+      if (error) {
         setSubmissions([]);
+        return;
       }
+
+      const enriched = (data || []).map((sub: any) => ({
+        ...sub,
+        assignments: assignments.find((a: any) => a.id === sub.assignment_id)
+      }));
+
+      setSubmissions(enriched);
     } catch (err: any) {
       console.error('Failed to fetch submissions', err);
     } finally {
@@ -161,7 +148,6 @@ export default function TeacherClassDetailPage() {
     }
 
     setIsSending(true);
-
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not logged in");
@@ -247,42 +233,21 @@ export default function TeacherClassDetailPage() {
           </div>
 
           <div className="flex space-x-6 border-b border-[#e7dff0] mb-6 px-2 overflow-x-auto">
-            <button
-              onClick={() => setActiveSubTab('content')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'content'
+            {(['content', 'students', 'grades', 'notifications'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveSubTab(tab)}
+                className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === tab
                   ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
                   : 'text-[#64748b] hover:text-[#4b3f68]'
-                }`}
-            >
-              Course Content
-            </button>
-            <button
-              onClick={() => setActiveSubTab('students')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'students'
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
-                  : 'text-[#64748b] hover:text-[#4b3f68]'
-                }`}
-            >
-              Enrolled Students
-            </button>
-            <button
-              onClick={() => setActiveSubTab('grades')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'grades'
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
-                  : 'text-[#64748b] hover:text-[#4b3f68]'
-                }`}
-            >
-              Assignments & Grades
-            </button>
-            <button
-              onClick={() => setActiveSubTab('notifications')}
-              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'notifications'
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
-                  : 'text-[#64748b] hover:text-[#4b3f68]'
-                }`}
-            >
-              Broadcast Notification
-            </button>
+                  }`}
+              >
+                {tab === 'content' && 'Course Content'}
+                {tab === 'students' && 'Enrolled Students'}
+                {tab === 'grades' && 'Assignments & Grades'}
+                {tab === 'notifications' && 'Broadcast Notification'}
+              </button>
+            ))}
           </div>
 
           {activeSubTab === 'content' && (
@@ -339,7 +304,7 @@ export default function TeacherClassDetailPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
-                      <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[300px]">Assignment Target</th>
+                      <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[300px]">Assignment</th>
                       <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student Name</th>
                       <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</th>
                       <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Action</th>
@@ -348,7 +313,7 @@ export default function TeacherClassDetailPage() {
                   <tbody className="divide-y divide-[#e7dff0]">
                     {submissions.map((sub) => (
                       <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
-                        <td className="py-4 px-6 text-[13.5px] font-bold text-[#4b3f68] truncate max-w-[300px]" title={sub.assignments?.title}>
+                        <td className="py-4 px-6 text-[13.5px] font-bold text-[#4b3f68] truncate max-w-[300px]">
                           {sub.assignments?.title || 'Unknown Assignment'}
                         </td>
                         <td className="py-4 px-6 text-[14px] font-semibold text-[#64748b]">
@@ -356,8 +321,8 @@ export default function TeacherClassDetailPage() {
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${sub.grade !== null
-                              ? 'bg-[#dcfce7] text-[#16a34a]'
-                              : 'bg-[#fef9c3] text-[#ca8a04]'
+                            ? 'bg-[#dcfce7] text-[#16a34a]'
+                            : 'bg-[#fef9c3] text-[#ca8a04]'
                             }`}>
                             {sub.grade !== null ? 'GRADED' : 'SUBMITTED'}
                           </span>
@@ -427,11 +392,7 @@ export default function TeacherClassDetailPage() {
                     disabled={isSending}
                     className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-bold tracking-wide rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed uppercase"
                   >
-                    {isSending ? (
-                      <>Processing...</>
-                    ) : (
-                      <><Send size={16} /> Broadcast Now</>
-                    )}
+                    {isSending ? <>Processing...</> : <><Send size={16} /> Broadcast Now</>}
                   </button>
                 </div>
               </form>
@@ -449,20 +410,10 @@ export default function TeacherClassDetailPage() {
       />
 
       <style>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(4px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
