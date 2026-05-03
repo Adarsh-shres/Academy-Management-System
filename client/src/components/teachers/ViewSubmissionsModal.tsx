@@ -51,7 +51,7 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
 
         // Step 3: Fetch submissions for this assignment
         const { data: subData, error: subErr } = await supabase
-          .from('submissions')
+          .from('assignment_submissions')
           .select('id, student_id, file_url, submitted_at, status')
           .eq('assignment_id', assignment.id);
 

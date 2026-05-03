@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppModal from '../components/shared/AppModal';
 import StatCard from '../components/dashboard/StatCard';
 import { useCourses } from '../context/CourseContext';
@@ -11,6 +12,7 @@ const DEPARTMENT_OPTIONS = [
 ] as const;
 
 type CourseLevel = (typeof LEVEL_OPTIONS)[number];
+type LevelFilter = 'All' | CourseLevel;
 
 function buildCourseCode(level: string, departments: string[], courses: Course[]) {
   if (!level || departments.length === 0) return '';
@@ -30,6 +32,11 @@ function buildCourseCode(level: string, departments: string[], courses: Course[]
   });
 
   return `${prefix}-${String(nextSequence).padStart(2, '0')}`;
+}
+
+function getCourseLevel(course: Course): CourseLevel | null {
+  const levelMatch = course.courseCode.match(/^[456]/);
+  return levelMatch ? (levelMatch[0] as CourseLevel) : null;
 }
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -57,10 +64,12 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 }
 
 export default function CoursesPage() {
+  const navigate = useNavigate();
   const { courses, loading, error: contextError, addCourse, updateCourse, deleteCourse } = useCourses();
 
   const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'All' | 'Active' | 'Inactive'>('All');
+  const [filterLevel, setFilterLevel] = useState<LevelFilter>('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isDepartmentMenuOpen, setIsDepartmentMenuOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -129,7 +138,6 @@ export default function CoursesPage() {
         department: newDepartments.join(', '),
         facultyLead: newFaculty || 'Unassigned',
         description: newDescription || 'No description provided.',
-        scheduleDays: [],
       });
       resetNewCourseForm();
       setIsNewCourseModalOpen(false);
@@ -170,14 +178,23 @@ export default function CoursesPage() {
     }
   };
 
-  const filteredCourses = courses.filter((course) => filterStatus === 'All' || course.status === filterStatus);
+  const filteredCourses = courses.filter((course) => {
+    const matchesStatus = filterStatus === 'All' || course.status === filterStatus;
+    const matchesLevel = filterLevel === 'All' || getCourseLevel(course) === filterLevel;
+
+    return matchesStatus && matchesLevel;
+  });
   const activeCourses = courses.filter((course) => course.status === 'Active');
   const inactiveCourses = courses.filter((course) => course.status === 'Inactive');
+
+  const openCourseClasses = (courseId: string) => {
+    navigate(`/courses/${courseId}/classes`);
+  };
 
   const handleExportCSV = () => {
     if (!window.confirm('Download courses data as a CSV file?')) return;
 
-    const headers = ['Course Code', 'Course Name', 'Department', 'Faculty Lead', 'Status', 'Weekly Schedule', 'Description'];
+    const headers = ['Course Code', 'Course Name', 'Department', 'Faculty Lead', 'Status', 'Description'];
 
     const escapeCSV = (val: string) => {
       if (val.includes(',') || val.includes('"') || val.includes('\n')) {
@@ -192,7 +209,6 @@ export default function CoursesPage() {
       escapeCSV(course.department),
       escapeCSV(course.facultyLead),
       course.status,
-      escapeCSV((course.scheduleDays || []).join(' | ')),
       escapeCSV(course.description || ''),
     ].join(','));
 
@@ -276,7 +292,7 @@ export default function CoursesPage() {
         <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col animate-fade-up">
           <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#fbf8fe]">
             <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">
-              {filterStatus === 'All' ? 'All Courses' : `${filterStatus} Courses`}
+              {filterLevel === 'All' ? 'All Course Levels' : `Level ${filterLevel} Courses`}
             </h3>
 
             <div className="flex items-center gap-3 ml-auto flex-wrap">
@@ -290,14 +306,21 @@ export default function CoursesPage() {
                   className="flex items-center gap-1.5 bg-[#f3eff7] hover:bg-[#6a5182] active:bg-[#5b4471] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                  Filter {filterStatus !== 'All' && `(${filterStatus})`}
+                  Filter {filterLevel !== 'All' && `(Level ${filterLevel})`}
                 </button>
 
                 {isFilterOpen && (
                   <div className="absolute top-[110%] right-0 w-36 bg-white border border-[#e2e8f0] rounded-sm shadow-lg z-10 flex flex-col overflow-hidden py-1">
-                    <button onClick={() => { setFilterStatus('All'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'All' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>All Courses</button>
-                    <button onClick={() => { setFilterStatus('Active'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'Active' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>Active</button>
-                    <button onClick={() => { setFilterStatus('Inactive'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterStatus === 'Inactive' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>Inactive</button>
+                    <button onClick={() => { setFilterLevel('All'); setIsFilterOpen(false); }} className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterLevel === 'All' ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}>All Levels</button>
+                    {LEVEL_OPTIONS.map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => { setFilterLevel(level); setIsFilterOpen(false); }}
+                        className={`px-4 py-2 text-left text-[13px] hover:bg-[#f3eff7] transition-colors ${filterLevel === level ? 'bg-[#f3eff7] font-bold text-[#6a5182]' : 'text-[#475569]'}`}
+                      >
+                        Level {level}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
@@ -325,9 +348,26 @@ export default function CoursesPage() {
               <tbody>
                 {filteredCourses.length > 0 ? (
                   filteredCourses.map((course) => (
-                    <tr key={course.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors group">
+                    <tr
+                      key={course.id}
+                      role="link"
+                      tabIndex={0}
+                      title={`View classes for ${course.name}`}
+                      onClick={() => openCourseClasses(course.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          openCourseClasses(course.id);
+                        }
+                      }}
+                      className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#6a5182]/25 transition-colors group cursor-pointer"
+                    >
                       <td className="py-3 px-6 text-[13px] font-semibold text-[#475569]">{course.courseCode}</td>
-                      <td className="py-3 px-6 text-[13px] font-medium text-[#1e293b]">{course.name}</td>
+                      <td className="py-3 px-6 text-[13px] font-medium text-[#1e293b]">
+                        <span className="group-hover:text-[#6a5182] group-focus:text-[#6a5182] group-hover:underline underline-offset-4 transition-colors">
+                          {course.name}
+                        </span>
+                      </td>
                       <td className="py-3 px-6">
                         <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#dbeafe] text-[#1d4ed8]">{course.department}</span>
                       </td>
@@ -340,14 +380,20 @@ export default function CoursesPage() {
                       <td className="py-3 px-6 text-right">
                         <div className="flex items-center justify-end gap-3 text-[#94a3b8]">
                           <button
-                            onClick={() => setEditingCourse({ ...course })}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setEditingCourse({ ...course });
+                            }}
                             className="hover:text-[#6a5182] transition-colors cursor-pointer hover:scale-110 active:scale-95"
                             title="Edit"
                           >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                           </button>
                           <button
-                            onClick={() => handleDelete(course.id)}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDelete(course.id);
+                            }}
                             className="hover:text-[#ef4444] transition-colors cursor-pointer hover:scale-110 active:scale-95"
                             title="Delete"
                           >

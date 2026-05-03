@@ -13,7 +13,8 @@ export default function TeacherClassDetailPage() {
 
   const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades'>('content');
   const [course, setCourse] = useState<any>(null);
-  const [realClassId, setRealClassId] = useState<string | null>(null);
+  const [classDetails, setClassDetails] = useState<any>(null);
+  const [teacherName, setTeacherName] = useState<string>('');
   const [className, setClassName] = useState<string>('');
   const [students, setStudents] = useState<any[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
@@ -27,7 +28,8 @@ export default function TeacherClassDetailPage() {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
 
   useEffect(() => {
-    async function loadCourse() {
+    async function loadClassAndCourse() {
+      if (!classId) return;
       try {
         const { data: classData, error: classError } = await supabase
           .from('classes')
@@ -51,7 +53,7 @@ export default function TeacherClassDetailPage() {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
     }
-    if (classId) loadCourse();
+    loadClassAndCourse();
   }, [classId, navigate]);
 
   useEffect(() => {
@@ -153,7 +155,7 @@ export default function TeacherClassDetailPage() {
       if (!user) throw new Error("Not logged in");
 
       const { error } = await supabase.from('notifications').insert({
-        class_id: realClassId || classId,
+        class_id: classId,
         teacher_id: user.id,
         message: `${title.toUpperCase()}\n\n${message}`,
         type: 'manual',
@@ -215,9 +217,9 @@ export default function TeacherClassDetailPage() {
                 <span className="bg-[#f3eff7] text-[#6a5182] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#d8c8e9] inline-block mb-3">
                   {course.course_code}
                 </span>
-                <h2 className="text-[28px] font-extrabold text-[#4b3f68] mb-1 leading-tight tracking-tight">{course.name}</h2>
+                <h2 className="text-[28px] font-extrabold text-[#4b3f68] mb-1 leading-tight tracking-tight">{course.name} - {className}</h2>
                 <div className="flex flex-wrap items-center gap-4 text-[#64748b] text-[13.5px] font-medium mt-3">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#cbd5e1]"></div> Room: <strong className="text-[#4b3f68]">{course.room}</strong></div>
+                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#cbd5e1]"></div> Teacher: <strong className="text-[#4b3f68]">{teacherName || 'Assigned Teacher'}</strong></div>
                 </div>
               </div>
               <div className="bg-[#fbf8fe] border border-[#e7dff0] p-4 rounded-sm flex items-center justify-between gap-6 md:w-auto w-full">
@@ -251,7 +253,7 @@ export default function TeacherClassDetailPage() {
           </div>
 
           {activeSubTab === 'content' && (
-            <TeacherContentTab courseId={course.id} classId={realClassId || undefined} />
+            <TeacherContentTab courseId={course.id} classId={classId} />
           )}
 
           {activeSubTab === 'students' && (

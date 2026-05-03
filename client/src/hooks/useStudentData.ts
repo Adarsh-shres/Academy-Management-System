@@ -55,16 +55,14 @@ export function useStudentData() {
 
   const uiColors = ['#6a5182', '#8b6ca8', '#4b3f68', '#b096cc', '#778196'];
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (!user) {
       setIsLoading(false);
       return;
     }
 
     const currentUser = user;
-
-    async function fetchData() {
-      setIsLoading(true);
+    setIsLoading(true);
       setError(null);
 
       try {
@@ -118,8 +116,6 @@ export function useStudentData() {
           const totalClasses = courseAttendance.length;
           const attendedClasses = courseAttendance.filter((a: any) => a.status === 'Present').length;
           const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
-          const scheduleDays = Array.isArray(course.schedule_days) ? course.schedule_days.join(', ') : '';
-
           return {
             id: course.id,
             name: course.name || 'Unknown Course',
@@ -130,7 +126,7 @@ export function useStudentData() {
             totalClasses,
             attendedClasses,
             color: uiColors[idx % uiColors.length],
-            schedule: scheduleDays ? `${scheduleDays} - TBD` : 'Schedule not set',
+            schedule: 'See assigned class schedule',
           };
         });
 
@@ -170,8 +166,9 @@ export function useStudentData() {
       } finally {
         setIsLoading(false);
       }
-    }
+  };
 
+  useEffect(() => {
     void fetchData();
   }, [user]);
 
@@ -181,5 +178,6 @@ export function useStudentData() {
     profile,
     isLoading,
     error,
+    refetch: fetchData,
   };
 }

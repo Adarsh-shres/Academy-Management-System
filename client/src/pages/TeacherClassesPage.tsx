@@ -39,6 +39,16 @@ export default function TeacherClassesPage() {
         } else {
           setCourses([]);
         }
+
+        // Combine and deduplicate
+        const allCoursesMap = new Map();
+        if (facultyLeadCourses) {
+          facultyLeadCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
+        }
+        classCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
+
+        const combinedCourses = Array.from(allCoursesMap.values());
+        setCourses(combinedCourses);
       } catch (err) {
         console.error('Failed to load courses', err);
       } finally {
@@ -54,8 +64,8 @@ export default function TeacherClassesPage() {
     <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1400px] mx-auto w-full">
       {/* Header section */}
       <div className="mb-8">
-        <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">My Classes</h1>
-        <p className="text-[#64748b] font-medium mt-1">{totalClassesCount} active classes this semester</p>
+        <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">My Courses</h1>
+        <p className="text-[#64748b] font-medium mt-1">{totalClassesCount} active courses this semester</p>
       </div>
 
       {/* Classes Grid */}

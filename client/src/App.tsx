@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/shared/ProtectedRoute';
+import { NotificationProvider } from './context/NotificationContext';
 import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
@@ -11,9 +12,12 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
+import CourseClassesPage from './pages/CourseClassesPage.tsx';
+import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
+import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
 import TeacherSettingsPage from './pages/TeacherSettingsPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
@@ -21,6 +25,10 @@ import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
+import NotificationsPage from './pages/NotificationsPage.tsx';
+import SendNotificationPage from './pages/SendNotificationPage.tsx';
+import StudentFoldersPage from './pages/StudentFoldersPage.tsx';
+import FolderContentsPage from './pages/FolderContentsPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -33,8 +41,9 @@ function UnderDevelopment() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <NotificationProvider>
+      <Router>
+        <Routes>
         {/* ── Public routes ──────────────────────────────────────── */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -55,9 +64,12 @@ function App() {
           <Route path="/register-students" element={<RegisterStudentsPage />} />
           <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
+          <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
           <Route path="/teachers" element={<TeachersPage />} />
           <Route path="/user-roles" element={<UserRolesPage />} />
           <Route path="/userroles" element={<UserRolesPage />} />
+          <Route path="/send-notification" element={<SendNotificationPage />} />
           <Route path="/under-development" element={<UnderDevelopment />} />
           <Route path="*" element={<UnderDevelopment />} />
         </Route>
@@ -68,6 +80,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/courses/:courseId/classes"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherCourseClassesPage />
             </ProtectedRoute>
           }
         />
@@ -101,9 +121,13 @@ function App() {
           <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
           <Route path="/student/attendance" element={<StudentAttendancePage />} />
           <Route path="/student/profile" element={<StudentProfilePage />} />
+          <Route path="/student/notifications" element={<NotificationsPage />} />
+          <Route path="/student/folders" element={<StudentFoldersPage />} />
+          <Route path="/student/folders/:folderId" element={<FolderContentsPage />} />
         </Route>
       </Routes>
     </Router>
+    </NotificationProvider>
   );
 }
 
