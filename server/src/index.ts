@@ -4,11 +4,18 @@ import dotenv from 'dotenv';
 
 dotenv.config(); 
 
+import notificationsRouter from './routes/notifications';
+import usersRouter from './routes/users';
+
 const app = express();
 const port = process.env.PORT || 5000; 
 
 app.use(cors()); 
 app.use(express.json());
+
+// Mount routes
+app.use('/notifications', notificationsRouter);
+app.use('/users', usersRouter);
 
 app.get('/', (_req, res) => {
   res.json({ 

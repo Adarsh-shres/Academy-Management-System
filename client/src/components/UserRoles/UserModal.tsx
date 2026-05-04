@@ -93,7 +93,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, editingUser }: Us
                   form.role === role ? 'bg-white text-[#6a5182] shadow-sm' : 'text-[#64748b] hover:text-[#4b3f68]'
                 }`}
               >
-                {role === ROLES.TEACHER ? 'Teacher' : 'Student'}
+                {role}
               </button>
             ))}
           </div>

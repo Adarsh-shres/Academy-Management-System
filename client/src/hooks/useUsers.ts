@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { type User, ROLES, generateId } from '../data/mockUsers.ts';
+import { useAuth } from '../context/AuthContext';
 
 export interface UserStats {
   total: number;
@@ -17,17 +18,22 @@ interface SupabaseUserRow {
 }
 
 function toDisplayUser(row: SupabaseUserRow): User | null {
-  if (row.role !== 'teacher' && row.role !== 'student') {
+  if (!['teacher', 'student', 'admin', 'super_admin'].includes(row.role || '')) {
     return null;
   }
 
   const name = row.name?.trim() || 'Unnamed User';
 
+  let roleEnum = ROLES.STUDENT;
+  if (row.role === 'teacher') roleEnum = ROLES.TEACHER;
+  else if (row.role === 'admin') roleEnum = ROLES.ADMIN;
+  else if (row.role === 'super_admin') roleEnum = ROLES.SUPER_ADMIN;
+
   return {
     id: row.id,
     name,
     email: row.email ?? '',
-    role: row.role === 'teacher' ? ROLES.TEACHER : ROLES.STUDENT,
+    role: roleEnum,
     department: '',
     course: '',
     phone: '',
@@ -43,26 +49,35 @@ function toDisplayUser(row: SupabaseUserRow): User | null {
 }
 
 export const useUsers = () => {
+  const { user: authUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
 
+  const getHeaders = useCallback(() => {
+    return {
+      'Content-Type': 'application/json',
+      'x-user-role': authUser?.role || ''
+    };
+  }, [authUser]);
+
   const loadUsers = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, email, name, role')
-      .in('role', ['teacher', 'student'])
-      .order('name', { ascending: true });
+    if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'super_admin')) return;
 
-    if (error) {
-      console.error('[useUsers] Failed to load users:', error.message);
-      return;
+    try {
+      const response = await fetch('http://localhost:5000/users', {
+        headers: getHeaders()
+      });
+      if (!response.ok) throw new Error('Failed to load users');
+      
+      const data = await response.json();
+      const mappedUsers = (data as SupabaseUserRow[])
+        .map(toDisplayUser)
+        .filter((user): user is User => Boolean(user));
+
+      setUsers(mappedUsers);
+    } catch (error) {
+      console.error('[useUsers] Failed to load users:', error);
     }
-
-    const mappedUsers = (data as SupabaseUserRow[])
-      .map(toDisplayUser)
-      .filter((user): user is User => Boolean(user));
-
-    setUsers(mappedUsers);
-  }, []);
+  }, [authUser, getHeaders]);
 
   useEffect(() => {
     loadUsers();
@@ -77,30 +92,83 @@ export const useUsers = () => {
     };
   }, [users]);
 
-  const addUser = (userData: Omit<User, 'id' | 'joinDate' | 'avatar'>) => {
-    const newUser: User = {
-      ...userData,
-      id: generateId(),
-      joinDate: new Date().toISOString().split('T')[0],
-      avatar: userData.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase(),
-    };
-    setUsers((prev) => [newUser, ...prev]);
+  const addUser = async (userData: Omit<User, 'id' | 'joinDate' | 'avatar'>) => {
+    try {
+      const mappedRole = Object.entries(ROLES).find(([, value]) => value === userData.role)?.[0].toLowerCase();
+      
+      const response = await fetch('http://localhost:5000/users', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          name: userData.name,
+          email: userData.email,
+          role: mappedRole || 'student'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to add user');
+      
+      // Reload to get the new user with DB ID
+      await loadUsers();
+    } catch (error) {
+      console.error('Failed to add user:', error);
+      throw error;
+    }
   };
 
-  const updateUser = (updatedUser: User) => {
-    setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+  const updateUser = async (updatedUser: User) => {
+    try {
+      const mappedRole = Object.entries(ROLES).find(([, value]) => value === updatedUser.role)?.[0].toLowerCase();
+
+      const response = await fetch(`http://localhost:5000/users/${updatedUser.id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: mappedRole || 'student'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update user');
+      
+      await loadUsers();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      throw error;
+    }
   };
 
-  const deleteUser = (id: string) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+  const deleteUser = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:5000/users/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+
+      if (!response.ok) throw new Error('Failed to delete user');
+      
+      await loadUsers();
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      throw error;
+    }
   };
 
-  const bulkDelete = (ids: string[]) => {
-    setUsers((prev) => prev.filter((u) => !ids.includes(u.id)));
+  const bulkDelete = async (ids: string[]) => {
+    try {
+      // The current backend doesn't have bulk delete, so we loop
+      for (const id of ids) {
+        await fetch(`http://localhost:5000/users/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+        });
+      }
+      await loadUsers();
+    } catch (error) {
+      console.error('Failed to bulk delete users:', error);
+      throw error;
+    }
   };
 
   return {
