@@ -12,6 +12,8 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
+import BatchesPage from './pages/BatchesPage.tsx';
+import BatchDetailsPage from './pages/BatchDetailsPage.tsx';
 import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
@@ -64,6 +66,8 @@ function App() {
           <Route path="/register-students" element={<RegisterStudentsPage />} />
           <Route path="/all-students" element={<AllStudentsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/batches" element={<BatchesPage />} />
+          <Route path="/batches/:batchId" element={<BatchDetailsPage />} />
           <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
           <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
           <Route path="/teachers" element={<TeachersPage />} />

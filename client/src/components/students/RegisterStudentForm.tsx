@@ -5,7 +5,6 @@ import { provisionUser } from '../../lib/userProvisioning';
 import type { Department, Gender, StudentFormData } from '../../types/student';
 
 const departments: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
-const courses = ['B.Tech', 'M.Tech', 'BCA', 'MCA', 'MBA'];
 
 const initial: StudentFormData = {
   firstName: '',
@@ -17,7 +16,6 @@ const initial: StudentFormData = {
   password: '',
   gender: 'Male',
   department: 'CSE',
-  course: '',
   city: '',
   address: '',
   photo: null,
@@ -65,7 +63,6 @@ export default function RegisterStudentForm() {
           mobile_no: form.mobileNo,
           gender: form.gender,
           department: form.department,
-          course: form.course,
           city: form.city,
           address: form.address,
         },
@@ -141,24 +138,14 @@ export default function RegisterStudentForm() {
             <SectionHeading
               eyebrow="Academic Placement"
               title="Enrollment Details"
-              description="Assign the department, course, and active academic identity."
+              description="Assign the department and active academic identity."
             />
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               <Field label="Department">
                 <select name="department" value={form.department} onChange={handleChange} className={inputClass}>
                   {departments.map((department) => (
                     <option key={department} value={department}>
                       {department}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Course">
-                <select name="course" value={form.course} onChange={handleChange} className={inputClass}>
-                  <option value="">Select course</option>
-                  {courses.map((course) => (
-                    <option key={course} value={course}>
-                      {course}
                     </option>
                   ))}
                 </select>

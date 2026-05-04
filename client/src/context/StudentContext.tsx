@@ -134,6 +134,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     const newStudent: StudentRecord = {
       ...data,
       id: crypto.randomUUID(),
+      course: '',
       isActive: true,
       dateEnrolled: new Date().toISOString().split('T')[0],
     };

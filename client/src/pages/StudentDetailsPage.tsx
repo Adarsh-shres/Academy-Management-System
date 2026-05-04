@@ -289,7 +289,6 @@ export default function StudentDetailsPage() {
               <DetailItem label="Email ID" value={student.email} />
               <DetailItem label="Mobile No." value={student.mobileNo} />
               <DetailItem label="Department" value={student.department} />
-              <DetailItem label="Course" value={student.course} />
               <DetailItem label="Enrollment Date" value={student.dateEnrolled} />
               <DetailItem label="City" value={student.city} />
               <div className="sm:col-span-2 md:col-span-2">

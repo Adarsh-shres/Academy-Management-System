@@ -13,10 +13,8 @@ export default function AllStudentsPage() {
   const [studentToDelete, setStudentToDelete] = useState<StudentRecord | null>(null);
   const [saveError, setSaveError] = useState('');
 
-  const formatCourseDetails = (department: string, course: string) => {
-    if (department && course) return { badge: department, text: course };
-    if (department) return { badge: department, text: 'Course not set yet' };
-    if (course) return { badge: 'Not set', text: course };
+  const formatDepartmentDetails = (department: string) => {
+    if (department) return { badge: department, text: 'Department assigned' };
     return { badge: 'Not set', text: 'Profile details not set yet' };
   };
 
@@ -40,7 +38,7 @@ export default function AllStudentsPage() {
             <thead className="border-b border-[#e2e8f0] bg-[#f8fafc] text-[13px] font-semibold uppercase tracking-wide text-[#64748b]">
               <tr>
                 <th className="px-6 py-4">Student Name</th>
-                <th className="px-6 py-4">Course Details</th>
+                <th className="px-6 py-4">Department Details</th>
                 <th className="px-6 py-4">Email</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Actions</th>
@@ -49,7 +47,7 @@ export default function AllStudentsPage() {
             <tbody className="divide-y divide-[#e2e8f0]">
               {students.length > 0 ? (
                 students.map((student) => {
-                  const details = formatCourseDetails(student.department, student.course);
+                  const details = formatDepartmentDetails(student.department);
 
                   return (
                     <tr key={student.id} className="transition-colors hover:bg-[#f8fafc]">

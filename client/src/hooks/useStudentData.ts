@@ -84,7 +84,7 @@ export function useStudentData() {
           name: currentUser.name || 'Student',
           email: currentUser.email || '',
           avatar: buildStudentAvatar(currentUser.name || 'Student'),
-          course: profileRow?.course || 'Course not set yet',
+          course: 'Course assigned through batches',
           semester: 'Semester not set',
           rollNo: `STD-${currentUser.id.substring(0, 4).toUpperCase()}`,
           department: profileRow?.department || 'Department not set yet',
