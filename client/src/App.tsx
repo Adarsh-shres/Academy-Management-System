@@ -14,6 +14,10 @@ import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
 import BatchesPage from './pages/BatchesPage.tsx';
 import BatchDetailsPage from './pages/BatchDetailsPage.tsx';
+import ClassesPage from './pages/ClassesPage.tsx';
+import ClassBatchSelectPage from './pages/ClassBatchSelectPage.tsx';
+import BatchClassesPage from './pages/BatchClassesPage.tsx';
+import ClassFormPage from './pages/ClassFormPage.tsx';
 import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
@@ -68,6 +72,11 @@ function App() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/batches" element={<BatchesPage />} />
           <Route path="/batches/:batchId" element={<BatchDetailsPage />} />
+          <Route path="/classes" element={<ClassesPage />} />
+          <Route path="/classes/new" element={<ClassBatchSelectPage />} />
+          <Route path="/classes/:batchId/new" element={<ClassFormPage />} />
+          <Route path="/classes/:batchId/:classId/edit" element={<ClassFormPage />} />
+          <Route path="/classes/:batchId" element={<BatchClassesPage />} />
           <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
           <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
           <Route path="/teachers" element={<TeachersPage />} />

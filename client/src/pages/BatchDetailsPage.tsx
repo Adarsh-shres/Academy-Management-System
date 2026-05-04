@@ -4,6 +4,8 @@ import AppModal from '../components/shared/AppModal';
 import { useBatches } from '../context/BatchContext';
 import { useCourses } from '../context/CourseContext';
 import { useStudents } from '../context/StudentContext';
+import { supabase } from '../lib/supabase';
+import type { BatchStatus } from '../types/batch';
 import type { StudentRecord } from '../types/student';
 
 type CsvImportResult = {
@@ -97,18 +99,23 @@ export default function BatchDetailsPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { batches, loading, getBatchById, assignStudentsToBatch, updateBatch } = useBatches();
+  const { batches, loading, getBatchById, assignStudentsToBatch, updateBatch, deleteBatch } = useBatches();
   const { courses } = useCourses();
   const { students } = useStudents();
 
   const batch = batchId ? getBatchById(batchId) : undefined;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [csvResult, setCsvResult] = useState<CsvImportResult | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editStatus, setEditStatus] = useState<BatchStatus>('Active');
+  const [editCourseIds, setEditCourseIds] = useState<string[]>([]);
 
   const assignedCourses = useMemo(
     () => (batch ? courses.filter((course) => batch.courseIds.includes(course.id)) : []),
@@ -170,6 +177,17 @@ export default function BatchDetailsPage() {
     }
   };
 
+  const openEditBatch = () => {
+    if (!batch) return;
+
+    setEditName(batch.name);
+    setEditDescription(batch.description);
+    setEditStatus(batch.status);
+    setEditCourseIds(batch.courseIds);
+    setActionError('');
+    setIsEditOpen(true);
+  };
+
   const toggleStudent = (studentId: string) => {
     setSelectedStudentIds((prev) =>
       prev.includes(studentId)
@@ -181,6 +199,14 @@ export default function BatchDetailsPage() {
   const selectAllAvailableStudents = () => {
     setSelectedStudentIds((prev) =>
       Array.from(new Set([...prev, ...filteredAvailableStudents.map((student) => student.id)])),
+    );
+  };
+
+  const toggleEditCourse = (courseId: string) => {
+    setEditCourseIds((prev) =>
+      prev.includes(courseId)
+        ? prev.filter((id) => id !== courseId)
+        : [...prev, courseId],
     );
   };
 
@@ -248,6 +274,64 @@ export default function BatchDetailsPage() {
     }
   };
 
+  const handleSaveBatch = async () => {
+    if (!batch) return;
+
+    if (!editName.trim()) {
+      setActionError('Enter a batch name before saving.');
+      return;
+    }
+
+    if (editCourseIds.length === 0) {
+      setActionError('Select at least one course for this batch.');
+      return;
+    }
+
+    setIsSaving(true);
+    setActionError('');
+
+    try {
+      await updateBatch(batch.id, {
+        name: editName.trim(),
+        description: editDescription.trim(),
+        status: editStatus,
+        courseIds: editCourseIds,
+      });
+      setIsEditOpen(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update batch.';
+      setActionError(message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteBatch = async () => {
+    if (!batch) return;
+    if (!window.confirm(`Delete ${batch.name}? This does not delete student accounts.`)) return;
+
+    setIsSaving(true);
+    setActionError('');
+
+    try {
+      const { error: classDeleteError } = await supabase
+        .from('classes')
+        .delete()
+        .eq('batch_id', batch.id);
+
+      if (classDeleteError && classDeleteError.code !== '42703') {
+        throw new Error(classDeleteError.message);
+      }
+
+      await deleteBatch(batch.id);
+      navigate('/batches');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete batch.';
+      setActionError(message);
+      setIsSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -292,6 +376,12 @@ export default function BatchDetailsPage() {
 
           <div className="flex flex-wrap items-center gap-3">
             <button
+              onClick={openEditBatch}
+              className="inline-flex items-center justify-center gap-2 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-bold px-5 py-2.5 rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer"
+            >
+              Edit Batch
+            </button>
+            <button
               onClick={openImportStudents}
               className="inline-flex items-center justify-center gap-2 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-bold px-5 py-2.5 rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer"
             >
@@ -311,6 +401,13 @@ export default function BatchDetailsPage() {
               className="inline-flex items-center justify-center gap-2 bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[13.5px] font-bold px-5 py-2.5 rounded-sm hover:bg-white transition-all cursor-pointer disabled:opacity-60"
             >
               {batch.status === 'Active' ? 'Archive' : 'Activate'}
+            </button>
+            <button
+              onClick={() => void handleDeleteBatch()}
+              disabled={isSaving}
+              className="inline-flex items-center justify-center gap-2 bg-[#fef2f2] border border-[#fecaca] text-[#dc2626] text-[13.5px] font-bold px-5 py-2.5 rounded-sm hover:bg-[#fee2e2] transition-all cursor-pointer disabled:opacity-60"
+            >
+              Delete
             </button>
           </div>
         </div>
@@ -355,7 +452,7 @@ export default function BatchDetailsPage() {
                     <button
                       key={course.id}
                       type="button"
-                      onClick={() => navigate(`/courses/${course.id}/classes`)}
+                      onClick={() => navigate(`/classes/${batch.id}`)}
                       className="w-full px-5 py-4 text-left hover:bg-[#f8fafc] transition-colors cursor-pointer"
                     >
                       <p className="text-[14px] font-bold text-[#1e293b]">{course.name}</p>
@@ -542,6 +639,87 @@ export default function BatchDetailsPage() {
               <button type="button" onClick={handleSaveSelectedStudents} disabled={isSaving} className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed">
                 {isSaving && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {isSaving ? 'Saving...' : 'Save Students'}
+              </button>
+            </div>
+          </div>
+        </AppModal>
+      )}
+
+      {isEditOpen && (
+        <AppModal onClose={() => setIsEditOpen(false)} widthClass="max-w-[760px]">
+          <div className="bg-white rounded-md shadow-2xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-[20px] font-extrabold text-[#0d3349] tracking-tight">Edit Batch</h3>
+                <p className="text-[13px] text-[#64748b] mt-1">Update batch details and the courses attached to this intake.</p>
+              </div>
+              <button onClick={() => setIsEditOpen(false)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer p-1" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Batch Code</label>
+                  <input value={batch.code} readOnly className="bg-[#eef2f7] border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none font-sans text-[#1e293b] cursor-not-allowed" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Batch Name</label>
+                  <input value={editName} onChange={(event) => setEditName(event.target.value)} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
+                  <div className="flex bg-[#f8fafc] rounded-sm p-1 gap-1 border border-[#cbd5e1] w-full">
+                    <button type="button" onClick={() => setEditStatus('Active')} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editStatus === 'Active' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68]'}`}>
+                      Active
+                    </button>
+                    <button type="button" onClick={() => setEditStatus('Archived')} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${editStatus === 'Archived' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68]'}`}>
+                      Archived
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Description</label>
+                  <textarea value={editDescription} onChange={(event) => setEditDescription(event.target.value)} rows={5} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b] resize-none" />
+                </div>
+              </div>
+
+              <div className="flex flex-col min-h-0 rounded-sm border border-[#e2e8f0] overflow-hidden">
+                <div className="p-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
+                  <p className="text-[13px] font-extrabold text-[#4b3f68] uppercase tracking-wide">Assigned Courses</p>
+                  <p className="text-[12px] text-[#64748b] mt-1">{editCourseIds.length} selected</p>
+                </div>
+                <div className="max-h-[420px] overflow-y-auto divide-y divide-[#edf2f7]">
+                  {courses.map((course) => {
+                    const isSelected = editCourseIds.includes(course.id);
+
+                    return (
+                      <label key={course.id} className="flex items-start gap-3 px-4 py-3 hover:bg-[#f8fafc] transition-colors cursor-pointer">
+                        <input type="checkbox" checked={isSelected} onChange={() => toggleEditCourse(course.id)} className="mt-1 w-4 h-4 accent-[#6a5182]" />
+                        <span className="min-w-0">
+                          <span className="block text-[13.5px] font-bold text-[#1e293b] truncate">{course.name}</span>
+                          <span className="block text-[12px] text-[#64748b] mt-0.5">{course.courseCode} | {course.department}</span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {actionError && (
+              <div className="mx-6 mb-4 rounded-sm border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[13px] font-semibold text-[#dc2626]">
+                {actionError}
+              </div>
+            )}
+
+            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#fbf8fe] flex justify-end gap-3">
+              <button type="button" onClick={() => setIsEditOpen(false)} disabled={isSaving} className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-60">
+                Cancel
+              </button>
+              <button type="button" onClick={() => void handleSaveBatch()} disabled={isSaving} className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed">
+                {isSaving ? 'Saving...' : 'Save Batch'}
               </button>
             </div>
           </div>

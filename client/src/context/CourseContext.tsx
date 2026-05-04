@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Course, CourseRow } from '../types/course';
@@ -22,7 +23,7 @@ const CourseContext = createContext<CourseContextValue | null>(null);
 
 const FALLBACK_COURSES: Course[] = MOCK_COURSES.map((course, index) => ({
   ...course,
-  courseCode: course.id,
+  courseCode: `CRS-${String(index + 1).padStart(3, '0')}`,
   status: course.status as Course['status'],
   createdAt: new Date(2026, 0, index + 1).toISOString(),
 }));

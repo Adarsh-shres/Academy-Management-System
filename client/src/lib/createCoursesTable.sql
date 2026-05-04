@@ -23,13 +23,13 @@ CREATE POLICY "Allow full access for anon" ON courses
 
 -- Seed with initial courses so the page isn't empty
 INSERT INTO courses (course_code, name, status, department, faculty_lead, description) VALUES
-  ('5cs01', 'Collaborative Development',      'Active',   'CSE', 'Prof. Linus Torvalds',  'Team-based software development practices including version control, code review, and agile methodologies.'),
-  ('5cs02', 'Fullstack Development',           'Active',   'CSE', 'Prof. Sunita Sharma',   'End-to-end web application development covering React, Node.js, databases, and deployment.'),
-  ('5cs03', 'Algorithms and Complexity',       'Inactive', 'CSE', 'Prof. Sunita Sharma',   'Advanced algorithmic techniques, complexity analysis, NP-completeness, and optimization.'),
-  ('5cs05', 'Beginner Python Course',          'Active',   'IT',  'Dr. Guido Rossum',      'Introduction to Python programming covering syntax, data structures, and basic scripting.'),
-  ('5cs06', 'Beginner Java Course',            'Active',   'CSE', 'Dr. Alan Turing',       'Fundamentals of Java programming, OOP principles, collections, and exception handling.'),
-  ('5cs07', 'Beginner React Course',           'Active',   'CSE', 'Prof. Linus Torvalds',  'Modern React development with hooks, context, routing, and component patterns.'),
-  ('5cs08', 'Game Development Fundamentals',   'Inactive', 'IT',  'Dr. John Doe',          'Introduction to game development concepts, 2D rendering, physics engines, and game loops.'),
-  ('5cs09', 'Beginner Javascript Course',      'Active',   'CSE', 'Prof. Linus Torvalds',  'Core JavaScript from variables and functions to async programming and DOM manipulation.'),
-  ('5cs10', 'Web Development Course',          'Active',   'IT',  'Dr. John Doe',          'HTML, CSS, JavaScript, and responsive design for building modern web interfaces.')
+  ('CRS-001', 'Collaborative Development',      'Active',   'CSE', 'Prof. Linus Torvalds',  'Team-based software development practices including version control, code review, and agile methodologies.'),
+  ('CRS-002', 'Fullstack Development',           'Active',   'CSE', 'Prof. Sunita Sharma',   'End-to-end web application development covering React, Node.js, databases, and deployment.'),
+  ('CRS-003', 'Algorithms and Complexity',       'Inactive', 'CSE', 'Prof. Sunita Sharma',   'Advanced algorithmic techniques, complexity analysis, NP-completeness, and optimization.'),
+  ('CRS-004', 'Beginner Python Course',          'Active',   'IT',  'Dr. Guido Rossum',      'Introduction to Python programming covering syntax, data structures, and basic scripting.'),
+  ('CRS-005', 'Beginner Java Course',            'Active',   'CSE', 'Dr. Alan Turing',       'Fundamentals of Java programming, OOP principles, collections, and exception handling.'),
+  ('CRS-006', 'Beginner React Course',           'Active',   'CSE', 'Prof. Linus Torvalds',  'Modern React development with hooks, context, routing, and component patterns.'),
+  ('CRS-007', 'Game Development Fundamentals',   'Inactive', 'IT',  'Dr. John Doe',          'Introduction to game development concepts, 2D rendering, physics engines, and game loops.'),
+  ('CRS-008', 'Beginner Javascript Course',      'Active',   'CSE', 'Prof. Linus Torvalds',  'Core JavaScript from variables and functions to async programming and DOM manipulation.'),
+  ('CRS-009', 'Web Development Course',          'Active',   'IT',  'Dr. John Doe',          'HTML, CSS, JavaScript, and responsive design for building modern web interfaces.')
 ON CONFLICT (course_code) DO NOTHING;
