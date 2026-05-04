@@ -6,12 +6,13 @@ import ProfileDropdown from '../components/shared/ProfileDropdown';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
+import TeacherAttendanceTab from '../components/teachers/TeacherAttendanceTab';
 
 export default function TeacherClassDetailPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
 
-  const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades'>('content');
+  const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades' | 'attendance'>('content');
   const [course, setCourse] = useState<any>(null);
   const [classDetails, setClassDetails] = useState<any>(null);
   const [teacherName, setTeacherName] = useState<string>('');
@@ -273,6 +274,15 @@ export default function TeacherClassDetailPage() {
             >
               Broadcast Notification
             </button>
+            <button
+              onClick={() => setActiveSubTab('attendance')}
+              className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === 'attendance'
+                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
+                  : 'text-[#64748b] hover:text-[#4b3f68]'
+                }`}
+            >
+              Attendance
+            </button>
           </div>
 
           {activeSubTab === 'content' && (
@@ -426,6 +436,15 @@ export default function TeacherClassDetailPage() {
                 </div>
               </form>
             </div>
+          )}
+
+          {activeSubTab === 'attendance' && (
+            <TeacherAttendanceTab
+              classId={classId}
+              students={students}
+              courseName={course?.name || ''}
+              className={className}
+            />
           )}
 
         </div>

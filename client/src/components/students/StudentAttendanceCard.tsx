@@ -1,7 +1,21 @@
+import type { ClassAttendanceData } from "../../hooks/useStudentData";
 import type { Course } from "./StudentCourseCard";
 
-export default function StudentAttendanceCard({ course }: { course: Course }) {
-  const { name, code, instructor, attendance, totalClasses, attendedClasses } = course;
+// Support both Course-based and ClassAttendance-based rendering
+interface StudentAttendanceCardProps {
+  course?: Course;
+  classData?: ClassAttendanceData;
+}
+
+export default function StudentAttendanceCard({ course, classData }: StudentAttendanceCardProps) {
+  // Normalize props — prefer classData if available
+  const name = classData?.courseName ?? course?.name ?? 'Unknown';
+  const code = classData?.courseCode ?? course?.code ?? '---';
+  const instructor = classData?.teacherName ?? course?.instructor ?? 'Unknown';
+  const attendance = classData?.attendancePercent ?? course?.attendance ?? 100;
+  const totalClasses = classData?.totalSessions ?? course?.totalClasses ?? 0;
+  const attendedClasses = classData?.presentCount ?? course?.attendedClasses ?? 0;
+  const absentClasses = classData ? classData.absentCount : (totalClasses - attendedClasses);
 
   const getStatusLabel = (pct: number) => {
     if (pct >= 90) return { label: "Good Standing", cls: "text-primary bg-[#f3eff7] border-[#e7dff0]" };
@@ -17,8 +31,6 @@ export default function StudentAttendanceCard({ course }: { course: Course }) {
     return "#4b3f68";
   };
 
-  const absentClasses = totalClasses - attendedClasses;
-
   return (
     <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] p-5 hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)] transition-all duration-200">
       <div className="flex items-start justify-between mb-6">
@@ -26,6 +38,9 @@ export default function StudentAttendanceCard({ course }: { course: Course }) {
           <span className="inline-block text-[10.5px] font-semibold px-2 py-0.5 rounded-[6px] text-primary bg-[#f3eff7] uppercase tracking-wide mb-1.5">{code}</span>
           <h3 className="font-sans text-[16px] font-semibold text-[#4b3f68] leading-tight tracking-tight mb-1">{name}</h3>
           <p className="text-[13px] text-[#7c8697] font-medium">{instructor}</p>
+          {classData && (
+            <p className="text-[12px] text-[#b096cc] font-medium mt-0.5">{classData.className}</p>
+          )}
         </div>
         <div className="text-right flex flex-col items-end">
           <div className="font-sans text-[24px] font-bold text-[#4b3f68] leading-none mb-2 mt-1">
