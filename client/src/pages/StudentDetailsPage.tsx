@@ -21,9 +21,11 @@ type StudentAssignmentRow = {
 type StudentAttendanceRow = {
   id: string;
   courseName: string;
+  className: string;
   date: string;
+  day: string;
+  time: string;
   status: string;
-  remarks: string;
 };
 
 /** Shows a single student profile with edit and delete actions. */
@@ -40,6 +42,19 @@ export default function StudentDetailsPage() {
   const [attendance, setAttendance] = useState<StudentAttendanceRow[]>([]);
   const [activityLoading, setActivityLoading] = useState(false);
   const [activityError, setActivityError] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState<string>('all');
+
+  // Unique course names for the filter dropdown
+  const courseOptions = useMemo(() => {
+    const names = Array.from(new Set(attendance.map((r) => r.courseName))).filter(Boolean);
+    return names.sort();
+  }, [attendance]);
+
+  // Filtered attendance based on selected course
+  const filteredAttendance = useMemo(() => {
+    if (selectedCourse === 'all') return attendance;
+    return attendance.filter((r) => r.courseName === selectedCourse);
+  }, [attendance, selectedCourse]);
 
   useEffect(() => {
     if (!id) return;
@@ -62,7 +77,7 @@ export default function StudentDetailsPage() {
             .eq('student_id', id),
           supabase
             .from('attendance')
-            .select('*')
+            .select('id, class_id, student_id, date, time, status')
             .eq('student_id', id)
             .order('date', { ascending: false }),
         ]);
@@ -72,10 +87,10 @@ export default function StudentDetailsPage() {
           ...((submissionsResult.data as any[] | null) ?? []),
         ];
 
-        const courseIds = Array.from(new Set([
-          ...submissionRows.map((row) => row.assignments?.course_id).filter(Boolean),
-          ...(((attendanceResult.data as any[] | null) ?? []).map((row) => row.course_id).filter(Boolean)),
-        ]));
+        // Collect course IDs from assignments
+        const courseIds = Array.from(new Set(
+          submissionRows.map((row) => row.assignments?.course_id).filter(Boolean)
+        ));
 
         const courseMap = new Map<string, { name?: string; course_code?: string }>();
 
@@ -105,15 +120,55 @@ export default function StudentDetailsPage() {
           };
         });
 
-        const mappedAttendance = ((attendanceResult.data as any[] | null) ?? []).map((row) => {
-          const course = row.course_id ? courseMap.get(row.course_id) : null;
+        // Resolve class_id -> class name & course name for attendance records
+        const attendanceRows = (attendanceResult.data as any[] | null) ?? [];
+        const classIds = Array.from(new Set(attendanceRows.map((r) => r.class_id).filter(Boolean)));
+
+        const classMap = new Map<string, { name: string; courseName: string }>();
+        if (classIds.length > 0) {
+          const { data: classRows } = await supabase
+            .from('classes')
+            .select('id, name, course_id')
+            .in('id', classIds);
+
+          const attendanceCourseIds = Array.from(new Set(
+            ((classRows as any[] | null) ?? []).map((c) => c.course_id).filter(Boolean)
+          ));
+
+          const attCourseMap = new Map<string, string>();
+          if (attendanceCourseIds.length > 0) {
+            const { data: attCourseRows } = await supabase
+              .from('courses')
+              .select('id, name')
+              .in('id', attendanceCourseIds);
+            ((attCourseRows as any[] | null) ?? []).forEach((c) => {
+              attCourseMap.set(c.id, c.name);
+            });
+          }
+
+          ((classRows as any[] | null) ?? []).forEach((cls) => {
+            classMap.set(cls.id, {
+              name: cls.name || 'Unknown Class',
+              courseName: attCourseMap.get(cls.course_id) || 'Unknown Course',
+            });
+          });
+        }
+
+        const mappedAttendance = attendanceRows.map((row) => {
+          const cls = row.class_id ? classMap.get(row.class_id) : null;
+          const dateStr = row.date || '-';
+          const dayName = dateStr !== '-'
+            ? new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' })
+            : '-';
 
           return {
             id: row.id,
-            courseName: course?.name || 'Unknown Course',
-            date: row.date || '-',
+            courseName: cls?.courseName || 'Unknown Course',
+            className: cls?.name || 'Unknown Class',
+            date: dateStr,
+            day: dayName,
+            time: row.time || '-',
             status: row.status || '-',
-            remarks: row.remarks || '-',
           };
         });
 
@@ -144,14 +199,13 @@ export default function StudentDetailsPage() {
   }, [id]);
 
   const attendanceSummary = useMemo(() => {
-    const total = attendance.length;
-    const present = attendance.filter((row) => row.status === 'Present').length;
-    const late = attendance.filter((row) => row.status === 'Late').length;
-    const absent = attendance.filter((row) => row.status === 'Absent').length;
+    const total = filteredAttendance.length;
+    const present = filteredAttendance.filter((row) => row.status.toLowerCase() === 'present').length;
+    const absent = filteredAttendance.filter((row) => row.status.toLowerCase() === 'absent').length;
     const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
 
-    return { total, present, late, absent, percentage };
-  }, [attendance]);
+    return { total, present, absent, percentage };
+  }, [filteredAttendance]);
 
   const handleDeleteStudent = () => {
     if (!student) {
@@ -237,11 +291,10 @@ export default function StudentDetailsPage() {
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id as StudentDetailTab)}
-            className={`px-5 py-3 text-[13.5px] font-bold transition-colors border-b-2 cursor-pointer ${
-              activeTab === tab.id
-                ? 'border-[#6a5182] text-[#6a5182]'
-                : 'border-transparent text-[#64748b] hover:text-[#4b3f68]'
-            }`}
+            className={`px-5 py-3 text-[13.5px] font-bold transition-colors border-b-2 cursor-pointer ${activeTab === tab.id
+              ? 'border-[#6a5182] text-[#6a5182]'
+              : 'border-transparent text-[#64748b] hover:text-[#4b3f68]'
+              }`}
           >
             {tab.label}
           </button>
@@ -273,9 +326,8 @@ export default function StudentDetailsPage() {
                 {student.lastName[0]}
               </div>
               <span
-                className={`rounded-full px-3 py-1.5 text-[12px] font-bold ${
-                  student.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                }`}
+                className={`rounded-full px-3 py-1.5 text-[12px] font-bold ${student.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                  }`}
               >
                 {student.isActive ? 'Active Status' : 'Deactivated'}
               </span>
@@ -352,10 +404,25 @@ export default function StudentDetailsPage() {
 
       {activeTab === 'attendance' && (
         <div className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          {/* Course Filter */}
+          <div className="flex items-center gap-3">
+            <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider whitespace-nowrap">Filter by Subject:</label>
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              className="bg-white border border-[#e2e8f0] rounded-sm px-4 py-2.5 text-[13px] font-semibold text-[#4b3f68] outline-none focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all cursor-pointer min-w-[220px]"
+            >
+              <option value="all">All Subjects</option>
+              {courseOptions.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Summary Pills */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <SummaryPill label="Attendance" value={`${attendanceSummary.percentage}%`} />
             <SummaryPill label="Present" value={String(attendanceSummary.present)} />
-            <SummaryPill label="Late" value={String(attendanceSummary.late)} />
             <SummaryPill label="Absent" value={String(attendanceSummary.absent)} />
           </div>
 
@@ -366,43 +433,49 @@ export default function StudentDetailsPage() {
                 <p className="text-[12.5px] text-[#64748b] mt-1">Attendance records across this student's courses.</p>
               </div>
               <span className="rounded-sm bg-white border border-[#e2e8f0] px-3 py-2 text-[12px] font-bold text-[#64748b]">
-                {attendanceSummary.total} records
+                {filteredAttendance.length} records
               </span>
             </div>
 
             {activityLoading ? (
               <div className="py-16 text-center text-[13px] font-semibold text-[#64748b] animate-pulse">Loading attendance...</div>
-            ) : attendance.length > 0 ? (
+            ) : filteredAttendance.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
                       <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Date</th>
+                      <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Day</th>
+                      <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Time</th>
                       <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course</th>
+                      <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Class</th>
                       <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</th>
-                      <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {attendance.map((record) => (
-                      <tr key={record.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors">
-                        <td className="py-4 px-6 text-[13px] font-semibold text-[#475569]">{record.date}</td>
-                        <td className="py-4 px-6 text-[13px] text-[#64748b]">{record.courseName}</td>
-                        <td className="py-4 px-6">
-                          <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold uppercase ${
-                            record.status === 'Present'
+                    {filteredAttendance.map((record) => {
+                      const statusLower = record.status.toLowerCase();
+                      return (
+                        <tr key={record.id} className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] transition-colors">
+                          <td className="py-4 px-6 text-[13px] font-semibold text-[#475569]">{record.date}</td>
+                          <td className="py-4 px-6 text-[13px] text-[#64748b]">{record.day}</td>
+                          <td className="py-4 px-6 text-[13px] text-[#64748b]">{record.time}</td>
+                          <td className="py-4 px-6 text-[13px] text-[#64748b]">{record.courseName}</td>
+                          <td className="py-4 px-6 text-[13px] font-semibold text-[#475569]">{record.className}</td>
+                          <td className="py-4 px-6">
+                            <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold uppercase ${statusLower === 'present'
                               ? 'bg-emerald-100 text-emerald-700'
-                              : record.status === 'Late'
+                              : statusLower === 'late'
                                 ? 'bg-amber-100 text-amber-700'
                                 : 'bg-rose-100 text-rose-700'
-                          }`}
-                          >
-                            {record.status}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-[13px] text-[#64748b]">{record.remarks}</td>
-                      </tr>
-                    ))}
+                              }`}
+                            >
+                              {statusLower === 'present' ? 'Present' : statusLower === 'late' ? 'Late' : 'Absent'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
