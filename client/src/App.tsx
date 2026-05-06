@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AIChatBot from './components/shared/AIChatBot';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import { NotificationProvider } from './context/NotificationContext';
 import LandingPage from './pages/LandingPage.tsx';
@@ -141,6 +142,7 @@ function App() {
           <Route path="/student/folders/:folderId" element={<FolderContentsPage />} />
         </Route>
       </Routes>
+      <AIChatBot />
     </Router>
     </NotificationProvider>
   );

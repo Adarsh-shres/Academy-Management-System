@@ -1,8 +1,8 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
-// Assuming you have an auth context, if not, we use a placeholder or check Supabase auth
-// import { useAuth } from './AuthProvider'; 
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface Notification {
   id: string;
@@ -20,35 +20,37 @@ interface NotificationContextType {
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   isLoading: boolean;
+  latestNotification: Notification | null;
+  clearLatestNotification: () => void;
 }
+
+// ─── Context ──────────────────────────────────────────────────────────────────
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [latestNotification, setLatestNotification] = useState<Notification | null>(null);
 
-  // Get current user ID (adjust this based on how your app stores auth)
+  // ── Auth tracking ───────────────────────────────────────────────────────────
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        setUserId(session.user.id);
-      }
-    };
-    fetchUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user?.id || null);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
     });
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+      if (!session) setNotifications([]);
+    });
+
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  // Fetch initial notifications and subscribe to realtime
+  // ── Fetch + realtime ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!userId) {
       setNotifications([]);
@@ -59,13 +61,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        // Fetch from backend API
-        const response = await fetch(`http://localhost:5000/notifications/${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch notifications');
-        const data = await response.json();
+        const res = await fetch(`http://localhost:5000/notifications/${userId}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: Notification[] = await res.json();
         setNotifications(data);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
+      } catch (err) {
+        console.error('NotificationContext – fetch error:', err);
       } finally {
         setIsLoading(false);
       }
@@ -73,31 +74,43 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     fetchNotifications();
 
-    // Set up Supabase Realtime subscription
+    // Realtime: listen for new rows where user_id OR teacher_id matches
     const channel = supabase
-      .channel(`notifications:user_id=eq.${userId}`)
+      .channel(`notif-user-${userId}`)
       .on(
         'postgres_changes',
-        { 
-          event: '*', 
-          schema: 'public', 
+        {
+          event: '*',
+          schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${userId}` 
         },
         (payload) => {
+          const row = (payload.new ?? {}) as any;
+          const isForMe =
+            row.user_id === userId || row.teacher_id === userId;
+
+          if (!isForMe) return;
+
+          // Normalise to the Notification interface
+          const normalised: Notification = {
+            id: row.id,
+            user_id: row.user_id ?? row.teacher_id,
+            title: row.title ?? 'Notification',
+            message: row.message,
+            type: row.type ?? 'announcement',
+            is_read: row.is_read ?? false,
+            created_at: row.created_at,
+          };
+
           if (payload.eventType === 'INSERT') {
-            const newNotification = payload.new as Notification;
-            setNotifications((prev) => [newNotification, ...prev]);
-            
-            // Optional: Show a toast notification here
-            // toast.success(`New Notification: ${newNotification.title}`);
+            setNotifications((prev) => [normalised, ...prev]);
+            setLatestNotification(normalised);
           } else if (payload.eventType === 'UPDATE') {
-            const updatedNotification = payload.new as Notification;
-            setNotifications((prev) => 
-              prev.map((n) => (n.id === updatedNotification.id ? updatedNotification : n))
+            setNotifications((prev) =>
+              prev.map((n) => (n.id === normalised.id ? normalised : n))
             );
           } else if (payload.eventType === 'DELETE') {
-            setNotifications((prev) => prev.filter((n) => n.id !== payload.old.id));
+            setNotifications((prev) => prev.filter((n) => n.id !== payload.old?.id));
           }
         }
       )
@@ -108,45 +121,55 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [userId]);
 
-  const markAsRead = async (id: string) => {
-    // Optimistic UI update
-    setNotifications((prev) => 
-      prev.map((n) => n.id === id ? { ...n, is_read: true } : n)
+  // ── Actions ─────────────────────────────────────────────────────────────────
+
+  const markAsRead = useCallback(async (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
-
     try {
-      await fetch(`http://localhost:5000/notifications/${id}/read`, {
-        method: 'PATCH',
-      });
-    } catch (error) {
-      console.error('Failed to mark as read:', error);
-      // Revert optimistic update on error if needed
+      await fetch(`http://localhost:5000/notifications/${id}/read`, { method: 'PATCH' });
+    } catch (err) {
+      console.error('markAsRead error:', err);
     }
-  };
+  }, []);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     if (!userId) return;
-
-    // Optimistic UI update
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-
     try {
       await fetch(`http://localhost:5000/notifications/user/${userId}/read-all`, {
         method: 'PATCH',
       });
-    } catch (error) {
-      console.error('Failed to mark all as read:', error);
+    } catch (err) {
+      console.error('markAllAsRead error:', err);
     }
-  };
+  }, [userId]);
+
+  const clearLatestNotification = useCallback(() => {
+    setLatestNotification(null);
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, isLoading }}>
+    <NotificationContext.Provider
+      value={{
+        notifications,
+        unreadCount,
+        markAsRead,
+        markAllAsRead,
+        isLoading,
+        latestNotification,
+        clearLatestNotification,
+      }}
+    >
       {children}
     </NotificationContext.Provider>
   );
 };
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export const useNotificationContext = () => {
   const context = useContext(NotificationContext);

@@ -166,7 +166,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     try {
       const fileUrl = await handleFileUpload(file);
 
-      const { error: insertError } = await supabase
+      const selectedCourse = courses.find(c => c.id === courseId);
+      const { data: newAssignment, error: insertError } = await supabase
         .from('assignments')
         .insert({
           teacher_id: user?.id,
@@ -179,9 +180,39 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
           attachment_url: fileUrl,
           portal_open: true,
           created_at: new Date().toISOString()
-        });
+        })
+        .select()
+        .single();
 
       if (insertError) throw insertError;
+
+      // Handle submissions and notifications for enrolled students
+      if (newAssignment && selectedCourse?.id) {
+        const { data: enrolledStudents } = await supabase
+          .from('enrollments')
+          .select('student_id')
+          .eq('course_id', selectedCourse.id);
+
+        if (enrolledStudents && enrolledStudents.length > 0) {
+          // 1. Create pending submissions
+          const submissions = enrolledStudents.map((e: any) => ({
+            assignment_id: newAssignment.id,
+            student_id: e.student_id,
+            status: 'pending'
+          }));
+          await supabase.from('assignment_submissions').insert(submissions);
+
+          // 2. Create notifications for enrolled students
+          const notifications = enrolledStudents.map((e: any) => ({
+            user_id: e.student_id,
+            title: 'New Assignment Posted',
+            message: `A new assignment "${title}" has been added for your course.`,
+            type: 'update',
+            is_read: false,
+          }));
+          await supabase.from('notifications').insert(notifications);
+        }
+      }
 
       onCreated();
       onClose();

@@ -3,34 +3,45 @@ import { supabase } from '../lib/supabase';
 
 const router = Router();
 
-/**
- * GET /notifications/:userId
- * Fetch latest 20 notifications for a specific user
- */
+// ────────────────────────────────────────────────────────────────────────────
+// GET /notifications/:userId
+// Fetch latest 30 notifications for a specific user
+// ────────────────────────────────────────────────────────────────────────────
 router.get('/:userId', async (req: Request, res: Response) => {
   const { userId } = req.params;
 
   try {
     const { data, error } = await supabase
       .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
+      .select('id, user_id, teacher_id, title, message, type, is_read, created_at, class_id')
+      .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(30);
 
     if (error) throw error;
 
-    res.status(200).json(data);
+    // Normalise rows: map teacher_id→user_id if user_id is null (legacy rows)
+    const normalised = (data || []).map((n: any) => ({
+      id: n.id,
+      user_id: n.user_id ?? n.teacher_id,
+      title: n.title ?? 'Notification',
+      message: n.message,
+      type: n.type ?? 'announcement',
+      is_read: n.is_read ?? false,
+      created_at: n.created_at,
+    }));
+
+    res.status(200).json(normalised);
   } catch (error: any) {
     console.error('Error fetching notifications:', error.message);
     res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 });
 
-/**
- * PATCH /notifications/:id/read
- * Mark a specific notification as read
- */
+// ────────────────────────────────────────────────────────────────────────────
+// PATCH /notifications/:id/read
+// Mark a specific notification as read
+// ────────────────────────────────────────────────────────────────────────────
 router.patch('/:id/read', async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -43,7 +54,6 @@ router.patch('/:id/read', async (req: Request, res: Response) => {
       .single();
 
     if (error) throw error;
-
     res.status(200).json(data);
   } catch (error: any) {
     console.error('Error updating notification:', error.message);
@@ -51,10 +61,10 @@ router.patch('/:id/read', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * PATCH /notifications/user/:userId/read-all
- * Mark all notifications for a user as read
- */
+// ────────────────────────────────────────────────────────────────────────────
+// PATCH /notifications/user/:userId/read-all
+// Mark all notifications for a user as read
+// ────────────────────────────────────────────────────────────────────────────
 router.patch('/user/:userId/read-all', async (req: Request, res: Response) => {
   const { userId } = req.params;
 
@@ -62,11 +72,10 @@ router.patch('/user/:userId/read-all', async (req: Request, res: Response) => {
     const { error } = await supabase
       .from('notifications')
       .update({ is_read: true })
-      .eq('user_id', userId)
+      .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
       .eq('is_read', false);
 
     if (error) throw error;
-
     res.status(200).json({ success: true, message: 'All notifications marked as read' });
   } catch (error: any) {
     console.error('Error updating notifications:', error.message);
@@ -74,46 +83,98 @@ router.patch('/user/:userId/read-all', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST /notifications
- * Create a new custom announcement/notification
- */
+// ────────────────────────────────────────────────────────────────────────────
+// POST /notifications
+// Send a notification to one or more users
+//
+// Body:
+//   title    string  – notification heading
+//   message  string  – notification body
+//   type     string  – 'announcement' | 'content' | 'update' (default: 'announcement')
+//   target   string  – 'general' | 'student' | 'teacher' | 'class' | 'individual'
+//   classId  string? – required when target === 'class'
+//   userId   string | string[]? – required when target === 'individual'
+// ────────────────────────────────────────────────────────────────────────────
 router.post('/', async (req: Request, res: Response) => {
-  const { userId, title, message, type = 'announcement' } = req.body;
+  const {
+    userId,
+    title = 'Notification',
+    message,
+    type = 'announcement',
+    target = 'individual',
+    classId,
+  } = req.body;
 
-  if (!userId || !title || !message) {
-    return res.status(400).json({ error: 'Missing required fields: userId, title, message' });
+  if (!message) {
+    return res.status(400).json({ error: 'Missing required field: message' });
   }
 
   try {
-    // If userId is an array (multiple recipients)
-    if (Array.isArray(userId)) {
-      const inserts = userId.map(id => ({
-        user_id: id,
-        title,
-        message,
-        type
-      }));
-      
-      const { data, error } = await supabase
-        .from('notifications')
-        .insert(inserts)
-        .select();
-        
+    let userIdsToNotify: string[] = [];
+
+    if (target === 'general') {
+      // All users
+      const { data: users, error } = await supabase.from('users').select('id');
       if (error) throw error;
-      return res.status(201).json(data);
+      userIdsToNotify = users.map((u: any) => u.id);
+
+    } else if (target === 'teacher') {
+      // All teachers
+      const { data: teachers, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'teacher');
+      if (error) throw error;
+      userIdsToNotify = teachers.map((u: any) => u.id);
+
+    } else if (target === 'student') {
+      // All students
+      const { data: students, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'student');
+      if (error) throw error;
+      userIdsToNotify = students.map((u: any) => u.id);
+
+    } else if (target === 'class') {
+      if (!classId) {
+        return res.status(400).json({ error: 'Missing required field: classId for class target' });
+      }
+      // All students enrolled in the course
+      const { data: enrollments, error } = await supabase
+        .from('enrollments')
+        .select('student_id')
+        .eq('course_id', classId);
+      if (error) throw error;
+      userIdsToNotify = enrollments.map((e: any) => e.student_id);
+
+    } else {
+      // Individual target
+      if (!userId) {
+        return res.status(400).json({ error: 'Missing required field: userId for individual target' });
+      }
+      userIdsToNotify = Array.isArray(userId) ? userId : [userId];
     }
 
-    // Single recipient
+    if (userIdsToNotify.length === 0) {
+      return res.status(200).json({ success: true, message: 'No users found to notify', count: 0 });
+    }
+
+    const inserts = userIdsToNotify.map((id: string) => ({
+      user_id: id,
+      title,
+      message,
+      type,
+      is_read: false,
+    }));
+
     const { data, error } = await supabase
       .from('notifications')
-      .insert([{ user_id: userId, title, message, type }])
-      .select()
-      .single();
+      .insert(inserts)
+      .select();
 
     if (error) throw error;
-
-    res.status(201).json(data);
+    return res.status(201).json({ success: true, count: data.length, data });
   } catch (error: any) {
     console.error('Error creating notification:', error.message);
     res.status(500).json({ error: 'Failed to create notification' });
