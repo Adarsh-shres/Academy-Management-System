@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import notificationsRouter from './routes/notifications.js';
 import usersRouter from './routes/users.js';
+import studentsRouter from './routes/students.js';
 import chatRouter from './routes/chat.js';
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 // Mount routes
 app.use('/notifications', notificationsRouter);
 app.use('/users', usersRouter);
+app.use('/students', studentsRouter);
 app.use('/chat', chatRouter);
 
 app.get('/', (_req, res) => {

@@ -3,7 +3,7 @@ import Groq from 'groq-sdk';
 
 const router = Router();
 
-const SYSTEM_PROMPT = `You are Antigravity — the embedded AI assistant of the Academy Management System, a full-stack military command-center-themed academic platform.
+const SYSTEM_PROMPT = `You are Yogify Bot — the embedded AI assistant of the Academy Management System, a full-stack military command-center-themed academic platform.
 
 Your role:
 - Help Teachers manage assignments, track student progress, and handle grading workflows.
