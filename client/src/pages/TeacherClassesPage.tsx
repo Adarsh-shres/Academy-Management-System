@@ -11,6 +11,7 @@ export default function TeacherClassesPage() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [attendanceMap, setAttendanceMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function loadCourses() {
@@ -36,6 +37,26 @@ export default function TeacherClassesPage() {
 
         if (data && data.length > 0) {
           setCourses(data);
+          
+          const classIds = data.map((c: any) => c.id);
+          const { data: attendanceData } = await supabase
+            .from('attendance')
+            .select('class_id, status')
+            .in('class_id', classIds);
+
+          if (attendanceData) {
+            const map: Record<string, number> = {};
+            classIds.forEach((classId: string) => {
+              const classRecords = attendanceData.filter((a: any) => a.class_id === classId);
+              if (classRecords.length === 0) {
+                map[classId] = 0;
+              } else {
+                const present = classRecords.filter((a: any) => a.status === 'present').length;
+                map[classId] = Math.round((present / classRecords.length) * 100);
+              }
+            });
+            setAttendanceMap(map);
+          }
         } else {
           setCourses([]);
         }
@@ -67,7 +88,6 @@ export default function TeacherClassesPage() {
       ) : courses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course, idx) => {
-            const randomProgress = course.completed_lessons ? (course.completed_lessons / (course.total_lessons || 1)) * 100 : 0;
             const courseRoom = course.room || 'Virtual';
             const courseTotalStudents = course.student_ids ? course.student_ids.length : 0;
 
@@ -82,8 +102,14 @@ export default function TeacherClassesPage() {
                     <span className="bg-[#f1f5f9] text-[#4b3f68] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#e2e8f0]">
                       {course.courses?.course_code || `CRS-${idx + 1}`}
                     </span>
-                    <span className="bg-[#dcfce7] text-[#16a34a] rounded-sm px-2.5 py-1 text-[11px] font-bold">
-                      {course.attendance || 100}% Attend.
+                    <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold ${
+                      (attendanceMap[course.id] ?? 0) >= 75
+                        ? 'bg-[#dcfce7] text-[#16a34a]'
+                        : (attendanceMap[course.id] ?? 0) >= 50
+                        ? 'bg-[#fef9c3] text-[#ca8a04]'
+                        : 'bg-[#fee2e2] text-red-500'
+                    }`}>
+                      {attendanceMap[course.id] ?? 0}% Attend.
                     </span>
                   </div>
 
@@ -93,19 +119,6 @@ export default function TeacherClassesPage() {
                     <span className="w-1 h-1 rounded-full bg-[#cbd5e1]"></span>
                     <span className="flex items-center gap-1.5 text-[#6a5182] font-semibold">{courseRoom}</span>
                   </p>
-
-                  <div className="mt-6">
-                    <div className="flex justify-between text-[11.5px] font-bold text-[#64748b] mb-2 uppercase">
-                      <span>Course Progress</span>
-                      <span className="text-[#6a5182]">{Math.round(randomProgress)}%</span>
-                    </div>
-                    <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#6a5182] rounded-full transition-all duration-500" style={{ width: `${randomProgress}%` }}></div>
-                    </div>
-                    <p className="text-[11.5px] text-[#94a3b8] font-medium mt-2">
-                      {course.completed_lessons || 0} / {course.total_lessons || 'N'} Units Completed
-                    </p>
-                  </div>
                 </div>
               </div>
             );

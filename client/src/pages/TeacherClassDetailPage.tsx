@@ -23,8 +23,10 @@ export default function TeacherClassDetailPage() {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  const [submissions, setSubmissions] = useState<any[]>([]);
-  const [isLoadingGrades, setIsLoadingGrades] = useState(false);
+  const [assignments, setAssignments] = useState<any[]>([]);
+  const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
+  const [assignmentSubmissions, setAssignmentSubmissions] = useState<any[]>([]);
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -79,6 +81,15 @@ export default function TeacherClassDetailPage() {
           room: classData.courses?.department || 'Virtual',
           course_code: classData.courses?.course_code || 'N/A'
         });
+
+        if (classData.teacher_id) {
+          const { data: teacherData } = await supabase
+            .from('users')
+            .select('name')
+            .eq('id', classData.teacher_id)
+            .single();
+          if (teacherData) setTeacherName(teacherData.name);
+        }
       } catch (err) {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
@@ -124,47 +135,92 @@ export default function TeacherClassDetailPage() {
     fetchStudents();
   }, [classId]);
 
-  const loadSubmissions = async () => {
-    setIsLoadingGrades(true);
+  const loadAssignments = async () => {
+    setIsLoadingAssignments(true);
     try {
-      const { data: assignments, error: aError } = await supabase
-        .from('assignments')
-        .select('id, title')
-        .eq('class_id', classId);
-
-      if (aError || !assignments?.length) {
-        setSubmissions([]);
-        return;
-      }
-
-      const assignmentIds = assignments.map((a: any) => a.id);
-
       const { data, error } = await supabase
-        .from('submissions')
-        .select('*, users(name)')
-        .in('assignment_id', assignmentIds);
+        .from('assignments')
+        .select('id, title, description, due_date, status')
+        .eq('class_id', classId)
+        .order('due_date', { ascending: true });
 
-      if (error) {
-        setSubmissions([]);
+      if (error) throw error;
+      setAssignments(data || []);
+    } catch (err) {
+      console.error('Failed to load assignments', err);
+    } finally {
+      setIsLoadingAssignments(false);
+    }
+  };
+
+  const handleView = (fileUrl: string) => {
+    // Use Google Docs viewer to preview any file type in the browser
+    const previewUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+    window.open(previewUrl, '_blank');
+  };
+
+  const loadSubmissionsForAssignment = async (assignment: any) => {
+    setSelectedAssignment(assignment);
+    setIsLoadingSubmissions(true);
+    try {
+      const { data: classData, error: classErr } = await supabase
+        .from('classes')
+        .select('student_ids')
+        .eq('id', classId)
+        .single();
+        
+      if (classErr && classErr.code !== 'PGRST116') throw classErr;
+      
+      const studentIds = classData?.student_ids || [];
+      
+      if (studentIds.length === 0) {
+        setAssignmentSubmissions([]);
         return;
       }
-
-      const enriched = (data || []).map((sub: any) => ({
-        ...sub,
-        assignments: assignments.find((a: any) => a.id === sub.assignment_id)
-      }));
-
-      setSubmissions(enriched);
-    } catch (err: any) {
-      console.error('Failed to fetch submissions', err);
+      
+      const { data: usersData, error: usersErr } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', studentIds);
+        
+      if (usersErr) throw usersErr;
+      
+      const { data: subData, error: subErr } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('assignment_id', assignment.id);
+        
+      if (subErr) throw subErr;
+      
+      const submissionsWithUsers = usersData?.map((user: any) => {
+        const sub = subData?.find((s: any) => s.student_id === user.id);
+        return {
+          id: sub ? sub.id : `pending-${user.id}`,
+          assignment_id: assignment.id,
+          student_id: user.id,
+          users: { name: user.name, email: user.email },
+          status: sub ? 'submitted' : 'pending',
+          submitted_at: sub ? sub.submitted_at : null,
+          file_url: sub ? sub.file_url : null,
+          grade: sub ? sub.grade : null,
+          feedback: sub ? sub.feedback : null,
+          assignments: { id: assignment.id, title: assignment.title }
+        };
+      }) || [];
+      
+      setAssignmentSubmissions(submissionsWithUsers);
+    } catch (err) {
+      console.error('Failed to load submissions', err);
     } finally {
-      setIsLoadingGrades(false);
+      setIsLoadingSubmissions(false);
     }
   };
 
   useEffect(() => {
     if (activeSubTab === 'grades' && classId) {
-      loadSubmissions();
+      loadAssignments();
+      setSelectedAssignment(null);
+      setAssignmentSubmissions([]);
     }
   }, [activeSubTab, classId]);
 
@@ -557,7 +613,7 @@ export default function TeacherClassDetailPage() {
                 {tab === 'students' && 'Enrolled Students'}
                 {tab === 'grades' && 'Assignments & Grades'}
                 {tab === 'notifications' && 'Broadcast Notification'}
-                {tab === 'quizzes' && 'Quizzes'}
+                {tab === 'quizzes' && 'Quiz'}
               </button>
             ))}
           </div>
@@ -607,61 +663,209 @@ export default function TeacherClassDetailPage() {
           )}
 
           {activeSubTab === 'grades' && (
-            <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)] animate-fade-in">
-              {isLoadingGrades ? (
-                <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
-                  <p className="text-[14px] font-medium animate-pulse">Loading submissions...</p>
+            <div className="flex flex-col gap-4 animate-fade-in">
+
+              {/* Back button when viewing submissions */}
+              {selectedAssignment && (
+                <button
+                  onClick={() => { setSelectedAssignment(null); setAssignmentSubmissions([]); }}
+                  className="self-start text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer flex items-center gap-1"
+                >
+                  ← Back to Assignments
+                </button>
+              )}
+
+              {/* Assignment list */}
+              {!selectedAssignment && (
+                <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                  {isLoadingAssignments ? (
+                    <div className="flex justify-center py-20">
+                      <p className="text-[14px] font-medium animate-pulse text-[#94a3b8]">Loading assignments...</p>
+                    </div>
+                  ) : assignments.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
+                      <p className="text-[14px] font-semibold text-[#4b3f68]">No Assignments Found</p>
+                      <p className="text-[13px] text-[#64748b] mt-1">No assignments have been created for this class yet.</p>
+                    </div>
+                  ) : (
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                          <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">#</th>
+                          <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Assignment Title</th>
+                          <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Due Date</th>
+                          <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Status</th>
+                          <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#e7dff0]">
+                        {assignments.map((assignment, idx) => (
+                          <tr key={assignment.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                            <td className="py-4 px-6 text-[13px] font-semibold text-[#64748b]">
+                              {(idx + 1).toString().padStart(2, '0')}
+                            </td>
+                            <td className="py-4 px-6">
+                              <p className="text-[14px] font-bold text-[#4b3f68]">{assignment.title}</p>
+                              {assignment.description && (
+                                <p className="text-[12px] text-[#94a3b8] mt-0.5 truncate max-w-[300px]">{assignment.description}</p>
+                              )}
+                            </td>
+                            <td className="py-4 px-6 text-[13px] text-[#64748b] font-medium">
+                              {assignment.due_date ? new Date(assignment.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                            </td>
+                            <td className="py-4 px-6 text-center">
+                              <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${
+                                assignment.status === 'active'
+                                  ? 'bg-[#dcfce7] text-[#16a34a]'
+                                  : assignment.status === 'closed'
+                                  ? 'bg-[#fee2e2] text-red-500'
+                                  : 'bg-[#f1f5f9] text-[#64748b]'
+                              }`}>
+                                {(assignment.status || 'draft').toUpperCase()}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <button
+                                onClick={() => loadSubmissionsForAssignment(assignment)}
+                                className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
+                              >
+                                View Submissions
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
-              ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
-                      <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[300px]">Assignment</th>
-                      <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student Name</th>
-                      <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</th>
-                      <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e7dff0]">
-                    {submissions.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
-                        <td className="py-4 px-6 text-[13.5px] font-bold text-[#4b3f68] truncate max-w-[300px]">
-                          {sub.assignments?.title || 'Unknown Assignment'}
-                        </td>
-                        <td className="py-4 px-6 text-[14px] font-semibold text-[#64748b]">
-                          {sub.users?.name || 'Unknown Student'}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${sub.grade !== null
-                            ? 'bg-[#dcfce7] text-[#16a34a]'
-                            : 'bg-[#fef9c3] text-[#ca8a04]'
-                            }`}>
-                            {sub.grade !== null ? 'GRADED' : 'SUBMITTED'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <button
-                            onClick={() => setSelectedSubmission(sub)}
-                            className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
-                          >
-                            {sub.grade !== null ? 'REGRADE' : 'GRADE'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                    {submissions.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="py-16 text-center">
-                          <div className="flex flex-col items-center">
-                            <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
-                            <p className="text-[14px] font-semibold text-[#4b3f68]">No Submissions Found</p>
-                            <p className="text-[13px] text-[#64748b] mt-1">Students have not yet submitted assignments to this class.</p>
-                          </div>
-                        </td>
-                      </tr>
+              )}
+
+              {/* Submissions for selected assignment */}
+              {selectedAssignment && (
+                <div className="flex flex-col gap-4">
+                  <div className="bg-[#fbf8fe] border border-[#e7dff0] rounded-md p-4">
+                    <p className="text-[15px] font-extrabold text-[#4b3f68]">{selectedAssignment.title}</p>
+                    {selectedAssignment.due_date && (
+                      <p className="text-[12.5px] text-[#64748b] mt-1 font-medium">
+                        Due: {new Date(selectedAssignment.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
                     )}
-                  </tbody>
-                </table>
+                  </div>
+
+                  {!isLoadingSubmissions && assignmentSubmissions.length > 0 && (
+                    <div className="px-5 py-3 bg-white rounded-md border border-[#e7dff0] shadow-[0_1px_4px_rgba(57,31,86,0.02)] flex gap-6 text-[13px] font-semibold text-[#64748b]">
+                      <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#94a3b8] block"></span> Total Students: <span className="text-[#1e293b]">{assignmentSubmissions.length}</span></div>
+                      <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#10b981] block"></span> Submitted: <span className="text-[#1e293b]">{assignmentSubmissions.filter(s => s.status === 'submitted').length}</span></div>
+                      <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#f59e0b] block"></span> Pending: <span className="text-[#1e293b]">{assignmentSubmissions.filter(s => s.status === 'pending').length}</span></div>
+                    </div>
+                  )}
+
+                  <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                    {isLoadingSubmissions ? (
+                      <div className="flex justify-center py-20">
+                        <p className="text-[14px] font-medium animate-pulse text-[#94a3b8]">Loading submissions...</p>
+                      </div>
+                    ) : assignmentSubmissions.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
+                        <p className="text-[14px] font-semibold text-[#4b3f68]">No Submissions Yet</p>
+                        <p className="text-[13px] text-[#64748b] mt-1">No students have submitted this assignment yet.</p>
+                      </div>
+                    ) : (
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[60px]">#</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Submitted</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Grade Status</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#e7dff0]">
+                          {assignmentSubmissions.map((sub, idx) => {
+                            const gradeStatus = sub.status === 'pending'
+                              ? 'pending'
+                              : sub.grade === null
+                              ? 'submitted'
+                              : sub.grade >= 80
+                              ? 'complete'
+                              : 'partial';
+
+                            return (
+                              <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                                <td className="py-4 px-6 text-[13px] font-semibold text-[#64748b]">
+                                  {(idx + 1).toString().padStart(2, '0')}
+                                </td>
+                                <td className="py-4 px-6">
+                                  <p className="text-[14px] font-bold text-[#4b3f68]">{sub.users?.name || 'Unknown'}</p>
+                                  <p className="text-[12px] text-[#94a3b8]">{sub.users?.email || ''}</p>
+                                </td>
+                                <td className="py-4 px-6 text-center text-[12.5px] text-[#64748b] font-medium">
+                                  {sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
+                                </td>
+                                <td className="py-4 px-6 text-center">
+                                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${
+                                    gradeStatus === 'complete'
+                                      ? 'bg-green-100 text-green-700'
+                                      : gradeStatus === 'partial'
+                                      ? 'bg-yellow-100 text-yellow-700'
+                                      : gradeStatus === 'submitted'
+                                      ? 'bg-purple-100 text-purple-700'
+                                      : 'bg-red-100 text-red-700'
+                                  }`}>
+                                    {gradeStatus}
+                                  </span>
+                                </td>
+                                <td className="py-4 px-6 text-right whitespace-nowrap">
+                                  {sub.file_url ? (
+                                    <div className="flex items-center justify-end gap-2 mr-3 inline-flex">
+                                      <button
+                                        onClick={() => handleView(sub.file_url)}
+                                        className="px-3 py-1 bg-white border border-[#6a5182] text-[#6a5182] hover:bg-[#f3eff7] text-[11px] font-bold rounded-sm transition-colors cursor-pointer"
+                                      >
+                                        View
+                                      </button>
+                                      <button
+                                        onClick={async () => {
+                                          try {
+                                            const response = await fetch(sub.file_url);
+                                            const blob = await response.blob();
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = sub.file_url.split('/').pop() || 'submission';
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                          } catch (err) {
+                                            console.error('Failed to download file:', err);
+                                            window.open(sub.file_url, '_blank');
+                                          }
+                                        }}
+                                        className="px-3 py-1 bg-[#6a5182] border border-[#6a5182] text-white hover:bg-[#5b4471] text-[11px] font-bold rounded-sm transition-colors cursor-pointer"
+                                      >
+                                        Download
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <span className="text-[#94a3b8] mr-5">—</span>
+                                  )}
+                                  <button
+                                    onClick={() => setSelectedSubmission(sub)}
+                                    className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
+                                  >
+                                    {sub.grade !== null ? 'Regrade' : 'Grade'}
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -876,7 +1080,7 @@ export default function TeacherClassDetailPage() {
                 <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-6 md:p-8">
                   <div className="flex justify-between items-start mb-6 border-b border-[#e7dff0] pb-4">
                     <div>
-                      <button onClick={() => setSelectedQuiz(null)} className="text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer mb-2">← Back to Quizzes</button>
+                      <button onClick={() => setSelectedQuiz(null)} className="text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer mb-2">← Back to Quiz</button>
                       <h3 className="text-[18px] font-extrabold text-[#4b3f68]">{selectedQuiz.title}</h3>
                       {selectedQuiz.description && <p className="text-[13px] text-[#64748b] mt-1">{selectedQuiz.description}</p>}
                       <div className="flex gap-4 mt-2 text-[12px] text-[#64748b] font-medium">
@@ -1041,7 +1245,7 @@ export default function TeacherClassDetailPage() {
                 ) : quizzes.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 px-4 bg-white border border-dashed border-[#e7dff0] rounded-md w-full text-center">
                     <ClipboardList size={40} className="text-[#cbd5e1] mb-3" />
-                    <p className="text-[15px] font-bold text-[#4b3f68]">No Quizzes Yet</p>
+                    <p className="text-[15px] font-bold text-[#4b3f68]">No Quiz Yet</p>
                     <p className="text-[13px] text-[#64748b] mt-1">Create your first quiz for this class.</p>
                   </div>
                 ) : (
@@ -1075,7 +1279,7 @@ export default function TeacherClassDetailPage() {
         isOpen={!!selectedSubmission}
         onClose={() => setSelectedSubmission(null)}
         submission={selectedSubmission}
-        onGraded={loadSubmissions}
+        onGraded={() => selectedAssignment && loadSubmissionsForAssignment(selectedAssignment)}
       />
 
       <style>{`

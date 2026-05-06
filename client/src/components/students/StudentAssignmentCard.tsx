@@ -8,7 +8,7 @@ export interface Assignment {
   course: string;
   courseCode: string;
   deadline: string;
-  status: string;
+  status: 'pending' | 'submitted' | 'closed';
   description?: string;
   marks: string;
   submittedOn?: string | null;
@@ -28,6 +28,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
   const { title, course, courseCode, deadline, status, marks, submittedOn, grade } = assignment;
 
   const isPending = status === "pending";
+  const isClosed = status === "closed";
 
   const today = new Date();
   const due = new Date(deadline);
@@ -66,10 +67,12 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
             <h3 className="font-sans text-[14px] font-semibold text-[#4b3f68] leading-tight tracking-tight">{title}</h3>
             <span
               className={`text-[10px] font-semibold px-2 py-[2px] uppercase tracking-wide rounded-full border flex-shrink-0 ${
-                isPending ? "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" : "text-primary bg-[#f3eff7] border-[#e7dff0]"
+                isClosed ? "text-[#94a3b8] bg-[#faf8fc] border-[#e2d9ed]" :
+                isPending ? "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" : 
+                "text-primary bg-[#f3eff7] border-[#e7dff0]"
               }`}
             >
-              {isPending ? "Pending" : "Submitted"}
+              {isClosed ? "Closed" : isPending ? "Pending" : "Submitted"}
             </span>
           </div>
 
@@ -82,7 +85,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
           {!compact && (
             <div className="flex items-center gap-2.5 mt-2 flex-wrap">
               <span className="text-[12px] text-[#7c8697]">
-                {isPending ? `Due: ${new Date(deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : (submittedOn ? `Submitted: ${new Date(submittedOn).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : '')}
+                {status !== "submitted" ? `Due: ${new Date(deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${new Date(deadline).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}` : (submittedOn ? `Submitted: ${new Date(submittedOn).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${new Date(submittedOn).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}` : '')}
               </span>
               <span className="text-[12px] text-[#7c8697]">{marks}</span>
               {grade && <span className="text-[11px] font-semibold text-primary bg-[#f3eff7] px-2 py-[2px] rounded-[6px]">Grade: {grade}</span>}
@@ -98,7 +101,14 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
 
       {!compact && (
         <div className="mt-5 flex gap-3">
-          {isPending ? (
+          {isClosed ? (
+            <button 
+              disabled
+              className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-[#94a3b8] bg-[#f1f5f9] cursor-not-allowed"
+            >
+              Portal Closed
+            </button>
+          ) : isPending ? (
             <button 
               onClick={() => setIsModalOpen(true)}
               className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity cursor-pointer"

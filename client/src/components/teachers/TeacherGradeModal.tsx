@@ -10,7 +10,7 @@ interface TeacherGradeModalProps {
 
 /** Lets a teacher review a submission and save a grade. */
 export default function TeacherGradeModal({ isOpen, onClose, submission, onGraded }: TeacherGradeModalProps) {
-  const [grade, setGrade] = useState<number | ''>('');
+  const [gradeStatus, setGradeStatus] = useState<'complete' | 'partial' | 'pending'>('pending');
   const [feedback, setFeedback] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -21,9 +21,11 @@ export default function TeacherGradeModal({ isOpen, onClose, submission, onGrade
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) {
-      setGrade('');
-      setFeedback('');
+    if (isOpen && submission) {
+      if (submission.grade === null) setGradeStatus('pending');
+      else if (submission.grade >= 80) setGradeStatus('complete');
+      else setGradeStatus('partial');
+      setFeedback(submission.feedback || '');
     }
   }, [isOpen, submission]);
 
@@ -34,33 +36,44 @@ export default function TeacherGradeModal({ isOpen, onClose, submission, onGrade
 
   const handleSaveGrade = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (grade === '' || grade < 0 || grade > 100) {
-       alert("Please enter a valid numeric grade between 0 and 100.");
-       return;
-    }
+
+    let numericGrade: number | null = null;
+    if (gradeStatus === 'complete') numericGrade = 100;
+    else if (gradeStatus === 'partial') numericGrade = 50;
 
     setIsSaving(true);
     try {
-      const { error: gradeError } = await supabase
-        .from('submissions')
-        .update({
-          grade: Number(grade),
-          feedback: feedback.trim() || null,
-          graded_at: new Date().toISOString()
-        })
-        .eq('id', submission.id);
-
-      if (gradeError) {
-        throw new Error(gradeError.message);
+      if (String(submission.id).startsWith('pending-')) {
+        const { error: gradeError } = await supabase
+          .from('submissions')
+          .insert({
+            assignment_id: submission.assignment_id,
+            student_id: submission.student_id,
+            grade: numericGrade,
+            feedback: feedback.trim() || null,
+            graded_at: new Date().toISOString(),
+            status: 'graded'
+          });
+        if (gradeError) throw new Error(gradeError.message);
+      } else {
+        const { error: gradeError } = await supabase
+          .from('submissions')
+          .update({
+            grade: numericGrade,
+            feedback: feedback.trim() || null,
+            graded_at: new Date().toISOString()
+          })
+          .eq('id', submission.id);
+        if (gradeError) throw new Error(gradeError.message);
       }
 
-      const { error: submitError } = await supabase
-        .from('assignments')
-        .update({ status: 'graded' })
-        .eq('id', submission.assignments?.id);
+      if (submission.assignment_id) {
+        const { error: submitError } = await supabase
+          .from('assignments')
+          .update({ status: 'graded' })
+          .eq('id', submission.assignment_id);
 
-      if (submitError) {
-        throw new Error(submitError.message);
+        if (submitError) throw new Error(submitError.message);
       }
 
       onGraded();
@@ -105,7 +118,7 @@ export default function TeacherGradeModal({ isOpen, onClose, submission, onGrade
             </div>
 
             <div className="flex flex-col gap-1.5 pt-2 border-t border-[#e2e8f0]">
-               <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Submitted Work</label>
+               <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">{studentName}'s Submitted Work</label>
                {submission.file_url ? (
                   <a 
                     href={submission.file_url} 
@@ -124,18 +137,22 @@ export default function TeacherGradeModal({ isOpen, onClose, submission, onGrade
             </div>
 
             <div className="flex flex-col gap-1.5 pt-4 border-t border-[#e2e8f0]">
-              <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Numeric Grade (0-100) *</label>
-              <input 
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                placeholder="Ex. 95.5"
-                value={grade}
-                onChange={e => setGrade(e.target.value === '' ? '' : Number(e.target.value))}
-                className="bg-white border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[15px] font-bold text-[#1e293b] outline-none focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all w-1/2"
-                required
-              />
+              <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Grade Status *</label>
+              <div className="relative w-1/2">
+                <select
+                  value={gradeStatus}
+                  onChange={e => setGradeStatus(e.target.value as any)}
+                  className="bg-white border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] font-bold text-[#4b3f68] outline-none focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all w-full appearance-none cursor-pointer"
+                  required
+                >
+                  <option value="pending">Pending</option>
+                  <option value="complete">Complete</option>
+                  <option value="partial">Partial</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#64748b]">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -166,7 +183,7 @@ export default function TeacherGradeModal({ isOpen, onClose, submission, onGrade
            <button 
              type="submit" 
              form="grading-form"
-             disabled={isSaving || grade === ''}
+             disabled={isSaving}
              className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-bold tracking-wide rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
            >
              {isSaving ? 'Registering...' : 'Save Grade Result'}

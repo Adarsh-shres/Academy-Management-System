@@ -6,20 +6,30 @@ import type { Assignment } from "../components/students/StudentAssignmentCard";
 export default function StudentAssignmentsPage() {
   const { assignments, isLoading, error, refetch } = useStudentData();
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all"); // all | pending | submitted
+  const [filter, setFilter] = useState("all"); // all | open | closed | submitted
   const [subjectFilter, setSubjectFilter] = useState("all");
 
   const allSubjects = useMemo(() => {
     return Array.from(new Set(assignments.map((a) => a.course))).sort();
   }, [assignments]);
 
+  const isOpen = (a: Assignment) => a.status !== 'submitted' && a.portalOpen === true && !a.isPastDue;
+  const isClosed = (a: Assignment) => a.status !== 'submitted' && (a.portalOpen === false || a.isPastDue);
+  const isSubmitted = (a: Assignment) => a.status === 'submitted';
+
   const filtered = assignments.filter((a) => {
     const matchSearch =
       a.title.toLowerCase().includes(search.toLowerCase()) ||
       a.course.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === "all" || a.status === filter;
     const matchSubject = subjectFilter === "all" || a.course === subjectFilter;
-    return matchSearch && matchFilter && matchSubject;
+    
+    const matchFilter =
+      filter === 'all' ? true :
+      filter === 'open' ? isOpen(a) :
+      filter === 'closed' ? isClosed(a) :
+      filter === 'submitted' ? isSubmitted(a) : true;
+      
+    return matchSearch && matchSubject && matchFilter;
   });
 
   const groupedAssignments = useMemo(() => {
@@ -31,9 +41,10 @@ export default function StudentAssignmentsPage() {
   }, [filtered]);
 
   const filterOptions = [
-    { value: "all", label: "All", count: assignments.length },
-    { value: "pending", label: "Pending", count: assignments.filter((a) => a.status === "pending").length },
-    { value: "submitted", label: "Submitted", count: assignments.filter((a) => a.status === "submitted").length },
+    { value: 'all',       label: 'ALL',       count: assignments.length },
+    { value: 'open',      label: 'OPEN',      count: assignments.filter(isOpen).length },
+    { value: 'closed',    label: 'CLOSED',    count: assignments.filter(isClosed).length },
+    { value: 'submitted', label: 'SUBMITTED', count: assignments.filter(isSubmitted).length },
   ];
 
   return (
