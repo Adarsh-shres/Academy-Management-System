@@ -6,11 +6,13 @@ import { supabase } from '../lib/supabase';
 
 export interface Notification {
   id: string;
-  user_id: string;
-  title: string;
+  class_id?: string;
+  teacher_id?: string;
+  assignment_id?: string;
+  title?: string;
   message: string;
-  type: 'content' | 'update' | 'announcement';
-  is_read: boolean;
+  type: string;
+  is_read?: boolean;
   created_at: string;
 }
 
@@ -59,11 +61,19 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        // Fetch from backend API
-        const response = await fetch(`http://localhost:5000/notifications/${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch notifications');
-        const data = await response.json();
-        setNotifications(data);
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('teacher_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        const mapped = (data || []).map((n: any) => ({
+          ...n,
+          is_read: false
+        }));
+        setNotifications(mapped);
       } catch (error) {
         console.error('Error fetching notifications:', error);
       } finally {
@@ -75,26 +85,22 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     // Set up Supabase Realtime subscription
     const channel = supabase
-      .channel(`notifications:user_id=eq.${userId}`)
+      .channel(`notifications:teacher_id=eq.${userId}`)
       .on(
         'postgres_changes',
         { 
           event: '*', 
           schema: 'public', 
           table: 'notifications',
-          filter: `user_id=eq.${userId}` 
+          filter: `teacher_id=eq.${userId}` 
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            const newNotification = payload.new as Notification;
+            const newNotification = { ...payload.new, is_read: false } as Notification;
             setNotifications((prev) => [newNotification, ...prev]);
-            
-            // Optional: Show a toast notification here
-            // toast.success(`New Notification: ${newNotification.title}`);
           } else if (payload.eventType === 'UPDATE') {
-            const updatedNotification = payload.new as Notification;
             setNotifications((prev) => 
-              prev.map((n) => (n.id === updatedNotification.id ? updatedNotification : n))
+              prev.map((n) => (n.id === payload.new.id ? { ...n, ...payload.new, is_read: n.is_read } : n))
             );
           } else if (payload.eventType === 'DELETE') {
             setNotifications((prev) => prev.filter((n) => n.id !== payload.old.id));
@@ -113,15 +119,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     setNotifications((prev) => 
       prev.map((n) => n.id === id ? { ...n, is_read: true } : n)
     );
-
-    try {
-      await fetch(`http://localhost:5000/notifications/${id}/read`, {
-        method: 'PATCH',
-      });
-    } catch (error) {
-      console.error('Failed to mark as read:', error);
-      // Revert optimistic update on error if needed
-    }
   };
 
   const markAllAsRead = async () => {
@@ -129,14 +126,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     // Optimistic UI update
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-
-    try {
-      await fetch(`http://localhost:5000/notifications/user/${userId}/read-all`, {
-        method: 'PATCH',
-      });
-    } catch (error) {
-      console.error('Failed to mark all as read:', error);
-    }
   };
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
