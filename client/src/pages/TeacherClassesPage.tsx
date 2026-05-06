@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
 import { Users, Presentation } from '../components/shared/icons';
 
 
 
 export default function TeacherClassesPage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,15 +38,6 @@ export default function TeacherClassesPage() {
           setCourses([]);
         }
 
-        // Combine and deduplicate
-        const allCoursesMap = new Map();
-        if (facultyLeadCourses) {
-          facultyLeadCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
-        }
-        classCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
-
-        const combinedCourses = Array.from(allCoursesMap.values());
-        setCourses(combinedCourses);
       } catch (err) {
         console.error('Failed to load courses', err);
       } finally {

@@ -13,7 +13,6 @@ export default function TeacherClassDetailPage() {
 
   const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades'>('content');
   const [course, setCourse] = useState<any>(null);
-  const [classDetails, setClassDetails] = useState<any>(null);
   const [teacherName, setTeacherName] = useState<string>('');
   const [className, setClassName] = useState<string>('');
   const [students, setStudents] = useState<any[]>([]);
@@ -42,14 +41,23 @@ export default function TeacherClassDetailPage() {
           return;
         }
 
-        setRealClassId(classData.id);
         setClassName(classData.name || '');
         setCourse({
           ...classData.courses,
           room: classData.courses?.department || 'Virtual',
           course_code: classData.courses?.course_code || 'N/A'
         });
-      } catch (err) {
+
+        if (classData.teacher_id) {
+          const { data: teacherData } = await supabase
+            .from('users')
+            .select('name')
+            .eq('id', classData.teacher_id)
+            .single();
+
+          setTeacherName(teacherData?.name || '');
+        }
+      } catch {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
     }
@@ -84,7 +92,7 @@ export default function TeacherClassDetailPage() {
         }
 
         setStudents(studentsData || []);
-      } catch (err: any) {
+      } catch {
         setStudents([]);
       } finally {
         setIsLoadingStudents(false);

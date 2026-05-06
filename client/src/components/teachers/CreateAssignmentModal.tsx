@@ -59,7 +59,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   };
 
   useEffect(() => {
-    if (!isOpen || !user?.id) return;
+    const teacherId = user?.id;
+    if (!isOpen || !teacherId) return;
 
     resetForm();
 
@@ -78,7 +79,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
               course_code
             )
           `)
-          .eq('teacher_id', user.id);
+          .eq('teacher_id', teacherId);
 
         if (err) {
           console.error('Fetch error:', err.message);
@@ -153,6 +154,11 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
 
     if (!courseId || !classId || !title || !description || !dueDate || !dueTime || !file) {
       alert('Please fill in all required fields');
+      return;
+    }
+
+    if (!user?.id) {
+      alert('You must be logged in to create an assignment');
       return;
     }
 

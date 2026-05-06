@@ -20,6 +20,8 @@ import BatchClassesPage from './pages/BatchClassesPage.tsx';
 import ClassFormPage from './pages/ClassFormPage.tsx';
 import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
+import SchedulePage from './pages/SchedulePage.tsx';
+import ScheduleClassDetailPage from './pages/ScheduleClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import UserRolesPage from './pages/UserRolesPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
@@ -79,6 +81,8 @@ function App() {
           <Route path="/classes/:batchId" element={<BatchClassesPage />} />
           <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
           <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/schedule/classes/:classId" element={<ScheduleClassDetailPage />} />
           <Route path="/teachers" element={<TeachersPage />} />
           <Route path="/user-roles" element={<UserRolesPage />} />
           <Route path="/userroles" element={<UserRolesPage />} />

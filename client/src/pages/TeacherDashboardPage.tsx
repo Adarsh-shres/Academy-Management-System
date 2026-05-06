@@ -11,23 +11,6 @@ import TeacherAssignmentPage from './TeacherAssignmentPage';
 import TeacherClassesPage from './TeacherClassesPage';
 import TeacherSchedulePage from './TeacherSchedulePage';
 
-function getRelativeTime(value: string) {
-  const timestamp = new Date(value).getTime();
-  if (Number.isNaN(timestamp)) return 'Recently';
-
-  const diffMs = Date.now() - timestamp;
-  const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
-
-  if (diffMinutes < 1) return 'Just now';
-  if (diffMinutes < 60) return `${diffMinutes} min ago`;
-
-  const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-}
-
 /** Shows the monthly academic calendar for the teacher dashboard. */
 const TeacherInstitutionalCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));

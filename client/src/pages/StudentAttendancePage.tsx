@@ -13,9 +13,7 @@ export default function StudentAttendancePage() {
     return <div className="flex h-[300px] items-center justify-center text-[#4b3f68] font-semibold">{error}</div>;
   }
 
-  const avg = courses.length > 0 ? Math.round(courses.reduce((s, c) => s + c.attendance, 0) / courses.length) : 100;
   const atRisk = courses.filter((c) => c.attendance < 80);
-  const good = courses.filter((c) => c.attendance >= 90);
 
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full">
