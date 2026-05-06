@@ -10,32 +10,56 @@ const router = Router();
 router.get('/:userId', async (req: Request, res: Response) => {
   const { userId } = req.params;
 
-  try {
-    const { data, error } = await supabase
+  // ── Primary query: try with teacher_id column (post-migration schema) ──
+  let data: any[] | null = null;
+  let queryError: any = null;
+
+  const result = await supabase
+    .from('notifications')
+    .select('id, user_id, teacher_id, title, message, type, is_read, created_at, class_id')
+    .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  if (result.error) {
+    // Log the full Supabase error for diagnosis
+    console.error('[notifications GET] Supabase error:', JSON.stringify(result.error));
+
+    // ── Fallback: teacher_id column may not exist yet — query user_id only ──
+    const fallback = await supabase
       .from('notifications')
-      .select('id, user_id, teacher_id, title, message, type, is_read, created_at, class_id')
-      .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
+      .select('id, user_id, title, message, type, is_read, created_at')
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(30);
 
-    if (error) throw error;
-
-    // Normalise rows: map teacher_id→user_id if user_id is null (legacy rows)
-    const normalised = (data || []).map((n: any) => ({
-      id: n.id,
-      user_id: n.user_id ?? n.teacher_id,
-      title: n.title ?? 'Notification',
-      message: n.message,
-      type: n.type ?? 'announcement',
-      is_read: n.is_read ?? false,
-      created_at: n.created_at,
-    }));
-
-    res.status(200).json(normalised);
-  } catch (error: any) {
-    console.error('Error fetching notifications:', error.message);
-    res.status(500).json({ error: 'Failed to fetch notifications' });
+    if (fallback.error) {
+      console.error('[notifications GET] Fallback also failed:', JSON.stringify(fallback.error));
+      queryError = fallback.error;
+    } else {
+      data = fallback.data;
+    }
+  } else {
+    data = result.data;
   }
+
+  if (queryError) {
+    res.status(500).json({ error: 'Failed to fetch notifications', detail: queryError.message });
+    return;
+  }
+
+  // Normalise rows: map teacher_id→user_id if user_id is null (legacy rows)
+  const normalised = (data || []).map((n: any) => ({
+    id: n.id,
+    user_id: n.user_id ?? n.teacher_id ?? userId,
+    title: n.title ?? 'Notification',
+    message: n.message,
+    type: n.type ?? 'announcement',
+    is_read: n.is_read ?? false,
+    created_at: n.created_at,
+  }));
+
+  res.status(200).json(normalised);
 });
 
 // ────────────────────────────────────────────────────────────────────────────
