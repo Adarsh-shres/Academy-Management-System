@@ -6,6 +6,7 @@ dotenv.config();
 
 import notificationsRouter from './routes/notifications';
 import usersRouter from './routes/users';
+import chatRouter from './routes/chat';
 
 const app = express();
 const port = process.env.PORT || 5000; 
@@ -16,6 +17,7 @@ app.use(express.json());
 // Mount routes
 app.use('/notifications', notificationsRouter);
 app.use('/users', usersRouter);
+app.use('/chat', chatRouter);
 
 app.get('/', (_req, res) => {
   res.json({ 
