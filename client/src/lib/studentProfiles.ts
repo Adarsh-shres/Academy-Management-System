@@ -22,7 +22,7 @@ export interface StudentProfileRow {
 }
 
 export const STUDENT_PROFILE_SELECT =
-  'student_id, father_name, date_of_birth, mobile_no, gender, department, course, city, address, is_active, date_enrolled';
+  'student_id, father_name, date_of_birth, mobile_no, gender, department, city, address, is_active, date_enrolled';
 
 const DEPARTMENTS: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
 

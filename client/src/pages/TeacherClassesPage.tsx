@@ -40,15 +40,6 @@ export default function TeacherClassesPage() {
           setCourses([]);
         }
 
-        // Combine and deduplicate
-        const allCoursesMap = new Map();
-        if (facultyLeadCourses) {
-          facultyLeadCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
-        }
-        classCourses.forEach((c: any) => allCoursesMap.set(c.id, c));
-
-        const combinedCourses = Array.from(allCoursesMap.values());
-        setCourses(combinedCourses);
       } catch (err) {
         console.error('Failed to load courses', err);
       } finally {
