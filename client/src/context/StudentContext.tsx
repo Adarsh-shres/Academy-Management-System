@@ -6,7 +6,6 @@ import {
   buildStudentFullName,
   buildStudentProfileUpsert,
   mapStudentRecord,
-  STUDENT_PROFILE_SELECT,
   type StudentProfileRow,
   type SupabaseStudentUserRow,
 } from '../lib/studentProfiles';
@@ -81,44 +80,39 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const [students, setStudents] = useState<StudentRecord[]>([]);
 
   const refreshStudents = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, email, name, role')
-      .eq('role', 'student')
-      .order('name', { ascending: true });
-
-    if (error) {
-      console.error('[StudentContext] Failed to load students:', error.message);
-      setStudents(FALLBACK_STUDENTS);
-      return;
-    }
-
-    const studentRows = (data as SupabaseStudentUserRow[]) ?? [];
-    let profileMap = new Map<string, StudentProfileRow>();
-
-    if (studentRows.length > 0) {
-      const { data: profileRows, error: profileError } = await supabase
-        .from('student_profiles')
-        .select(STUDENT_PROFILE_SELECT)
-        .in(
-          'student_id',
-          studentRows.map((student) => student.id),
-        );
-
-      if (profileError) {
-        if (profileError.code !== '42P01') {
-          console.error('[StudentContext] Failed to load student profiles:', profileError.message);
-        }
-      } else {
-        profileMap = new Map((profileRows as StudentProfileRow[]).map((profile) => [profile.student_id, profile]));
+    try {
+      // Call the backend — service role key bypasses RLS for student_profiles
+      const res = await fetch('http://localhost:5000/students');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('[StudentContext] Backend error:', err);
+        setStudents(FALLBACK_STUDENTS);
+        return;
       }
+
+      const joined: { user: SupabaseStudentUserRow; profile: StudentProfileRow | null }[] =
+        await res.json();
+
+      if (joined.length === 0) {
+        setStudents(FALLBACK_STUDENTS);
+        return;
+      }
+
+      const profileMap = new Map<string, StudentProfileRow>(
+        joined
+          .filter((item) => item.profile !== null)
+          .map((item) => [item.user.id, item.profile as StudentProfileRow]),
+      );
+
+      const mapped = joined
+        .map((item) => mapStudentRecord(item.user, profileMap.get(item.user.id)))
+        .filter((student): student is StudentRecord => Boolean(student));
+
+      setStudents(mapped.length > 0 ? mapped : FALLBACK_STUDENTS);
+    } catch (err) {
+      console.error('[StudentContext] Network error fetching students:', err);
+      setStudents(FALLBACK_STUDENTS);
     }
-
-    const mapped = studentRows
-      .map((row) => mapStudentRecord(row, profileMap.get(row.id)))
-      .filter((student): student is StudentRecord => Boolean(student));
-
-    setStudents(mapped.length > 0 ? mapped : FALLBACK_STUDENTS);
   }, []);
 
   useEffect(() => {
@@ -156,6 +150,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
         email: currentStudent.email,
       };
 
+      // Update display name in users table (anon key is fine — users can update their own)
       const { error: userError } = await supabase
         .from('users')
         .update({
@@ -167,12 +162,16 @@ export function StudentProvider({ children }: { children: ReactNode }) {
         throw new Error(userError.message);
       }
 
-      const { error: profileError } = await supabase
-        .from('student_profiles')
-        .upsert(buildStudentProfileUpsert(nextStudent), { onConflict: 'student_id' });
+      // Upsert profile via backend — service role key bypasses RLS
+      const profileRes = await fetch(`http://localhost:5000/students/${id}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildStudentProfileUpsert(nextStudent)),
+      });
 
-      if (profileError) {
-        throw new Error(profileError.message);
+      if (!profileRes.ok) {
+        const errBody = await profileRes.json().catch(() => ({}));
+        throw new Error(errBody.error ?? 'Failed to update student profile');
       }
 
       setStudents((prev) => prev.map((student) => (student.id === id ? nextStudent : student)));
