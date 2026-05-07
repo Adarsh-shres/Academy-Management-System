@@ -166,7 +166,6 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     try {
       const fileUrl = await handleFileUpload(file);
 
-      const selectedCourse = courses.find(c => c.id === courseId);
       const { data: newAssignment, error: insertError } = await supabase
         .from('assignments')
         .insert({
@@ -187,24 +186,28 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
       if (insertError) throw insertError;
 
       // Handle submissions and notifications for enrolled students
-      if (newAssignment && selectedCourse?.id) {
-        const { data: enrolledStudents } = await supabase
-          .from('enrollments')
-          .select('student_id')
-          .eq('course_id', selectedCourse.id);
+      if (newAssignment && classId) {
+        // Fetch students from the class
+        const { data: classData } = await supabase
+          .from('classes')
+          .select('student_ids')
+          .eq('id', classId)
+          .single();
 
-        if (enrolledStudents && enrolledStudents.length > 0) {
+        const studentIds = classData?.student_ids || [];
+
+        if (studentIds.length > 0) {
           // 1. Create pending submissions
-          const submissions = enrolledStudents.map((e: any) => ({
+          const submissions = studentIds.map((studentId: string) => ({
             assignment_id: newAssignment.id,
-            student_id: e.student_id,
+            student_id: studentId,
             status: 'pending'
           }));
-          await supabase.from('assignment_submissions').insert(submissions);
+          await supabase.from('submissions').insert(submissions);
 
           // 2. Create notifications for enrolled students
-          const notifications = enrolledStudents.map((e: any) => ({
-            user_id: e.student_id,
+          const notifications = studentIds.map((studentId: string) => ({
+            user_id: studentId,
             title: 'New Assignment Posted',
             message: `A new assignment "${title}" has been added for your course.`,
             type: 'update',
