@@ -32,3 +32,32 @@ create index if not exists class_schedules_weekly_day_idx
 create index if not exists class_schedules_date_idx
   on public.class_schedules(schedule_date)
   where schedule_type = 'one_time';
+
+alter table public.class_schedules enable row level security;
+
+drop policy if exists "Authenticated users can read class schedules" on public.class_schedules;
+create policy "Authenticated users can read class schedules"
+  on public.class_schedules for select
+  to authenticated
+  using (true);
+
+drop policy if exists "Admins can manage class schedules" on public.class_schedules;
+create policy "Admins can manage class schedules"
+  on public.class_schedules for all
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.users
+      where users.id = auth.uid()
+        and users.role in ('super_admin', 'admin')
+    )
+  )
+  with check (
+    exists (
+      select 1
+      from public.users
+      where users.id = auth.uid()
+        and users.role in ('super_admin', 'admin')
+    )
+  );

@@ -10,13 +10,13 @@ import TeacherContentTab from '../components/teachers/TeacherContentTab';
 import TeacherAttendanceTab from '../components/teachers/TeacherAttendanceTab';
 
 export default function TeacherClassDetailPage() {
-  const { user } = useAuth();
+  useAuth();
   const { classId } = useParams();
   const navigate = useNavigate();
 
   const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades' | 'attendance'>('content');
   const [course, setCourse] = useState<any>(null);
-  const teacherName = user?.name || '';
+  const [teacherName, setTeacherName] = useState<string>('');
   const [className, setClassName] = useState<string>('');
   const [students, setStudents] = useState<any[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
@@ -50,6 +50,15 @@ export default function TeacherClassDetailPage() {
           room: classData.courses?.department || 'Virtual',
           course_code: classData.courses?.course_code || 'N/A'
         });
+        if (classData.teacher_id) {
+          const { data: teacherData } = await supabase
+            .from('users')
+            .select('name')
+            .eq('id', classData.teacher_id)
+            .single();
+
+          setTeacherName(teacherData?.name || '');
+        }
       } catch {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useNotificationContext, type Notification } from "../../context/NotificationContext";
+import { useNotificationContext } from "../../context/NotificationContext";
 
 type FilterType = 'all' | 'unread' | 'class' | 'personal';
 

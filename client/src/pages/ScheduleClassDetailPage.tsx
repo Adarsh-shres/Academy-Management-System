@@ -1,20 +1,25 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Calendar, MapPin, Users } from '../components/shared/icons';
 import AppModal from '../components/shared/AppModal';
+import { useCourses } from '../context/CourseContext';
 import { supabase } from '../lib/supabase';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 type CourseClass = {
   id: string;
+  batch_id?: string | null;
   name?: string | null;
   teacher_id?: string | null;
+  teacher_ids?: string[] | null;
   room?: string | null;
   student_ids?: string[] | null;
-  courses?: {
+  batches?: {
     name?: string | null;
-    course_code?: string | null;
+    code?: string | null;
+    course_ids?: string[] | null;
   } | null;
 };
 
@@ -68,11 +73,16 @@ function makeDraft(entry: ScheduleEntry): TodayDraft {
   };
 }
 
+function teacherIdsForClass(classRow: CourseClass) {
+  return Array.from(new Set([...(classRow.teacher_ids ?? []), ...(classRow.teacher_id ? [classRow.teacher_id] : [])]));
+}
+
 export default function ScheduleClassDetailPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
+  const { courses } = useCourses();
   const [courseClass, setCourseClass] = useState<CourseClass | null>(null);
-  const [teacherName, setTeacherName] = useState('');
+  const [teacherNames, setTeacherNames] = useState<string[]>([]);
   const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
   const [activeTab, setActiveTab] = useState<'weekly' | 'today'>('weekly');
   const [isLoading, setIsLoading] = useState(true);
@@ -94,7 +104,7 @@ export default function ScheduleClassDetailPage() {
 
     const { data: classRow, error: classError } = await supabase
       .from('classes')
-      .select('id, name, teacher_id, room, student_ids, courses(name, course_code)')
+      .select('id, batch_id, name, teacher_id, teacher_ids, room, student_ids, batches(name, code, course_ids)')
       .eq('id', classId)
       .maybeSingle();
 
@@ -107,16 +117,16 @@ export default function ScheduleClassDetailPage() {
     const nextClass = classRow as CourseClass;
     setCourseClass(nextClass);
 
-    if (nextClass.teacher_id) {
-      const { data: teacherRow } = await supabase
+    const teacherIds = teacherIdsForClass(nextClass);
+    if (teacherIds.length > 0) {
+      const { data: teacherRows } = await supabase
         .from('users')
         .select('name')
-        .eq('id', nextClass.teacher_id)
-        .maybeSingle();
+        .in('id', teacherIds);
 
-      setTeacherName((teacherRow as { name?: string } | null)?.name || 'Assigned Teacher');
+      setTeacherNames(((teacherRows as Array<{ name?: string | null }> | null) ?? []).map((teacher) => teacher.name?.trim() || 'Unnamed Teacher'));
     } else {
-      setTeacherName('No teacher assigned');
+      setTeacherNames([]);
     }
 
     const { data: scheduleRows, error: scheduleError } = await supabase
@@ -387,6 +397,12 @@ export default function ScheduleClassDetailPage() {
     );
   }
 
+  const batchCourseNames = courses
+    .filter((course) => (courseClass.batches?.course_ids ?? []).includes(course.id))
+    .map((course) => course.name);
+  const courseDisplay = batchCourseNames.length > 0 ? batchCourseNames.join(', ') : 'No batch courses';
+  const teacherDisplay = teacherNames.length > 0 ? teacherNames.join(', ') : 'No teacher assigned';
+
   const renderScheduleCard = (entry: ScheduleEntry) => (
     <div key={entry.id} className="rounded-sm border border-[#e2d9ed] bg-white p-4">
       <div className="flex justify-between items-start gap-3">
@@ -394,10 +410,10 @@ export default function ScheduleClassDetailPage() {
           {formatEntry(entry)}
         </span>
         <span className="bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[11px] font-bold px-2 py-0.5 rounded-sm">
-          {courseClass.courses?.course_code || 'CRS'}
+          {courseClass.batches?.code || 'Batch'}
         </span>
       </div>
-      <h4 className="text-[15px] font-bold text-[#4b3f68] mt-3">{courseClass.courses?.name || 'Course'}</h4>
+      <h4 className="text-[15px] font-bold text-[#4b3f68] mt-3">{courseDisplay}</h4>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-[#475569] mt-3">
         <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || courseClass.room || 'Room not set'}</span>
         <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {courseClass.student_ids?.length ?? 0}</span>
@@ -419,7 +435,7 @@ export default function ScheduleClassDetailPage() {
               Back to Schedule
             </button>
             <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">{courseClass.name || 'Class Schedule'}</h1>
-            <p className="text-[14px] text-[#64748b] mt-1">{courseClass.courses?.name || 'Course'} | {teacherName}</p>
+            <p className="text-[14px] text-[#64748b] mt-1">{courseClass.batches?.name || 'Batch'} | {courseDisplay} | {teacherDisplay}</p>
           </div>
         </div>
 

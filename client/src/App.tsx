@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AIChatBot from './components/shared/AIChatBot';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import { NotificationProvider } from './context/NotificationContext';
+
 import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
@@ -21,8 +21,10 @@ import BatchClassesPage from './pages/BatchClassesPage.tsx';
 import ClassFormPage from './pages/ClassFormPage.tsx';
 import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
+import SchedulePage from './pages/SchedulePage.tsx';
+import ScheduleClassDetailPage from './pages/ScheduleClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
-import UserRolesPage from './pages/UserRolesPage.tsx';
+import AdminUsersPage from './pages/AdminUsersPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
@@ -80,10 +82,10 @@ function App() {
         <Route path="/classes/:batchId" element={<BatchClassesPage />} />
         <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
         <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/schedule/classes/:classId" element={<ScheduleClassDetailPage />} />
         <Route path="/teachers" element={<TeachersPage />} />
-        <Route path="/user-roles" element={<UserRolesPage />} />
-        <Route path="/userroles" element={<UserRolesPage />} />
-        <Route path="/admin/users" element={<UserRolesPage />} />
+        <Route path="/user-management" element={<AdminUsersPage />} />
         <Route path="/send-notification" element={<SendNotificationPage />} />
         <Route path="/under-development" element={<UnderDevelopment />} />
         <Route path="*" element={<UnderDevelopment />} />
