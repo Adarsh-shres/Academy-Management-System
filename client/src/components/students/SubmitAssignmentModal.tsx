@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../lib/supabase';
 import type { Assignment } from './StudentAssignmentCard';
+import { useAuth } from '../../context/AuthContext';
 
 interface SubmitAssignmentModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SubmitAssignmentModalProps {
 }
 
 export default function SubmitAssignmentModal({ isOpen, onClose, assignment, onSubmitted }: SubmitAssignmentModalProps) {
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +48,7 @@ export default function SubmitAssignmentModal({ isOpen, onClose, assignment, onS
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) {
+    if (!file || !user) {
       alert('Please upload a file to submit.');
       return;
     }
@@ -55,17 +57,17 @@ export default function SubmitAssignmentModal({ isOpen, onClose, assignment, onS
     try {
       const fileUrl = await handleFileUpload(file);
 
-      // assignment.id is the submission ID because of how it is mapped in useStudentData.ts
-      const { error: updateError } = await supabase
-        .from('assignment_submissions')
-        .update({
+      const { error: insertError } = await supabase
+        .from('submissions')
+        .insert({
+          assignment_id: assignment.id,
+          student_id: user.id,
           file_url: fileUrl,
           status: 'submitted',
           submitted_at: new Date().toISOString(),
-        })
-        .eq('id', assignment.id);
+        });
 
-      if (updateError) throw updateError;
+      if (insertError) throw insertError;
 
       onSubmitted();
       onClose();
@@ -173,7 +175,7 @@ export default function SubmitAssignmentModal({ isOpen, onClose, assignment, onS
             disabled={isSubmitting || !file}
             className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Submitting...' : 'Turn In'}
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
         </div>
       </div>

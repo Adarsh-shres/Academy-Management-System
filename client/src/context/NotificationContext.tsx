@@ -6,11 +6,13 @@ import { supabase } from '../lib/supabase';
 
 export interface Notification {
   id: string;
-  user_id: string;
-  title: string;
+  class_id?: string;
+  teacher_id?: string;
+  assignment_id?: string;
+  title?: string;
   message: string;
-  type: 'content' | 'update' | 'announcement';
-  is_read: boolean;
+  type: string;
+  is_read?: boolean;
   created_at: string;
 }
 
@@ -61,12 +63,26 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/notifications/${userId}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: Notification[] = await res.json();
-        setNotifications(data);
-      } catch (err) {
-        console.error('NotificationContext – fetch error:', err);
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        const mapped: Notification[] = (data || []).map((n: any) => ({
+          id: n.id,
+          user_id: n.user_id ?? n.teacher_id,
+          title: n.title ?? 'Notification',
+          message: n.message,
+          type: n.type ?? 'announcement',
+          is_read: n.is_read ?? false,
+          created_at: n.created_at,
+        }));
+        setNotifications(mapped);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
       } finally {
         setIsLoading(false);
       }
@@ -128,7 +144,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
     try {
-      await fetch(`http://localhost:5000/notifications/${id}/read`, { method: 'PATCH' });
+      await supabase.from('notifications').update({ is_read: true }).eq('id', id);
     } catch (err) {
       console.error('markAsRead error:', err);
     }
@@ -138,9 +154,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     if (!userId) return;
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     try {
-      await fetch(`http://localhost:5000/notifications/user/${userId}/read-all`, {
-        method: 'PATCH',
-      });
+      await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
+        .eq('is_read', false);
     } catch (err) {
       console.error('markAllAsRead error:', err);
     }

@@ -29,6 +29,8 @@ export interface AssignmentData {
   isPending: boolean;
   description?: string;
   fileUrl?: string;
+  portalOpen: boolean;
+  isPastDue: boolean;
 }
 
 export interface StudentProfileData {
@@ -291,32 +293,65 @@ export function useStudentData() {
 
         setCourses(mappedCourses);
 
-        const { data: submissionsData, error: subError } = await supabase
-          .from('assignment_submissions')
-          .select('*, assignments(*)')
-          .eq('student_id', currentUser.id);
+        const { data: classesData, error: classesError } = await supabase
+          .from('classes')
+          .select('id, courses(name, course_code)')
+          .contains('student_ids', [currentUser.id]);
 
-        if (subError && subError.code !== '42P01') {
-          console.error('Fetch Submissions Error:', subError);
+        if (classesError) {
+          console.error('Fetch Classes Error:', classesError);
         }
 
-        const mappedAssignments: AssignmentData[] = (submissionsData || []).map((sub: any) => {
-          const assign = sub.assignments;
-          return {
-            id: sub.id,
-            title: assign.title || 'Untitled',
-            course: assign.course || 'Uncategorized',
-            courseCode: assign.course?.split(' ')[0] || assign.course || '---',
-            deadline: assign.due_date || new Date().toISOString(),
-            status: sub.status,
-            marks: sub.marks_awarded ? `${sub.marks_awarded} marks` : 'Pending',
-            grade: sub.grade || null,
-            submittedOn: sub.submitted_at || null,
-            isPending: sub.status === 'pending',
-            description: assign.description,
-            fileUrl: sub.file_url,
-          };
-        });
+        const classIds = (classesData || []).map(c => c.id);
+
+        let mappedAssignments: AssignmentData[] = [];
+        if (classIds.length > 0) {
+          const { data: assignmentsData, error: aError } = await supabase
+            .from('assignments')
+            .select('*')
+            .in('class_id', classIds);
+
+          if (aError) {
+            console.error('Fetch Assignments Error:', aError);
+          }
+
+          const { data: submissionsData, error: subError } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('student_id', currentUser.id);
+
+          if (subError) {
+            console.error('Fetch Submissions Error:', subError);
+          }
+
+          const submissionMap = (submissionsData || []).reduce((acc: any, sub: any) => {
+            acc[sub.assignment_id] = sub;
+            return acc;
+          }, {});
+
+          mappedAssignments = (assignmentsData || []).map((assign: any) => {
+            const classObj = (classesData || []).find(c => c.id === assign.class_id);
+            const courseObj = classObj?.courses;
+            const sub = submissionMap[assign.id];
+            
+            return {
+              id: assign.id,
+              title: assign.title || 'Untitled',
+              course: courseObj?.name || 'Uncategorized',
+              courseCode: courseObj?.course_code || '---',
+              deadline: assign.due_date || new Date().toISOString(),
+              status: sub ? 'submitted' : 'pending',
+              marks: sub?.grade !== null && sub?.grade !== undefined ? `${sub.grade} marks` : 'Pending',
+              grade: sub?.grade !== undefined ? String(sub.grade) : null,
+              submittedOn: sub?.submitted_at || null,
+              isPending: !sub,
+              description: assign.description,
+              fileUrl: sub?.file_url,
+              portalOpen: assign.portal_open ?? true,
+              isPastDue: assign.due_date ? new Date(assign.due_date) < new Date() : false,
+            };
+          });
+        }
 
         setAssignments(mappedAssignments.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()));
       } catch (err: any) {

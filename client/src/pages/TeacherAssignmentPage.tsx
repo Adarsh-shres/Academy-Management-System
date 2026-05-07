@@ -34,7 +34,21 @@ export default function TeacherAssignmentPage() {
 
       if (!assignmentsData) return;
 
-      setTotalStudents(1);
+      const classIds = [...new Set(assignmentsData.map((a: any) => a.class_id).filter(Boolean))];
+      let classStudentCounts: Record<string, number> = {};
+      
+      if (classIds.length > 0) {
+        const { data: classData } = await supabase
+          .from('classes')
+          .select('id, student_ids')
+          .in('id', classIds);
+          
+        if (classData) {
+          classData.forEach((cls: any) => {
+            classStudentCounts[cls.id] = Array.isArray(cls.student_ids) ? cls.student_ids.length : 0;
+          });
+        }
+      }
 
       const mappedAssignments = assignmentsData.map((a: any) => {
         let dueDateStr = '';
@@ -56,9 +70,10 @@ export default function TeacherAssignmentPage() {
           due_time: a.due_time || '',
           created_at: a.created_at,
           class_id: a.class_id,
-          course_id: a.course_id,  // ✅ added course_id
+          course_id: a.course_id,
           portal_open: a.portal_open || false,
           attachment_url: a.attachment_url || '',
+          totalStudents: classStudentCounts[a.class_id] || 0
         };
       });
 
@@ -89,8 +104,7 @@ export default function TeacherAssignmentPage() {
         const { data: subData } = await supabase
           .from('submissions')
           .select('assignment_id, id')
-          .in('assignment_id', assignIds)
-          .not('file_url', 'is', null); // Fixed: use file_url not attachment_url
+          .in('assignment_id', assignIds);
 
         const countMap: Record<string, number> = {};
         if (subData) {

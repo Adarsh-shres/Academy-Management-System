@@ -25,15 +25,18 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
     async function fetchData() {
       setIsLoading(true);
       try {
-        // Step 1: Get enrolled student IDs for this course
-        const { data: enrollmentData, error: enrollErr } = await supabase
-          .from('enrollments')
-          .select('student_id')
-          .eq('course_id', assignment.course_id);
+        // Step 1: Get student IDs from the class
+        const { data: classData, error: classErr } = await supabase
+          .from('classes')
+          .select('student_ids')
+          .eq('id', assignment.class_id)
+          .single();
 
-        if (enrollErr) throw enrollErr;
+        if (classErr && classErr.code !== 'PGRST116') throw classErr;
 
-        if (!enrollmentData || enrollmentData.length === 0) {
+        const studentIds = classData?.student_ids || [];
+
+        if (studentIds.length === 0) {
           setStudents([]);
           setSubmissions([]);
           setIsLoading(false);
@@ -41,7 +44,6 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
         }
 
         // Step 2: Get student details for enrolled students only
-        const studentIds = enrollmentData.map((e: any) => e.student_id);
         const { data: usersData, error: usersErr } = await supabase
           .from('users')
           .select('id, name')
@@ -49,9 +51,9 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
 
         if (usersErr) throw usersErr;
 
-        // Step 3: Fetch submissions for this assignment
+        // Step 3: Fetch actual submissions for this assignment
         const { data: subData, error: subErr } = await supabase
-          .from('assignment_submissions')
+          .from('submissions')
           .select('id, student_id, file_url, submitted_at, status')
           .eq('assignment_id', assignment.id);
 
@@ -93,35 +95,10 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
   const submittedCount = submissions.length;
   const pendingCount = totalStudents - submittedCount;
 
-  // Open file in browser tab instead of downloading
-  const handleViewFile = async (fileUrl: string) => {
-    try {
-      const ext = fileUrl.split('.').pop()?.split('?')[0]?.toLowerCase() || '';
-      const officeExts = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'];
-      
-      // Use Google Docs viewer for Microsoft Office files so they render inline
-      if (officeExts.includes(ext)) {
-        window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}`, '_blank', 'noopener,noreferrer');
-        return;
-      }
-
-      const response = await fetch(fileUrl);
-      const rawBlob = await response.blob();
-      
-      let mimeType = rawBlob.type;
-      if (!mimeType || mimeType === 'application/octet-stream') {
-        if (ext === 'pdf') mimeType = 'application/pdf';
-        else if (['jpg', 'jpeg'].includes(ext)) mimeType = 'image/jpeg';
-        else if (ext === 'png') mimeType = 'image/png';
-        else if (ext === 'txt') mimeType = 'text/plain';
-      }
-
-      const blob = new Blob([rawBlob], { type: mimeType });
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      window.open(fileUrl, '_blank', 'noopener,noreferrer');
-    }
+  const handleViewFile = (fileUrl: string) => {
+    // Use Google Docs viewer to preview any file type in the browser
+    const previewUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+    window.open(previewUrl, '_blank');
   };
 
   return (
