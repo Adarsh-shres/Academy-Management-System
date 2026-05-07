@@ -83,6 +83,7 @@ function App() {
         <Route path="/teachers" element={<TeachersPage />} />
         <Route path="/user-roles" element={<UserRolesPage />} />
         <Route path="/userroles" element={<UserRolesPage />} />
+        <Route path="/admin/users" element={<UserRolesPage />} />
         <Route path="/send-notification" element={<SendNotificationPage />} />
         <Route path="/under-development" element={<UnderDevelopment />} />
         <Route path="*" element={<UnderDevelopment />} />

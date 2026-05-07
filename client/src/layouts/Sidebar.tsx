@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const SUPER_ADMIN_NAV_ITEMS = [
   { name: 'Dashboard', path: '/dashboard', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
@@ -23,9 +24,22 @@ const STUDENT_NAV_ITEMS = [
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   const isStudent = location.pathname === '/student' || location.pathname.startsWith('/student/');
-  const navItems = isStudent ? STUDENT_NAV_ITEMS : SUPER_ADMIN_NAV_ITEMS;
+  const baseNavItems = isStudent ? STUDENT_NAV_ITEMS : SUPER_ADMIN_NAV_ITEMS;
+
+  const navItems = [...baseNavItems];
+  
+  if (user && (user.role === 'admin' || user.role === 'super_admin')) {
+    if (!navItems.find(item => item.path === '/admin/users')) {
+      navItems.splice(2, 0, {
+        name: 'User Management',
+        path: '/admin/users',
+        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      });
+    }
+  }
 
   return (
     <aside className="fixed top-0 left-0 bottom-0 w-[210px] bg-white/95 backdrop-blur border-r border-[#e7dff0] flex flex-col z-[100] transition-all duration-200 shadow-[0_0_30px_rgba(57,31,86,0.06)]">

@@ -1,12 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import notificationsRouter from './routes/notifications.js';
+import usersRouter from './routes/users.js';
+import chatRouter from './routes/chat.js';
 
-dotenv.config(); 
-
-import notificationsRouter from './routes/notifications';
-import usersRouter from './routes/users';
-import chatRouter from './routes/chat';
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000; 
