@@ -17,6 +17,7 @@ server/dist/
 
 server/src/generated/
 /prisma/migrations/
+supabase/.temp/
 
 npm-debug.log*
 yarn-debug.log*
