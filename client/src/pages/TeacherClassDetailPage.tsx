@@ -917,7 +917,6 @@ export default function TeacherClassDetailPage() {
             </div>
           )}
 
-<<<<<<< ours
           {activeSubTab === 'attendance' && (
             <TeacherAttendanceTab
               classId={classId}
@@ -925,7 +924,7 @@ export default function TeacherClassDetailPage() {
               courseName={course?.name || ''}
               className={className}
             />
-=======
+          )}
           {activeSubTab === 'quizzes' && (
             <div className="flex flex-col gap-6 animate-fade-in">
               {toast && (
@@ -1281,7 +1280,7 @@ export default function TeacherClassDetailPage() {
                 )
               )}
             </div>
->>>>>>> theirs
+
           )}
 
         </div>

@@ -293,16 +293,16 @@ export function useStudentData() {
 
         setCourses(mappedCourses);
 
-        const { data: classesData, error: classesError } = await supabase
+        const { data: classesData2, error: classesError2 } = await supabase
           .from('classes')
           .select('id, courses(name, course_code)')
           .contains('student_ids', [currentUser.id]);
 
-        if (classesError) {
-          console.error('Fetch Classes Error:', classesError);
+        if (classesError2) {
+          console.error('Fetch Classes Error:', classesError2);
         }
 
-        const classIds = (classesData || []).map(c => c.id);
+        const classIds = (classesData2 || []).map(c => c.id);
 
         let mappedAssignments: AssignmentData[] = [];
         if (classIds.length > 0) {
@@ -330,7 +330,7 @@ export function useStudentData() {
           }, {});
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
-            const classObj = (classesData || []).find(c => c.id === assign.class_id);
+            const classObj = (classesData2 || []).find((c: any) => c.id === assign.class_id);
             const courseObj = classObj?.courses;
             const sub = submissionMap[assign.id];
             
