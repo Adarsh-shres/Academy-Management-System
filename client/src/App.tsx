@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AIChatBot from './components/shared/AIChatBot';
+
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
 import LandingPage from './pages/LandingPage.tsx';

@@ -11,7 +11,7 @@ router.use(requireRole(['admin', 'super_admin']));
  * GET /users
  * Fetch all users
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     const { data, error } = await supabase
       .from('users')
