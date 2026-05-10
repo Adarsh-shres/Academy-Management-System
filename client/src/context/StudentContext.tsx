@@ -6,7 +6,6 @@ import {
   buildStudentFullName,
   buildStudentProfileUpsert,
   mapStudentRecord,
-  STUDENT_PROFILE_SELECT,
   type StudentProfileRow,
   type SupabaseStudentUserRow,
 } from '../lib/studentProfiles';
@@ -97,20 +96,23 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     let profileMap = new Map<string, StudentProfileRow>();
 
     if (studentRows.length > 0) {
-      const { data: profileRows, error: profileError } = await supabase
-        .from('student_profiles')
-        .select(STUDENT_PROFILE_SELECT)
-        .in(
-          'student_id',
-          studentRows.map((student) => student.id),
-        );
+      try {
+        const ids = studentRows.map((s) => s.id).join(',');
+        const res = await fetch(`http://localhost:5000/students/profiles?ids=${ids}`);
 
-      if (profileError) {
-        if (profileError.code !== '42P01') {
-          console.error('[StudentContext] Failed to load student profiles:', profileError.message);
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          console.error(
+            '[StudentContext] Failed to load student profiles via backend:',
+            res.status,
+            errBody,
+          );
+        } else {
+          const profileRows: StudentProfileRow[] = await res.json();
+          profileMap = new Map(profileRows.map((profile) => [profile.student_id, profile]));
         }
-      } else {
-        profileMap = new Map((profileRows as StudentProfileRow[]).map((profile) => [profile.student_id, profile]));
+      } catch (fetchErr: any) {
+        console.error('[StudentContext] Network error loading student profiles:', fetchErr.message);
       }
     }
 
