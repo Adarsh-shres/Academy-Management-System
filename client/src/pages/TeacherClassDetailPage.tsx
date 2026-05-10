@@ -1,3 +1,6 @@
+// SQL Required before testing:
+// ALTER TABLE quizzes ADD COLUMN IF NOT EXISTS access_code TEXT DEFAULT NULL;
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -55,6 +58,7 @@ export default function TeacherClassDetailPage() {
   const [quizDescription, setQuizDescription] = useState('');
   const [quizDueDate, setQuizDueDate] = useState('');
   const [quizTimeLimit, setQuizTimeLimit] = useState('');
+  const [quizAccessCode, setQuizAccessCode] = useState('');
   const [questions, setQuestions] = useState<any[]>([
     { question_text: '', question_type: 'mcq', options: ['', '', '', ''], correct_answer: '0', marks: 1 }
   ]);
@@ -273,7 +277,7 @@ export default function TeacherClassDetailPage() {
     try {
       const { data, error } = await supabase
         .from('quizzes')
-        .select('*')
+        .select('*, quiz_questions(*)')
         .eq('class_id', classId)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -299,29 +303,12 @@ export default function TeacherClassDetailPage() {
     try {
       const { data, error } = await supabase
         .from('quiz_submissions')
-        .select('*')
+        .select('*, users(name, email)')
         .eq('quiz_id', quizId)
         .order('submitted_at', { ascending: false });
 
       if (error) throw error;
-
-      // Fetch student names from users table
-      if (data && data.length > 0) {
-        const studentIds = data.map((s: any) => s.student_id);
-        const { data: usersData } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', studentIds);
-
-        const enriched = data.map((sub: any) => ({
-          ...sub,
-          student: usersData?.find((u: any) => u.id === sub.student_id) || null
-        }));
-
-        setQuizSubmissions(enriched);
-      } else {
-        setQuizSubmissions([]);
-      }
+      setQuizSubmissions(data || []);
     } catch (err) {
       console.error('Failed to load quiz submissions', err);
       setQuizSubmissions([]);
@@ -358,6 +345,7 @@ export default function TeacherClassDetailPage() {
     setQuizDescription('');
     setQuizDueDate('');
     setQuizTimeLimit('');
+    setQuizAccessCode('');
     setQuestions([{ question_text: '', question_type: 'mcq', options: ['', '', '', ''], correct_answer: '0', marks: 1 }]);
     setShowQuizForm(false);
     setIsEditingQuiz(false);
@@ -370,6 +358,7 @@ export default function TeacherClassDetailPage() {
     setQuizDescription(quiz.description || '');
     setQuizDueDate(quiz.due_date ? new Date(quiz.due_date).toISOString().slice(0, 16) : '');
     setQuizTimeLimit(quiz.time_limit_minutes ? String(quiz.time_limit_minutes) : '');
+    setQuizAccessCode(quiz.access_code || '');
 
     // Pre-fill questions from already-loaded quizQuestions
     if (quizQuestions.length > 0) {
@@ -391,6 +380,7 @@ export default function TeacherClassDetailPage() {
 
   const updateQuiz = async (publish: boolean) => {
     if (!quizTitle.trim()) { showToast('Please enter a quiz title.', 'error'); return; }
+    if (!quizAccessCode.trim()) { showToast('Access code is required.', 'error'); return; }
     if (questions.some(q => !q.question_text.trim())) { showToast('Please fill in all question texts.', 'error'); return; }
 
     setSavingMode(publish ? 'publish' : 'draft');
@@ -405,6 +395,7 @@ export default function TeacherClassDetailPage() {
           description: quizDescription.trim() || null,
           due_date: quizDueDate || null,
           time_limit_minutes: quizTimeLimit ? Math.round(Number(quizTimeLimit)) : null,
+          access_code: quizAccessCode.trim().toUpperCase(),
           is_published: publish
         })
         .eq('id', editingQuizId);
@@ -452,6 +443,7 @@ export default function TeacherClassDetailPage() {
 
   const saveQuiz = async (publish: boolean) => {
     if (!quizTitle.trim()) { showToast('Please enter a quiz title.', 'error'); return; }
+    if (!quizAccessCode.trim()) { showToast('Access code is required.', 'error'); return; }
     if (questions.some(q => !q.question_text.trim())) { showToast('Please fill in all question texts.', 'error'); return; }
 
     setSavingMode(publish ? 'publish' : 'draft');
@@ -470,6 +462,7 @@ export default function TeacherClassDetailPage() {
           description: quizDescription.trim() || null,
           due_date: quizDueDate || null,
           time_limit_minutes: quizTimeLimit ? Math.round(Number(quizTimeLimit)) : null,
+          access_code: quizAccessCode.trim().toUpperCase(),
           is_published: publish
         })
         .select()
@@ -989,6 +982,14 @@ export default function TeacherClassDetailPage() {
                       <input type="number" placeholder="E.g. 30" min="1" value={quizTimeLimit} onChange={e => setQuizTimeLimit(e.target.value)}
                         className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]" />
                     </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Access Code *</label>
+                      <div className="flex gap-2">
+                        <input type="text" placeholder="E.g. AX7K2P" value={quizAccessCode} onChange={e => setQuizAccessCode(e.target.value.toUpperCase())}
+                          className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] uppercase" />
+                        <button type="button" onClick={() => setQuizAccessCode(Math.random().toString(36).substring(2, 8).toUpperCase())} className="px-4 py-2 bg-[#f3eff7] text-[#6a5182] text-[13px] font-bold rounded-sm whitespace-nowrap hover:bg-[#e7dff0] transition-colors border border-[#d8c8e9] cursor-pointer">Generate Code</button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Questions */}
@@ -1093,10 +1094,27 @@ export default function TeacherClassDetailPage() {
                       <button onClick={() => setSelectedQuiz(null)} className="text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer mb-2">← Back to Quiz</button>
                       <h3 className="text-[18px] font-extrabold text-[#4b3f68]">{selectedQuiz.title}</h3>
                       {selectedQuiz.description && <p className="text-[13px] text-[#64748b] mt-1">{selectedQuiz.description}</p>}
-                      <div className="flex gap-4 mt-2 text-[12px] text-[#64748b] font-medium">
+                      <div className="flex gap-4 mt-2 text-[12px] text-[#64748b] font-medium items-center">
                         {selectedQuiz.due_date && <span>Due: {new Date(selectedQuiz.due_date).toLocaleString()}</span>}
                         {selectedQuiz.time_limit_minutes && <span>⏱ {selectedQuiz.time_limit_minutes} min</span>}
                         <span>{quizQuestions.length} question{quizQuestions.length !== 1 ? 's' : ''}</span>
+                        {selectedQuiz.access_code ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(selectedQuiz.access_code);
+                              showToast('Access code copied!');
+                            }}
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold hover:bg-[#e7dff0] transition-colors cursor-pointer"
+                            title="Click to copy"
+                          >
+                            🔑 {selectedQuiz.access_code}
+                          </button>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-[#f1f5f9] text-[#94a3b8] font-bold">
+                            No Code
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -1207,9 +1225,9 @@ export default function TeacherClassDetailPage() {
                                   </td>
                                   <td className="py-3 px-5">
                                     <p className="text-[14px] font-bold text-[#4b3f68]">
-                                      {sub.student?.name || 'Unknown Student'}
+                                      {sub.users?.name || 'Unknown Student'}
                                     </p>
-                                    <p className="text-[12px] text-[#94a3b8]">{sub.student?.email || ''}</p>
+                                    <p className="text-[12px] text-[#94a3b8]">{sub.users?.email || ''}</p>
                                   </td>
                                   <td className="py-3 px-5 text-center">
                                     <span className="text-[14px] font-extrabold text-[#4b3f68]">
@@ -1265,15 +1283,45 @@ export default function TeacherClassDetailPage() {
                         className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-5 flex justify-between items-center cursor-pointer hover:border-[#6a5182] hover:shadow-md transition-all">
                         <div>
                           <p className="text-[15px] font-bold text-[#4b3f68]">{quiz.title}</p>
-                          <div className="flex gap-4 mt-1 text-[12px] text-[#64748b] font-medium">
+                          <div className="flex gap-4 mt-1 text-[12px] text-[#64748b] font-medium items-center">
                             {quiz.due_date && <span>Due: {new Date(quiz.due_date).toLocaleDateString()}</span>}
                             {quiz.time_limit_minutes && <span>⏱ {quiz.time_limit_minutes} min</span>}
                             <span>Created: {new Date(quiz.created_at).toLocaleDateString()}</span>
+                            {quiz.access_code ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard.writeText(quiz.access_code);
+                                  showToast('Access code copied!');
+                                }}
+                                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold hover:bg-[#e7dff0] transition-colors cursor-pointer"
+                                title="Click to copy"
+                              >
+                                🔑 {quiz.access_code}
+                              </button>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-[#f1f5f9] text-[#94a3b8] font-bold">
+                                No Code
+                              </span>
+                            )}
                           </div>
                         </div>
-                        <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${quiz.is_published ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#f1f5f9] text-[#64748b]'}`}>
-                          {quiz.is_published ? 'PUBLISHED' : 'DRAFT'}
-                        </span>
+                        <div className="flex items-center gap-4">
+                          <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${quiz.is_published ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#f1f5f9] text-[#64748b]'}`}>
+                            {quiz.is_published ? 'PUBLISHED' : 'DRAFT'}
+                          </span>
+                          {quiz.is_published && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedQuiz(quiz);
+                              }}
+                              className="px-4 py-1.5 bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold text-[12px] uppercase tracking-wide rounded-sm hover:bg-[#e7dff0] transition-colors"
+                            >
+                              View Results
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
