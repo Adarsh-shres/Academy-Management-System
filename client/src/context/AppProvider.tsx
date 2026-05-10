@@ -2,9 +2,11 @@ import type { ReactNode } from 'react';
 import { AuthProvider } from './AuthContext';
 import { StudentProvider } from './StudentContext';
 import { CourseProvider } from './CourseContext';
+import { BatchProvider } from './BatchContext';
 import { TeacherProvider } from './TeacherContext';
 import { ScheduleProvider } from './ScheduleContext';
 import { TodoProvider } from './TodoContext';
+import { NotificationProvider } from './NotificationContext';
 
 /**
  * Combines every context provider into a single wrapper.
@@ -14,17 +16,21 @@ import { TodoProvider } from './TodoContext';
 export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      <StudentProvider>
-        <CourseProvider>
-          <TeacherProvider>
-            <ScheduleProvider>
-              <TodoProvider>
-                {children}
-              </TodoProvider>
-            </ScheduleProvider>
-          </TeacherProvider>
-        </CourseProvider>
-      </StudentProvider>
+      <NotificationProvider>
+        <StudentProvider>
+          <CourseProvider>
+            <BatchProvider>
+              <TeacherProvider>
+                <ScheduleProvider>
+                  <TodoProvider>
+                    {children}
+                  </TodoProvider>
+                </ScheduleProvider>
+              </TeacherProvider>
+            </BatchProvider>
+          </CourseProvider>
+        </StudentProvider>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

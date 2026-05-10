@@ -109,9 +109,9 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
               <SectionTitle
                 eyebrow="Enrollment"
                 title="Academic Placement"
-                description="Keep department and course placement visible and easy to update."
+                description="Keep department placement visible and easy to update."
               />
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div className="grid gap-2">
                   <FieldLabel>Email</FieldLabel>
                   <input
@@ -129,10 +129,6 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
                 <div className="grid gap-2">
                   <FieldLabel>Department</FieldLabel>
                   <input className={inputClassName()} value={draft.department} onChange={(e) => setField('department', e.target.value as StudentRecord['department'])} placeholder="e.g. CSE" />
-                </div>
-                <div className="grid gap-2">
-                  <FieldLabel>Course</FieldLabel>
-                  <input className={inputClassName()} value={draft.course} onChange={(e) => setField('course', e.target.value)} placeholder="e.g. B.Tech" />
                 </div>
               </div>
             </section>

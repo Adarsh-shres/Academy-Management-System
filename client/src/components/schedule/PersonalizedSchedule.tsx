@@ -10,9 +10,9 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
   const { user } = useAuth();
   const { mySchedule } = useSchedule();
 
-  const title = user?.role === 'teacher' ? 'Classes I Teach Today' : 'My Class Schedule';
+  const title = user?.role === 'teacher' ? 'Teaching Schedule Today' : 'My Class Schedule';
   const emptyStateText = user?.role === 'teacher'
-    ? "No classes to teach today"
+    ? 'No teaching sessions today'
     : "No classes scheduled for today";
 
   const formattedDate = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date());

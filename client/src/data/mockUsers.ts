@@ -1,5 +1,5 @@
 // mockUsers.ts
-export type Role = "Teacher" | "Student";
+export type Role = "Teacher" | "Student" | "Admin" | "Super Admin";
 
 export interface User {
   id: string;
@@ -15,6 +15,8 @@ export interface User {
 }
 
 export const ROLES: Record<string, Role> = {
+  SUPER_ADMIN: "Super Admin",
+  ADMIN: "Admin",
   TEACHER: "Teacher",
   STUDENT: "Student",
 };

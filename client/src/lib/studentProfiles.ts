@@ -14,7 +14,6 @@ export interface StudentProfileRow {
   mobile_no: string | null;
   gender: string | null;
   department: string | null;
-  course: string | null;
   city: string | null;
   address: string | null;
   is_active: boolean | null;
@@ -73,7 +72,7 @@ export function mapStudentRecord(row: SupabaseStudentUserRow, profile?: StudentP
     password: '',
     gender: normalizeStudentGender(profile?.gender),
     department: normalizeStudentDepartment(profile?.department),
-    course: profile?.course ?? '',
+    course: '',
     city: profile?.city ?? '',
     address: profile?.address ?? '',
     isActive: profile?.is_active ?? true,
@@ -89,7 +88,6 @@ export function buildStudentProfileUpsert(student: StudentRecord) {
     mobile_no: student.mobileNo.trim(),
     gender: student.gender,
     department: student.department,
-    course: student.course.trim(),
     city: student.city.trim(),
     address: student.address.trim(),
     is_active: student.isActive,

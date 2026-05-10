@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AIChatBot from './components/shared/AIChatBot';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import { NotificationProvider } from './context/NotificationContext';
+
 import LandingPage from './pages/LandingPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
@@ -12,10 +13,18 @@ import AllStudentsPage from './pages/AllStudentsPage.tsx';
 import StudentDetailsPage from './pages/StudentDetailsPage.tsx';
 import RegisterStudentsPage from './pages/RegisterStudentsPage.tsx';
 import CoursesPage from './pages/CoursesPage.tsx';
+import BatchesPage from './pages/BatchesPage.tsx';
+import BatchDetailsPage from './pages/BatchDetailsPage.tsx';
+import ClassesPage from './pages/ClassesPage.tsx';
+import ClassBatchSelectPage from './pages/ClassBatchSelectPage.tsx';
+import BatchClassesPage from './pages/BatchClassesPage.tsx';
+import ClassFormPage from './pages/ClassFormPage.tsx';
 import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
+import SchedulePage from './pages/SchedulePage.tsx';
+import ScheduleClassDetailPage from './pages/ScheduleClassDetailPage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
-import UserRolesPage from './pages/UserRolesPage.tsx';
+import AdminUsersPage from './pages/AdminUsersPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
@@ -25,6 +34,7 @@ import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
 import StudentClassDetailPage from './pages/StudentClassDetailPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
+import StudentAttendanceDetailPage from './pages/StudentAttendanceDetailPage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
 import NotificationsPage from './pages/NotificationsPage.tsx';
 import SendNotificationPage from './pages/SendNotificationPage.tsx';
@@ -42,94 +52,102 @@ function UnderDevelopment() {
 
 function App() {
   return (
-    <NotificationProvider>
-      <Router>
-        <Routes>
-        {/* ── Public routes ──────────────────────────────────────── */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Router>
+      <Routes>
+      {/* ── Public routes ──────────────────────────────────────── */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* ── Admin dashboard routes ─────────────────────────────── */}
-        <Route
-          element={
-            <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<StudentsPage />} />
-          <Route path="/students/:id" element={<StudentDetailsPage />} />
-          <Route path="/register-students" element={<RegisterStudentsPage />} />
-          <Route path="/all-students" element={<AllStudentsPage />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
-          <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
-          <Route path="/teachers" element={<TeachersPage />} />
-          <Route path="/user-roles" element={<UserRolesPage />} />
-          <Route path="/userroles" element={<UserRolesPage />} />
-          <Route path="/send-notification" element={<SendNotificationPage />} />
-          <Route path="/under-development" element={<UnderDevelopment />} />
-          <Route path="*" element={<UnderDevelopment />} />
-        </Route>
+      {/* ── Admin dashboard routes ─────────────────────────────── */}
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/students" element={<StudentsPage />} />
+        <Route path="/students/:id" element={<StudentDetailsPage />} />
+        <Route path="/register-students" element={<RegisterStudentsPage />} />
+        <Route path="/all-students" element={<AllStudentsPage />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/batches" element={<BatchesPage />} />
+        <Route path="/batches/:batchId" element={<BatchDetailsPage />} />
+        <Route path="/classes" element={<ClassesPage />} />
+        <Route path="/classes/new" element={<ClassBatchSelectPage />} />
+        <Route path="/classes/:batchId/new" element={<ClassFormPage />} />
+        <Route path="/classes/:batchId/:classId/edit" element={<ClassFormPage />} />
+        <Route path="/classes/:batchId" element={<BatchClassesPage />} />
+        <Route path="/courses/:courseId/classes" element={<CourseClassesPage />} />
+        <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/schedule/classes/:classId" element={<ScheduleClassDetailPage />} />
+        <Route path="/teachers" element={<TeachersPage />} />
+        <Route path="/user-management" element={<AdminUsersPage />} />
+        <Route path="/send-notification" element={<SendNotificationPage />} />
+        <Route path="/under-development" element={<UnderDevelopment />} />
+        <Route path="*" element={<UnderDevelopment />} />
+      </Route>
 
-        {/* ── Teacher dashboard routes ───────────────────────────── */}
-        <Route
-          path="/teacher/dashboard"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherDashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/courses/:courseId/classes"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherCourseClassesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/classes/:classId"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherClassDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/settings"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherSettingsPage />
-            </ProtectedRoute>
-          }
-        />
+      {/* ── Teacher dashboard routes ───────────────────────────── */}
+      <Route
+        path="/teacher/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/courses/:courseId/classes"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherCourseClassesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/classes/:classId"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherClassDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/settings"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherSettingsPage />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* ── Student dashboard routes ───────────────────────────── */}
-        <Route
-          element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/student/dashboard" element={<StudentDashboardPage />} />
-          <Route path="/student/courses" element={<StudentCoursesPage />} />
-          <Route path="/student/classes/:classId" element={<StudentClassDetailPage />} />
-          <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
-          <Route path="/student/attendance" element={<StudentAttendancePage />} />
-          <Route path="/student/profile" element={<StudentProfilePage />} />
-          <Route path="/student/notifications" element={<NotificationsPage />} />
-          <Route path="/student/folders" element={<StudentFoldersPage />} />
-          <Route path="/student/folders/:folderId" element={<FolderContentsPage />} />
-        </Route>
-      </Routes>
-    </Router>
-    </NotificationProvider>
+      {/* ── Student dashboard routes ───────────────────────────── */}
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/student/dashboard" element={<StudentDashboardPage />} />
+        <Route path="/student/courses" element={<StudentCoursesPage />} />
+        <Route path="/student/classes/:classId" element={<StudentClassDetailPage />} />
+        <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
+        <Route path="/student/attendance" element={<StudentAttendancePage />} />
+        <Route path="/student/attendance/:classId" element={<StudentAttendanceDetailPage />} />
+        <Route path="/student/profile" element={<StudentProfilePage />} />
+        <Route path="/student/notifications" element={<NotificationsPage />} />
+        <Route path="/student/folders" element={<StudentFoldersPage />} />
+        <Route path="/student/folders/:folderId" element={<FolderContentsPage />} />
+      </Route>
+    </Routes>
+    <AIChatBot />
+  </Router>
   );
 }
 

@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS public.student_profiles (
     mobile_no TEXT DEFAULT '',
     gender TEXT NOT NULL DEFAULT 'Male' CHECK (gender IN ('Male', 'Female')),
     department TEXT DEFAULT '',
-    course TEXT DEFAULT '',
     city TEXT DEFAULT '',
     address TEXT DEFAULT '',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -75,7 +74,6 @@ INSERT INTO public.student_profiles (
     mobile_no,
     gender,
     department,
-    course,
     city,
     address
 )
@@ -86,7 +84,6 @@ SELECT
     COALESCE(au.raw_user_meta_data -> 'profile' ->> 'mobile_no', ''),
     COALESCE(NULLIF(au.raw_user_meta_data -> 'profile' ->> 'gender', ''), 'Male'),
     COALESCE(au.raw_user_meta_data -> 'profile' ->> 'department', ''),
-    COALESCE(au.raw_user_meta_data -> 'profile' ->> 'course', ''),
     COALESCE(au.raw_user_meta_data -> 'profile' ->> 'city', ''),
     COALESCE(au.raw_user_meta_data -> 'profile' ->> 'address', '')
 FROM public.users u

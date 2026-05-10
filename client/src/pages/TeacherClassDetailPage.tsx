@@ -4,19 +4,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 import { Bell, Mail, ChevronLeft, Users, Send, ClipboardList } from '../components/shared/icons';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
+import TeacherAttendanceTab from '../components/teachers/TeacherAttendanceTab';
 
 export default function TeacherClassDetailPage() {
+  useAuth();
   const { classId } = useParams();
   const navigate = useNavigate();
 
-  const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades' | 'quizzes'>('content');
+  const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades' | 'attendance' | 'quizzes'>('content');
   const [course, setCourse] = useState<any>(null);
-  const [classDetails, setClassDetails] = useState<any>(null);
   const [teacherName, setTeacherName] = useState<string>('');
   const [className, setClassName] = useState<string>('');
   const [students, setStudents] = useState<any[]>([]);
@@ -78,23 +80,21 @@ export default function TeacherClassDetailPage() {
           return;
         }
 
-
         setClassName(classData.name || '');
         setCourse({
           ...classData.courses,
           room: classData.courses?.department || 'Virtual',
           course_code: classData.courses?.course_code || 'N/A'
         });
-
         if (classData.teacher_id) {
           const { data: teacherData } = await supabase
             .from('users')
             .select('name')
             .eq('id', classData.teacher_id)
             .single();
-          if (teacherData) setTeacherName(teacherData.name);
+          setTeacherName(teacherData?.name || '');
         }
-      } catch (err) {
+      } catch {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
       }
     }
@@ -129,7 +129,7 @@ export default function TeacherClassDetailPage() {
         }
 
         setStudents(studentsData || []);
-      } catch (err: any) {
+      } catch {
         setStudents([]);
       } finally {
         setIsLoadingStudents(false);
@@ -226,6 +226,7 @@ export default function TeacherClassDetailPage() {
       setSelectedAssignment(null);
       setAssignmentSubmissions([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSubTab, classId]);
 
   const handleTabChange = (tabId: string) => {
@@ -593,7 +594,7 @@ export default function TeacherClassDetailPage() {
           </div>
 
           <div className="flex space-x-6 border-b border-[#e7dff0] mb-6 px-2 overflow-x-auto">
-            {(['content', 'students', 'grades', 'notifications', 'quizzes'] as const).map((tab) => (
+            {(['content', 'students', 'grades', 'notifications', 'attendance', 'quizzes'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveSubTab(tab)}
@@ -606,6 +607,7 @@ export default function TeacherClassDetailPage() {
                 {tab === 'students' && 'Enrolled Students'}
                 {tab === 'grades' && 'Assignments & Grades'}
                 {tab === 'notifications' && 'Broadcast Notification'}
+                {tab === 'attendance' && 'Attendance'}
                 {tab === 'quizzes' && 'Quiz'}
               </button>
             ))}
@@ -908,6 +910,14 @@ export default function TeacherClassDetailPage() {
             </div>
           )}
 
+          {activeSubTab === 'attendance' && (
+            <TeacherAttendanceTab
+              classId={classId}
+              students={students}
+              courseName={course?.name || ''}
+              className={className}
+            />
+          )}
           {activeSubTab === 'quizzes' && (
             <div className="flex flex-col gap-6 animate-fade-in">
               {toast && (
@@ -1318,6 +1328,7 @@ export default function TeacherClassDetailPage() {
                 )
               )}
             </div>
+
           )}
 
         </div>

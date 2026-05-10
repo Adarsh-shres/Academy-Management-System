@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import notificationRoutes from './routes/notifications';
+import notificationsRouter from './routes/notifications.js';
+import usersRouter from './routes/users.js';
+import chatRouter from './routes/chat.js';
 
-dotenv.config(); 
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000; 
@@ -11,8 +13,10 @@ const port = process.env.PORT || 5000;
 app.use(cors()); 
 app.use(express.json());
 
-// Routes
-app.use('/notifications', notificationRoutes);
+// Mount routes
+app.use('/notifications', notificationsRouter);
+app.use('/users', usersRouter);
+app.use('/chat', chatRouter);
 
 app.get('/', (_req, res) => {
   res.json({ 

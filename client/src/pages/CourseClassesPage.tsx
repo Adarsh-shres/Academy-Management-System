@@ -7,7 +7,7 @@ import type { Course, CourseRow } from '../types/course';
 import { rowToCourse } from '../types/course';
 
 const MAX_STUDENTS_PER_CLASS = 35;
-const DAY_OPTIONS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const DAY_OPTIONS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
 
 type CourseClass = {
   id: string;

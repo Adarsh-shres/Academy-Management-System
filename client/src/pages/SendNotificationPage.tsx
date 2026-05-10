@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function SendNotificationPage() {
-  const [recipient, setRecipient] = useState("all");
+  const [recipient, setRecipient] = useState("general");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null, text: string }>({ type: null, text: "" });
+  const [courses, setCourses] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchCourses() {
+      const { data } = await supabase.from('courses').select('id, name');
+      if (data) setCourses(data);
+    }
+    fetchCourses();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,16 +25,37 @@ export default function SendNotificationPage() {
     setStatus({ type: null, text: "" });
 
     try {
-      // TODO: Connect to backend API to send notification
-      // await fetch('/api/notifications/send', { method: 'POST', body: JSON.stringify({ recipient, subject, message }) });
-      
-      // Simulate network request
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      let target = 'general';
+      let classId = undefined;
+
+      if (recipient === 'teacher') {
+        target = 'teacher';
+      } else if (recipient === 'student') {
+        target = 'student';
+      } else if (recipient !== 'general') {
+        target = 'class';
+        classId = recipient;
+      }
+
+      const response = await fetch('http://localhost:5000/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: subject,
+          message,
+          type: 'announcement',
+          target,
+          classId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send notification');
+      }
       
       setStatus({ type: 'success', text: 'Notification sent successfully.' });
       setSubject("");
       setMessage("");
-      // Reset after 3 seconds
       setTimeout(() => setStatus({ type: null, text: "" }), 3000);
     } catch (error) {
       setStatus({ type: 'error', text: 'Failed to send notification. Please try again.' });
@@ -74,10 +105,12 @@ export default function SendNotificationPage() {
                 onChange={(e) => setRecipient(e.target.value)}
                 className="w-full bg-[#faf8fc] border border-[#e2d9ed] rounded-[8px] px-4 py-2.5 text-[14px] text-[#4b3f68] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
               >
-                <option value="all">All Students</option>
-                <option value="course_physics">Physics 101 Students</option>
-                <option value="course_math">Calculus II Students</option>
-                <option value="course_chem">Chemistry Lab Students</option>
+                <option value="general">All Users</option>
+                <option value="student">Students</option>
+                <option value="teacher">Teachers</option>
+                {courses.map(course => (
+                  <option key={course.id} value={course.id}>Class: {course.name}</option>
+                ))}
               </select>
             </div>
 

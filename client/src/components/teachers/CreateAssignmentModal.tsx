@@ -59,7 +59,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
   };
 
   useEffect(() => {
-    if (!isOpen || !user?.id) return;
+    const teacherId = user?.id;
+    if (!isOpen || !teacherId) return;
 
     resetForm();
 
@@ -78,7 +79,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
               course_code
             )
           `)
-          .eq('teacher_id', user.id);
+          .eq('teacher_id', teacherId);
 
         if (err) {
           console.error('Fetch error:', err.message);
@@ -156,6 +157,11 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
       return;
     }
 
+    if (!user?.id) {
+      alert('You must be logged in to create an assignment');
+      return;
+    }
+
     const selectedDateTime = new Date(`${dueDate}T${dueTime}`);
     if (selectedDateTime <= new Date()) {
       alert('Due date must be in the future');
@@ -166,7 +172,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     try {
       const fileUrl = await handleFileUpload(file);
 
-      const { error: insertError } = await supabase
+      const { data: newAssignment, error: insertError } = await supabase
         .from('assignments')
         .insert({
           teacher_id: user?.id,
@@ -179,9 +185,43 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
           attachment_url: fileUrl,
           portal_open: true,
           created_at: new Date().toISOString()
-        });
+        })
+        .select()
+        .single();
 
       if (insertError) throw insertError;
+
+      // Handle submissions and notifications for enrolled students
+      if (newAssignment && classId) {
+        // Fetch students from the class
+        const { data: classData } = await supabase
+          .from('classes')
+          .select('student_ids')
+          .eq('id', classId)
+          .single();
+
+        const studentIds = classData?.student_ids || [];
+
+        if (studentIds.length > 0) {
+          // 1. Create pending submissions
+          const submissions = studentIds.map((studentId: string) => ({
+            assignment_id: newAssignment.id,
+            student_id: studentId,
+            status: 'pending'
+          }));
+          await supabase.from('submissions').insert(submissions);
+
+          // 2. Create notifications for enrolled students
+          const notifications = studentIds.map((studentId: string) => ({
+            user_id: studentId,
+            title: 'New Assignment Posted',
+            message: `A new assignment "${title}" has been added for your course.`,
+            type: 'update',
+            is_read: false,
+          }));
+          await supabase.from('notifications').insert(notifications);
+        }
+      }
 
       onCreated();
       onClose();

@@ -12,7 +12,6 @@ export interface StudentFormData {
   password: string;
   gender: Gender;
   department: Department;
-  course: string;
   city: string;
   address: string;
   photo?: File | null;
@@ -21,6 +20,7 @@ export interface StudentFormData {
 /** Full student record stored in context (post-registration) */
 export interface StudentRecord extends Omit<StudentFormData, 'photo'> {
   id: string;
+  course: string;
   isActive: boolean;
   dateEnrolled: string;
 }

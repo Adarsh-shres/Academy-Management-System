@@ -23,16 +23,8 @@ function avatarTileColor(id: string) {
 }
 
 function formatProgramSummary(student: StudentRecord) {
-  if (student.department && student.course) {
-    return `${student.department} - ${student.course}`;
-  }
-
   if (student.department) {
     return student.department;
-  }
-
-  if (student.course) {
-    return student.course;
   }
 
   return 'Profile details not set yet';
@@ -55,8 +47,7 @@ export default function StudentsPage() {
     return (
       fullName.includes(query) ||
       student.email.toLowerCase().includes(query) ||
-      student.department.toLowerCase().includes(query) ||
-      student.course.toLowerCase().includes(query)
+      student.department.toLowerCase().includes(query)
     );
   });
 
