@@ -6,7 +6,6 @@ import {
   buildStudentFullName,
   buildStudentProfileUpsert,
   mapStudentRecord,
-  STUDENT_PROFILE_SELECT,
   type StudentProfileRow,
   type SupabaseStudentUserRow,
 } from '../lib/studentProfiles';
@@ -81,44 +80,57 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const [students, setStudents] = useState<StudentRecord[]>([]);
 
   const refreshStudents = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, email, name, role')
-      .eq('role', 'student')
-      .order('name', { ascending: true });
+    // Get the current session to extract the user's role for the backend header
+    const { data: { session } } = await supabase.auth.getSession();
+    const userRole = session?.user?.user_metadata?.role
+      ?? session?.user?.app_metadata?.role
+      ?? 'admin';
 
-    if (error) {
-      console.error('[StudentContext] Failed to load students:', error.message);
-      setStudents(FALLBACK_STUDENTS);
-      return;
-    }
+    try {
+      const res = await fetch('http://localhost:5000/users/students', {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-role': userRole,
+        },
+      });
 
-    const studentRows = (data as SupabaseStudentUserRow[]) ?? [];
-    let profileMap = new Map<string, StudentProfileRow>();
-
-    if (studentRows.length > 0) {
-      const { data: profileRows, error: profileError } = await supabase
-        .from('student_profiles')
-        .select(STUDENT_PROFILE_SELECT)
-        .in(
-          'student_id',
-          studentRows.map((student) => student.id),
-        );
-
-      if (profileError) {
-        if (profileError.code !== '42P01') {
-          console.error('[StudentContext] Failed to load student profiles:', profileError.message);
-        }
-      } else {
-        profileMap = new Map((profileRows as StudentProfileRow[]).map((profile) => [profile.student_id, profile]));
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('[StudentContext] Backend error:', res.status, err);
+        setStudents(FALLBACK_STUDENTS);
+        return;
       }
+
+      const combined: Array<{
+        id: string;
+        email: string | null;
+        name: string | null;
+        role: string | null;
+        profile: StudentProfileRow | null;
+      }> = await res.json();
+
+      const profileMap = new Map(
+        combined
+          .filter(row => row.profile !== null)
+          .map(row => [row.id, row.profile as StudentProfileRow])
+      );
+
+      const userRows: SupabaseStudentUserRow[] = combined.map(row => ({
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        role: row.role,
+      }));
+
+      const mapped = userRows
+        .map((row) => mapStudentRecord(row, profileMap.get(row.id)))
+        .filter((student): student is StudentRecord => Boolean(student));
+
+      setStudents(mapped.length > 0 ? mapped : FALLBACK_STUDENTS);
+    } catch (err) {
+      console.error('[StudentContext] Failed to load students from backend:', err);
+      setStudents(FALLBACK_STUDENTS);
     }
-
-    const mapped = studentRows
-      .map((row) => mapStudentRecord(row, profileMap.get(row.id)))
-      .filter((student): student is StudentRecord => Boolean(student));
-
-    setStudents(mapped.length > 0 ? mapped : FALLBACK_STUDENTS);
   }, []);
 
   useEffect(() => {
