@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import AppModal from '../components/shared/AppModal';
 import StatCard from '../components/dashboard/StatCard';
 import { useCourses } from '../context/CourseContext';
+import { useTeachers } from '../context/TeacherContext';
 import type { Course } from '../types/course';
+import type { Teacher } from '../types/teacher';
 
-const DEPARTMENT_OPTIONS = ['Computer Science', 'Cyber Security', 'CSE', 'IT', 'ECE', 'Civil', 'Mech'] as const;
+const DEPARTMENT_OPTIONS = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'] as const;
 
 function buildCourseSerial(courses: Course[]) {
   let nextSequence = 1;
@@ -48,6 +50,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function CoursesPage() {
   const { courses, loading, error: contextError, addCourse, updateCourse, deleteCourse } = useCourses();
+  const { teachers } = useTeachers();
   const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'All' | 'Active' | 'Inactive'>('All');
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -284,7 +287,7 @@ export default function CoursesPage() {
               <button onClick={() => setEditingCourse(null)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">x</button>
             </div>
             <form className="flex flex-col gap-4" onSubmit={(event) => { event.preventDefault(); handleSaveEdit(); }}>
-              <CourseFields course={editingCourse} onChange={setEditingCourse} readOnlyCode />
+              <CourseFields course={editingCourse} onChange={setEditingCourse} teachers={teachers} readOnlyCode />
               <div className="flex gap-3 mt-4">
                 <button type="button" onClick={() => setEditingCourse(null)} className="flex-1 py-2.5 rounded-sm text-[13.5px] font-bold text-[#6a5182] bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white transition-all cursor-pointer">
                   Cancel
@@ -326,7 +329,7 @@ export default function CoursesPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
-                <input value={newFaculty} onChange={(event) => setNewFaculty(event.target.value)} placeholder="e.g. Dr. John Doe" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 text-[#1e293b]" />
+                <TeacherSelect value={newFaculty} onChange={setNewFaculty} teachers={teachers} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 text-[#1e293b]" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Description</label>
@@ -353,10 +356,12 @@ export default function CoursesPage() {
 function CourseFields({
   course,
   onChange,
+  teachers,
   readOnlyCode = false,
 }: {
   course: Course;
   onChange: (course: Course) => void;
+  teachers: Teacher[];
   readOnlyCode?: boolean;
 }) {
   const inputClass = 'bg-[#f8fafc] border border-[#cbd5e1] rounded-lg px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#006496] focus:ring-1 focus:ring-[#006496]/20 transition-all font-sans text-[#1e293b]';
@@ -385,11 +390,16 @@ function CourseFields({
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex flex-col gap-1.5">
           <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-          <input value={course.department || ''} onChange={(event) => onChange({ ...course, department: event.target.value })} className={inputClass} />
+          <select value={course.department || ''} onChange={(event) => onChange({ ...course, department: event.target.value })} className={inputClass}>
+            <option value="">Select department</option>
+            {DEPARTMENT_OPTIONS.map((department) => (
+              <option key={department} value={department}>{department}</option>
+            ))}
+          </select>
         </div>
         <div className="flex-1 flex flex-col gap-1.5">
           <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
-          <input value={course.facultyLead || ''} onChange={(event) => onChange({ ...course, facultyLead: event.target.value })} className={inputClass} />
+          <TeacherSelect value={course.facultyLead || ''} onChange={(facultyLead) => onChange({ ...course, facultyLead })} teachers={teachers} className={inputClass} />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
@@ -397,5 +407,28 @@ function CourseFields({
         <textarea rows={3} value={course.description || ''} onChange={(event) => onChange({ ...course, description: event.target.value })} className={`${inputClass} resize-none`} />
       </div>
     </>
+  );
+}
+
+function TeacherSelect({
+  value,
+  onChange,
+  teachers,
+  className,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  teachers: Teacher[];
+  className: string;
+}) {
+  return (
+    <select value={value} onChange={(event) => onChange(event.target.value)} className={className}>
+      <option value="">Unassigned</option>
+      {teachers.map((teacher) => (
+        <option key={teacher.id} value={teacher.name}>
+          {teacher.name}
+        </option>
+      ))}
+    </select>
   );
 }

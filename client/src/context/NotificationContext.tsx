@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 
 export interface Notification {
   id: string;
+  user_id?: string;
   class_id?: string;
   teacher_id?: string;
   assignment_id?: string;
@@ -74,6 +75,9 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         const mapped: Notification[] = (data || []).map((n: any) => ({
           id: n.id,
           user_id: n.user_id ?? n.teacher_id,
+          class_id: n.class_id ?? undefined,
+          teacher_id: n.teacher_id ?? undefined,
+          assignment_id: n.assignment_id ?? undefined,
           title: n.title ?? 'Notification',
           message: n.message,
           type: n.type ?? 'announcement',
@@ -111,6 +115,9 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
           const normalised: Notification = {
             id: row.id,
             user_id: row.user_id ?? row.teacher_id,
+            class_id: row.class_id ?? undefined,
+            teacher_id: row.teacher_id ?? undefined,
+            assignment_id: row.assignment_id ?? undefined,
             title: row.title ?? 'Notification',
             message: row.message,
             type: row.type ?? 'announcement',

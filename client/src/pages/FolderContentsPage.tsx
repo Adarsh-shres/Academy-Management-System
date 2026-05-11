@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 
-// Mock data interfaces
 interface FileItem {
   id: string;
   name: string;
@@ -9,25 +8,6 @@ interface FileItem {
   size: string;
   uploadDate: string;
 }
-
-// Simulated backend database
-const MOCK_FILES_DB: Record<string, { folderName: string, files: FileItem[] }> = {
-  "assignments": {
-    folderName: "Assignments",
-    files: [
-      { id: "f1", name: "Physics_Lab_Report_3.pdf", type: "pdf", size: "2.4 MB", uploadDate: "2024-05-01T08:30:00Z" },
-      { id: "f2", name: "Math_Homework_Ch4.doc", type: "doc", size: "1.1 MB", uploadDate: "2024-04-28T10:15:00Z" },
-    ]
-  },
-  "notes": {
-    folderName: "Course Notes",
-    files: [
-      { id: "f3", name: "Calculus_Limits_Slides.pdf", type: "pdf", size: "4.5 MB", uploadDate: "2024-04-29T14:15:00Z" },
-      { id: "f4", name: "Chemistry_Formulas.img", type: "img", size: "3.2 MB", uploadDate: "2024-04-25T09:00:00Z" },
-      { id: "f5", name: "History_Lecture_Audio_Transcript.doc", type: "doc", size: "0.8 MB", uploadDate: "2024-04-20T11:20:00Z" },
-    ]
-  }
-};
 
 const getFileIcon = (type: string) => {
   switch (type) {
@@ -64,30 +44,15 @@ export default function FolderContentsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Connect to your backend API to fetch folder contents by ID
-    // fetch(`/api/folders/${folderId}/files`).then(...)
-
-    // Simulating API call
-    setTimeout(() => {
-      if (folderId && MOCK_FILES_DB[folderId]) {
-        setFolderData(MOCK_FILES_DB[folderId]);
-      } else {
-        // Fallback for demo if folder not in mock db
-        setFolderData({ folderName: "Empty Folder", files: [] });
-      }
-      setIsLoading(false);
-    }, 500);
+    setFolderData({ folderName: folderId ? "Folder" : "Files", files: [] });
+    setIsLoading(false);
   }, [folderId]);
 
   if (isLoading) {
     return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Files...</div>;
   }
 
-  const handleDownload = (_fileId: string, fileName: string) => {
-    // TODO: Connect to your backend API for file download
-    // window.open(`/api/files/download/${fileId}`, '_blank');
-    alert(`Initiating download for ${fileName}`);
-  };
+  const handleDownload = (_fileId: string, _fileName: string) => {};
 
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full animate-in fade-in duration-200">

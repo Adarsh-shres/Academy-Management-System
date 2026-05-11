@@ -2,13 +2,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { provisionUser, type ProvisionedRole } from '../lib/userProvisioning';
-import { ROLES, type User } from '../data/mockUsers.ts';
+import { ROLES, type User } from '../data/users.ts';
 
 export interface UserStats {
   total: number;
   teachers: number;
   students: number;
   active: number;
+}
+
+interface SupabaseUserRow {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string | null;
 }
 
 export const useUsers = () => {
@@ -21,12 +28,12 @@ export const useUsers = () => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('id, email, name, role, created_at')
+        .select('id, email, name, role')
         .order('name', { ascending: true });
 
       if (error) throw error;
 
-      const mappedUsers: User[] = (data || []).map((row: any) => {
+      const mappedUsers: User[] = ((data || []) as SupabaseUserRow[]).map((row) => {
         let roleEnum = ROLES.STUDENT;
         if (row.role === 'teacher') roleEnum = ROLES.TEACHER;
         else if (row.role === 'admin') roleEnum = ROLES.ADMIN;
@@ -41,7 +48,7 @@ export const useUsers = () => {
           department: '',
           course: '',
           phone: '',
-          joinDate: new Date(row.created_at || Date.now()).toLocaleDateString(),
+          joinDate: 'N/A',
           status: 'Active',
           avatar: name
             .split(' ')

@@ -9,14 +9,8 @@ interface GradeItem {
   avgGrade?: string;
 }
 
-const INITIAL_GRADES: GradeItem[] = [
-  { id: '1', title: 'Attendance', course: 'Math 101', category: 'Classwork', avgGrade: '4/5' },
-  { id: '2', title: 'Assignment', course: 'Math 104', category: 'Homework', avgGrade: '8.5/10' },
-  { id: '3', title: 'Quiz', course: 'Math 104', category: 'Homework' },
-];
-
 export default function TeacherGrades() {
-  const [grades, setGrades] = useState<GradeItem[]>(INITIAL_GRADES);
+  const [grades, setGrades] = useState<GradeItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   /* ─── New Grade form state ─────────────────────────────────── */
@@ -57,6 +51,11 @@ export default function TeacherGrades() {
       </div>
 
       <div className="p-5 flex flex-col gap-4">
+        {grades.length === 0 && (
+          <div className="rounded-sm border border-dashed border-[#d8c8e9] bg-[#fbf8fe] p-8 text-center text-[13px] font-semibold text-[#7c8697]">
+            No grade entries yet.
+          </div>
+        )}
         {grades.map(item => (
           <div key={item.id} className="flex items-start gap-3 p-3.5 rounded-sm border border-[#e7dff0] hover:border-[#d8c8e9] hover:shadow-sm transition-all bg-[#fbf8fe]">
             <div className="w-10 h-10 rounded-sm bg-white flex items-center justify-center border border-[#e7dff0] shrink-0 text-primary">

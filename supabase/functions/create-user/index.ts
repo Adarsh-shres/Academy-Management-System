@@ -45,6 +45,25 @@ function readStudentGender(profile: Record<string, unknown>) {
   return profile.gender === 'Female' ? 'Female' : 'Male';
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string' && message.trim()) {
+      return message;
+    }
+  }
+
+  if (typeof error === 'string' && error.trim()) {
+    return error;
+  }
+
+  return 'Unexpected error.';
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -183,7 +202,6 @@ serve(async (req) => {
       user_id: createdUser.id,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unexpected error.';
-    return jsonResponse({ error: message }, 400);
+    return jsonResponse({ error: getErrorMessage(error) }, 400);
   }
 });

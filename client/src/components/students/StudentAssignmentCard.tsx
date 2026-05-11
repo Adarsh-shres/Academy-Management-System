@@ -14,6 +14,8 @@ export interface Assignment {
   submittedOn?: string | null;
   grade?: string | null;
   fileUrl?: string;
+  portalOpen?: boolean;
+  isPastDue?: boolean;
 }
 
 interface StudentAssignmentCardProps {

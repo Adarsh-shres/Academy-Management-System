@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent, ReactNode } from 'react';
+import { Download, Upload } from 'lucide-react';
 import { useStudents } from '../../context/StudentContext';
+import { parseStudentCsv, STUDENT_CSV_TEMPLATE_HEADERS } from '../../lib/studentCsvImport';
 import { provisionUser } from '../../lib/userProvisioning';
+import type { StudentCsvParseResult } from '../../lib/studentCsvImport';
 import type { Department, Gender, StudentFormData } from '../../types/student';
 
 const departments: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
@@ -27,6 +30,12 @@ export default function RegisterStudentForm() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [csvFileName, setCsvFileName] = useState('');
+  const [csvResult, setCsvResult] = useState<StudentCsvParseResult | null>(null);
+  const [importResults, setImportResults] = useState<
+    Array<{ rowNumber: number; email: string; name: string; status: 'created' | 'failed'; message: string }>
+  >([]);
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -37,10 +46,104 @@ export default function RegisterStudentForm() {
     setForm((prev) => ({ ...prev, photo: e.target.files?.[0] ?? null }));
   };
 
+  const createStudentAccount = async (student: StudentFormData) => {
+    const fullName = `${student.firstName} ${student.lastName}`.trim();
+
+    await provisionUser({
+      email: student.email.trim().toLowerCase(),
+      password: student.password,
+      fullName,
+      role: 'student',
+      profile: {
+        father_name: student.fatherName,
+        date_of_birth: student.dateOfBirth,
+        mobile_no: student.mobileNo,
+        gender: student.gender,
+        department: student.department,
+        city: student.city,
+        address: student.address,
+      },
+    });
+
+    return fullName;
+  };
+
   const resetForm = () => {
     setForm(initial);
     setSuccessMsg('');
     setErrorMsg('');
+  };
+
+  const handleCsvFile = async (file: File | undefined) => {
+    setSuccessMsg('');
+    setErrorMsg('');
+    setImportResults([]);
+    setCsvFileName(file?.name ?? '');
+
+    if (!file) {
+      setCsvResult(null);
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const result = parseStudentCsv(text);
+      setCsvResult(result);
+      if (result.totalRows === 0) {
+        setErrorMsg('The CSV file does not contain any student rows.');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to read CSV file.';
+      setCsvResult(null);
+      setErrorMsg(message);
+    }
+  };
+
+  const downloadCsvTemplate = () => {
+    const blob = new Blob([`${STUDENT_CSV_TEMPLATE_HEADERS.join(',')}\n`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'student-import-template.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportStudents = async () => {
+    if (!csvResult || csvResult.validRows.length === 0) return;
+
+    setSuccessMsg('');
+    setErrorMsg('');
+    setImportResults([]);
+    setIsImporting(true);
+
+    const results: Array<{ rowNumber: number; email: string; name: string; status: 'created' | 'failed'; message: string }> = [];
+
+    for (const row of csvResult.validRows) {
+      const name = `${row.data.firstName} ${row.data.lastName}`.trim();
+      try {
+        await createStudentAccount(row.data);
+        results.push({ rowNumber: row.rowNumber, email: row.data.email, name, status: 'created', message: 'Created' });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to create student account.';
+        results.push({ rowNumber: row.rowNumber, email: row.data.email, name, status: 'failed', message });
+      }
+      setImportResults([...results]);
+    }
+
+    const createdCount = results.filter((result) => result.status === 'created').length;
+    const failedCount = results.length - createdCount;
+
+    if (createdCount > 0) {
+      await refreshStudents();
+      setSuccessMsg(`Imported ${createdCount} student${createdCount === 1 ? '' : 's'} from CSV.`);
+    }
+
+    if (failedCount > 0) {
+      setErrorMsg(`${failedCount} student${failedCount === 1 ? '' : 's'} could not be imported. Check the import results below.`);
+    }
+
+    setIsImporting(false);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -50,23 +153,7 @@ export default function RegisterStudentForm() {
     setIsSubmitting(true);
 
     try {
-      const fullName = `${form.firstName} ${form.lastName}`.trim();
-
-      await provisionUser({
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
-        fullName,
-        role: 'student',
-        profile: {
-          father_name: form.fatherName,
-          date_of_birth: form.dateOfBirth,
-          mobile_no: form.mobileNo,
-          gender: form.gender,
-          department: form.department,
-          city: form.city,
-          address: form.address,
-        },
-      });
+      const fullName = await createStudentAccount(form);
 
       await refreshStudents();
       setSuccessMsg(`Student account created for ${fullName || 'the new student'}.`);
@@ -105,6 +192,87 @@ export default function RegisterStudentForm() {
               {errorMsg}
             </div>
           )}
+
+          <section className="grid gap-4 rounded-2xl border border-[#e2d9ed] bg-[#fbf8fe] p-4 md:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <SectionHeading
+                eyebrow="Bulk Import"
+                title="Import Students From CSV"
+                description="Upload a CSV to create student accounts through the same Supabase provisioning flow."
+              />
+              <button
+                type="button"
+                onClick={downloadCsvTemplate}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#d8c8e9] bg-white px-4 py-2.5 text-[13px] font-bold text-[#6a5182] transition-all hover:bg-[#f3eff7]"
+              >
+                <Download size={16} />
+                Template
+              </button>
+            </div>
+
+            <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#d8c8e9] bg-white px-6 py-8 text-center transition-colors hover:bg-[#f8f4fd]">
+              <input type="file" accept=".csv,text/csv" onChange={(event) => void handleCsvFile(event.target.files?.[0])} className="sr-only" />
+              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#e2d9ed] bg-[#f7f2fb] text-[#6a5182]">
+                <Upload size={22} />
+              </span>
+              <span>
+                <span className="block text-[14px] font-extrabold text-[#4b3f68]">{csvFileName || 'Choose CSV file'}</span>
+                <span className="mt-1 block text-[12.5px] text-[#64748b]">
+                  Required headers: firstName, lastName, email, password.
+                </span>
+              </span>
+            </label>
+
+            {csvResult && (
+              <div className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white">
+                <div className="grid grid-cols-3 divide-x divide-[#e2e8f0] bg-[#f8fafc]">
+                  <ImportStat label="Rows" value={csvResult.totalRows} tone="text-[#0d3349]" />
+                  <ImportStat label="Valid" value={csvResult.validRows.length} tone="text-emerald-700" />
+                  <ImportStat label="Needs Fix" value={csvResult.invalidRows.length} tone="text-rose-700" />
+                </div>
+
+                {csvResult.invalidRows.length > 0 && (
+                  <div className="max-h-[180px] overflow-y-auto border-t border-[#e2e8f0] p-4">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[#64748b]">Rows To Fix</p>
+                    <div className="grid gap-2">
+                      {csvResult.invalidRows.slice(0, 8).map((row) => (
+                        <p key={row.rowNumber} className="text-[12.5px] font-semibold text-rose-700">
+                          Row {row.rowNumber}: {row.errors.join(' ')}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {importResults.length > 0 && (
+                  <div className="max-h-[220px] overflow-y-auto border-t border-[#e2e8f0] p-4">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[#64748b]">Import Results</p>
+                    <div className="grid gap-2">
+                      {importResults.map((result) => (
+                        <p
+                          key={`${result.rowNumber}-${result.email}`}
+                          className={`text-[12.5px] font-semibold ${result.status === 'created' ? 'text-emerald-700' : 'text-rose-700'}`}
+                        >
+                          Row {result.rowNumber}: {result.name || result.email} - {result.message}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => void handleImportStudents()}
+                disabled={isImporting || !csvResult || csvResult.validRows.length === 0}
+                className="rounded-2xl bg-[#6a5182] px-5 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.18)] transition-all hover:bg-[#5b4471] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isImporting ? 'Importing Students...' : 'Import Valid Students'}
+              </button>
+            </div>
+          </section>
 
           <section className="grid gap-4">
             <SectionHeading
@@ -242,6 +410,15 @@ function SectionHeading({
       <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">{eyebrow}</p>
       <h3 className="mt-2 text-[20px] font-extrabold tracking-tight text-[#0d3349]">{title}</h3>
       <p className="mt-1 text-[13px] text-[#64748b]">{description}</p>
+    </div>
+  );
+}
+
+function ImportStat({ label, value, tone }: { label: string; value: number; tone: string }) {
+  return (
+    <div className="p-4">
+      <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#64748b]">{label}</p>
+      <p className={`mt-2 text-[24px] font-extrabold leading-none ${tone}`}>{value}</p>
     </div>
   );
 }

@@ -14,6 +14,8 @@ const STATUS_STYLES: Record<TeacherStatus, { bg: string; text: string }> = {
   Inactive: { bg: 'bg-[#f1f5f9]', text: 'text-[#475569]' },
 };
 
+const DEPARTMENT_OPTIONS = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'] as const;
+
 const AVATAR_TILES = [
   'bg-[#6a5182]',
   'bg-[#8b6ca8]',
@@ -43,7 +45,7 @@ export default function TeachersPage() {
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newSubject, setNewSubject] = useState('');
-  const [newDept, setNewDept] = useState('');
+  const [newDept, setNewDept] = useState('CSE');
   const [isCreatingTeacher, setIsCreatingTeacher] = useState(false);
   const [createTeacherError, setCreateTeacherError] = useState('');
   const [createTeacherSuccess, setCreateTeacherSuccess] = useState('');
@@ -58,7 +60,7 @@ export default function TeachersPage() {
     setNewEmail('');
     setNewPassword('');
     setNewSubject('');
-    setNewDept('');
+    setNewDept('CSE');
     setCreateTeacherError('');
     setCreateTeacherSuccess('');
   };
@@ -85,7 +87,7 @@ export default function TeachersPage() {
         role: 'teacher',
         profile: {
           subject: newSubject || 'General Studies',
-          department: newDept || 'Dept. of General Studies',
+          department: newDept || 'CSE',
           status: 'Active',
         },
       });
@@ -436,7 +438,7 @@ export default function TeachersPage() {
                       <TeacherInput value={newSubject} onChange={setNewSubject} placeholder="e.g. Quantum Physics" />
                     </TeacherField>
                     <TeacherField label="Department">
-                      <TeacherInput value={newDept} onChange={setNewDept} placeholder="e.g. Dept. of Physics" />
+                      <TeacherDepartmentSelect value={newDept} onChange={setNewDept} />
                     </TeacherField>
                   </div>
                 </section>
@@ -487,7 +489,7 @@ export default function TeachersPage() {
                     <TeacherInput value={editName} onChange={setEditName} />
                   </TeacherField>
                   <TeacherField label="Department">
-                    <TeacherInput value={editDept} onChange={setEditDept} />
+                    <TeacherDepartmentSelect value={editDept} onChange={setEditDept} />
                   </TeacherField>
                 </div>
                 <TeacherField label="Subject / Specialization">
@@ -570,6 +572,23 @@ function TeacherInput({
       minLength={minLength}
       className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10"
     />
+  );
+}
+
+/** Renders the shared department picker for teacher create and edit flows. */
+function TeacherDepartmentSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  return (
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10"
+    >
+      {DEPARTMENT_OPTIONS.map((department) => (
+        <option key={department} value={department}>
+          {department}
+        </option>
+      ))}
+    </select>
   );
 }
 

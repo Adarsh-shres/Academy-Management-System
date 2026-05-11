@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/dashboard/StatCard';
-import RecentActivity from '../components/dashboard/RecentActivity';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function LandingPage() {
@@ -49,15 +48,15 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[18px] animate-fade-up" style={{ animationDelay: '100ms' }}>
           <StatCard 
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>}
-            label="Active Entities"
-            value="1,284"
-            subContent={<><span className="text-[#10b981] font-bold">+12%</span> this month</>}
+            label="Student Records"
+            value="Live"
+            subContent="Connected to your database"
           />
           <StatCard 
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
-            label="Faculty Chairs"
-            value="42"
-            subContent="Stable Performance"
+            label="Faculty Access"
+            value="RBAC"
+            subContent="Role-based permissions"
           />
           <StatCard 
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
@@ -66,18 +65,6 @@ export default function LandingPage() {
             isAccent
             subContent={<span className="text-[10.5px] font-bold text-primary bg-[#f3eff7] px-[9px] py-0.5 rounded-full tracking-wide">Audit Link Active</span>}
           />
-        </div>
-
-        {/* System Preview using RecentActivity Component */}
-        <div className="animate-fade-up flex flex-col gap-3 mt-4" style={{ animationDelay: '200ms' }}>
-          <div>
-            <h2 className="font-sans text-[20px] font-extrabold text-[#4b3f68] tracking-tight">System Preview</h2>
-            <p className="text-[13px] text-[#7c8697] mt-0.5">Experience the power of real-time administrative oversight.</p>
-          </div>
-          <div className="pointer-events-none w-full relative">
-            <RecentActivity />
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-main-bg to-transparent pointer-events-none"></div>
-          </div>
         </div>
 
       </main>

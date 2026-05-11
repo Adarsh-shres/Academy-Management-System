@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { sendClassNotification } from '../../lib/notifications';
 import { Calendar, FileText } from '../shared/icons';
 
 interface Assignment {
@@ -85,24 +86,21 @@ export default function AssignmentCard({
 
     setTogglingPortal(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
       const { error: updateError } = await supabase
         .from('assignments')
         .update({ portal_open: true })
         .eq('id', assignment.id);
       if (updateError) throw updateError;
 
-      await supabase
-        .from('notifications')
-        .insert({
-          class_id: assignment.class_id,
-          teacher_id: user.id,
+      if (assignment.class_id) {
+        await sendClassNotification({
+          classId: assignment.class_id,
+          title: 'Assignment Portal Opened',
           message: `New assignment posted: ${assignment.title}. Due: ${formattedDueDate}`,
           type: 'assignment_open',
-          assignment_id: assignment.id
+          assignmentId: assignment.id,
         });
+      }
 
       if (onRefresh) onRefresh();
     } catch (err) {
@@ -120,9 +118,6 @@ export default function AssignmentCard({
     }
     setTogglingPortal(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
       const { error: updateError } = await supabase
         .from('assignments')
         .update({
@@ -139,15 +134,15 @@ export default function AssignmentCard({
         hour: 'numeric', minute: '2-digit',
       }).format(new Date(`${newDueDate}T${newDueTime}`));
 
-      await supabase
-        .from('notifications')
-        .insert({
-          class_id: assignment.class_id,
-          teacher_id: user.id,
+      if (assignment.class_id) {
+        await sendClassNotification({
+          classId: assignment.class_id,
+          title: 'Assignment Reopened',
           message: `Assignment reopened: ${assignment.title}. New due date: ${newFormattedDate}`,
           type: 'assignment_open',
-          assignment_id: assignment.id
+          assignmentId: assignment.id,
         });
+      }
 
       setShowReopenModal(false);
       if (onRefresh) onRefresh();

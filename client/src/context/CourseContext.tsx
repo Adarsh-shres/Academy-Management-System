@@ -5,7 +5,6 @@ import type { Course, CourseRow } from '../types/course';
 import { courseToRow, rowToCourse } from '../types/course';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
-import { MOCK_COURSES } from '../data/mockCourses';
 
 interface CourseContextValue {
   courses: Course[];
@@ -20,13 +19,6 @@ interface CourseContextValue {
 }
 
 const CourseContext = createContext<CourseContextValue | null>(null);
-
-const FALLBACK_COURSES: Course[] = MOCK_COURSES.map((course, index) => ({
-  ...course,
-  courseCode: `CRS-${String(index + 1).padStart(3, '0')}`,
-  status: course.status as Course['status'],
-  createdAt: new Date(2026, 0, index + 1).toISOString(),
-}));
 
 export function CourseProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -45,14 +37,14 @@ export function CourseProvider({ children }: { children: ReactNode }) {
 
     if (fetchError) {
       console.error('Error fetching courses:', fetchError);
-      setCourses(FALLBACK_COURSES);
-      setError(null);
+      setCourses([]);
+      setError(fetchError.message);
       setLoading(false);
       return;
     }
 
     const mappedCourses = ((data as CourseRow[]) ?? []).map(rowToCourse);
-    setCourses(mappedCourses.length > 0 ? mappedCourses : FALLBACK_COURSES);
+    setCourses(mappedCourses);
     setLoading(false);
   }, []);
 
@@ -66,13 +58,11 @@ export function CourseProvider({ children }: { children: ReactNode }) {
     const activeCourses = courses.filter((course) => course.status === 'Active');
 
     if (user.role === 'teacher') {
-      const assignedCourses = activeCourses.filter((course) => course.facultyLead === user.name);
-      return assignedCourses.length > 0 ? assignedCourses : activeCourses.slice(0, 3);
+      return activeCourses.filter((course) => course.facultyLead === user.name);
     }
 
     if (user.role === 'student') {
-      // Keep the student dashboard populated until enrollments are modeled.
-      return activeCourses.slice(0, 4);
+      return [];
     }
 
     return activeCourses;

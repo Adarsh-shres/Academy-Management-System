@@ -10,12 +10,11 @@ export function useScrollReveal(options: RevealOptions = { threshold: 0.12 }) {
     useEffect(() => {
         if (!rootRef.current) return;
 
-        // Configuration matching initial script.js logic
         const revealMap = [
             { selector: ".feature-box", dir: null },
             { selector: ".card", dir: null },
             { selector: ".contact", dir: null },
-            { selector: ".mock-box", dir: "from-right" },
+            { selector: ".preview-box", dir: "from-right" },
         ];
 
         // Ensure initially hidden classes are applied correctly before intersection
@@ -38,7 +37,7 @@ export function useScrollReveal(options: RevealOptions = { threshold: 0.12 }) {
             });
         }, options);
 
-        const targetSelectors = ".feature-box, .card, .contact, .mock-box";
+        const targetSelectors = ".feature-box, .card, .contact, .preview-box";
         const targetElements = rootRef.current.querySelectorAll(targetSelectors);
         targetElements.forEach((el: Element) => observer.observe(el));
 
