@@ -6,7 +6,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { sendClassNotification } from '../lib/notifications';
 import { useAuth } from '../context/AuthContext';
-import { Bell, Mail, ChevronLeft, Users, Send, ClipboardList } from '../components/shared/icons';
+import { ChevronLeft, Users, Send, ClipboardList } from '../components/shared/icons';
+import NotificationBell from '../components/shared/NotificationBell';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
@@ -553,12 +554,7 @@ export default function TeacherClassDetailPage() {
           </div>
 
           <div className="flex items-center gap-4 ml-auto">
-            <button className="relative text-[#64748b] hover:text-[#6a5182] transition-colors cursor-pointer">
-              <Mail size={18} />
-            </button>
-            <button className="relative text-[#64748b] hover:text-[#6a5182] transition-colors cursor-pointer">
-              <Bell size={18} />
-            </button>
+            <NotificationBell />
             <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
             <ProfileDropdown />
           </div>
