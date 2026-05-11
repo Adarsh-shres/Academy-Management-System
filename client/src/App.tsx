@@ -23,6 +23,7 @@ import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
 import SchedulePage from './pages/SchedulePage.tsx';
 import ScheduleClassDetailPage from './pages/ScheduleClassDetailPage.tsx';
+import AdminTeacherSchedulePage from './pages/AdminTeacherSchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import AdminUsersPage from './pages/AdminUsersPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
@@ -36,6 +37,7 @@ import StudentClassDetailPage from './pages/StudentClassDetailPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentAttendanceDetailPage from './pages/StudentAttendanceDetailPage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
+import StudentSchedulePage from './pages/StudentSchedulePage.tsx';
 import NotificationsPage from './pages/NotificationsPage.tsx';
 import SendNotificationPage from './pages/SendNotificationPage.tsx';
 import StudentFoldersPage from './pages/StudentFoldersPage.tsx';
@@ -85,6 +87,7 @@ function App() {
         <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/schedule/classes/:classId" element={<ScheduleClassDetailPage />} />
+        <Route path="/schedule/teachers/:teacherId" element={<AdminTeacherSchedulePage />} />
         <Route path="/teachers" element={<TeachersPage />} />
         <Route path="/user-management" element={<AdminUsersPage />} />
         <Route path="/send-notification" element={<SendNotificationPage />} />
@@ -139,6 +142,7 @@ function App() {
         <Route path="/student/courses" element={<StudentCoursesPage />} />
         <Route path="/student/classes/:classId" element={<StudentClassDetailPage />} />
         <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
+        <Route path="/student/schedule" element={<StudentSchedulePage />} />
         <Route path="/student/attendance" element={<StudentAttendancePage />} />
         <Route path="/student/attendance/:classId" element={<StudentAttendanceDetailPage />} />
         <Route path="/student/profile" element={<StudentProfilePage />} />

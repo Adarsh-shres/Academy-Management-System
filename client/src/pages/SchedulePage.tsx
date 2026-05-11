@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users } from '../components/shared/icons';
 import { useCourses } from '../context/CourseContext';
 import { getScheduleCourseId } from '../lib/scheduleCourseSelection';
+import { getScheduleTeacherId } from '../lib/scheduleTeacherSelection';
 import { supabase } from '../lib/supabase';
 
 type BatchClass = {
@@ -26,6 +27,7 @@ type ScheduleEntry = {
   id: string;
   class_id: string;
   course_id?: string | null;
+  teacher_id?: string | null;
   schedule_type: 'weekly' | 'one_time';
   day_of_week?: string | null;
   schedule_date?: string | null;
@@ -72,7 +74,6 @@ export default function SchedulePage() {
   const [scheduleTarget, setScheduleTarget] = useState<'class' | 'teacher'>('class');
   const [selectedClassId, setSelectedClassId] = useState('');
   const [selectedTeacherId, setSelectedTeacherId] = useState('');
-  const [selectedTeacherClassId, setSelectedTeacherClassId] = useState('');
 
   const loadScheduleOverview = useCallback(async () => {
     setIsLoading(true);
@@ -244,21 +245,25 @@ export default function SchedulePage() {
     [teachers],
   );
 
-  const selectedTeacherClasses = useMemo(
-    () => classes.filter((courseClass) => teacherIdsForClass(courseClass).includes(selectedTeacherId)),
-    [classes, selectedTeacherId],
-  );
-
   const openSelectedSchedule = () => {
-    const targetClassId = scheduleTarget === 'class' ? selectedClassId : selectedTeacherClassId;
-    if (!targetClassId) return;
+    if (scheduleTarget === 'teacher') {
+      if (!selectedTeacherId) return;
+      navigate(`/schedule/teachers/${selectedTeacherId}`);
+      return;
+    }
 
-    navigate(`/schedule/classes/${targetClassId}`);
+    if (!selectedClassId) return;
+    navigate(`/schedule/classes/${selectedClassId}`);
   };
 
   const renderScheduleLine = (entry: ScheduleEntry & { usesOverride?: boolean }) => {
     const courseClass = classMap.get(entry.class_id);
     if (!courseClass) return null;
+    const teacherId = getScheduleTeacherId(entry, {
+      teacher_id: courseClass.teacher_id,
+      teacher_ids: courseClass.teacher_ids,
+    });
+    const teacherName = teacherId ? teacherNames[teacherId] : '';
 
     return (
       <button
@@ -279,7 +284,7 @@ export default function SchedulePage() {
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[12.5px] font-medium text-[#475569]">
           <span>{trimTime(entry.start_time)} - {trimTime(entry.end_time)}</span>
           <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || courseClass.room || 'Room not set'}</span>
-          <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {teacherNamesForClass(courseClass)}</span>
+          <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {teacherName || 'Teacher not selected'}</span>
         </div>
       </button>
     );
@@ -334,7 +339,6 @@ export default function SchedulePage() {
                   value={selectedTeacherId}
                   onChange={(event) => {
                     setSelectedTeacherId(event.target.value);
-                    setSelectedTeacherClassId('');
                   }}
                   className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
                 >
@@ -344,20 +348,10 @@ export default function SchedulePage() {
                   ))}
                 </select>
               </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Assigned Batch Class</label>
-                <select value={selectedTeacherClassId} onChange={(event) => setSelectedTeacherClassId(event.target.value)} disabled={!selectedTeacherId} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b] disabled:opacity-60">
-                  <option value="">{selectedTeacherId ? 'Choose assigned class' : 'Select teacher first'}</option>
-                  {selectedTeacherClasses.map((courseClass) => (
-                    <option key={courseClass.id} value={courseClass.id}>{courseClass.name || 'Class'} | {courseClass.batches?.name || 'Batch'}</option>
-                  ))}
-                </select>
-              </div>
             </div>
           )}
 
-          <button type="button" onClick={openSelectedSchedule} disabled={scheduleTarget === 'class' ? !selectedClassId : !selectedTeacherClassId} className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+          <button type="button" onClick={openSelectedSchedule} disabled={scheduleTarget === 'class' ? !selectedClassId : !selectedTeacherId} className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
             Open Schedule
           </button>
         </div>
