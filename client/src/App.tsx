@@ -23,6 +23,7 @@ import CourseClassesPage from './pages/CourseClassesPage.tsx';
 import CourseClassDetailPage from './pages/CourseClassDetailPage.tsx';
 import SchedulePage from './pages/SchedulePage.tsx';
 import ScheduleClassDetailPage from './pages/ScheduleClassDetailPage.tsx';
+import AdminTeacherSchedulePage from './pages/AdminTeacherSchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import AdminUsersPage from './pages/AdminUsersPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
@@ -85,6 +86,7 @@ function App() {
         <Route path="/courses/:courseId/classes/:classId" element={<CourseClassDetailPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/schedule/classes/:classId" element={<ScheduleClassDetailPage />} />
+        <Route path="/schedule/teachers/:teacherId" element={<AdminTeacherSchedulePage />} />
         <Route path="/teachers" element={<TeachersPage />} />
         <Route path="/user-management" element={<AdminUsersPage />} />
         <Route path="/send-notification" element={<SendNotificationPage />} />

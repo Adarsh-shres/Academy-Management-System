@@ -6,7 +6,7 @@ import { CalendarCheck2, MapPin, Users } from '../components/shared/icons';
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 type AssignedClassRow = {
-  id: string;
+  id?: string;
   name?: string | null;
   room?: string | null;
   batches?: {
@@ -15,7 +15,7 @@ type AssignedClassRow = {
   } | null;
 };
 
-type TeacherScheduleEntry = {
+type TeacherScheduleRow = {
   id: string;
   teacher_id: string;
   class_id?: string | null;
@@ -28,9 +28,39 @@ type TeacherScheduleEntry = {
   room?: string | null;
   notes?: string | null;
   is_cancelled?: boolean | null;
+};
+
+type ClassScheduleRow = {
+  id: string;
+  class_id: string;
+  course_id?: string | null;
+  teacher_id?: string | null;
+  schedule_type: 'weekly' | 'one_time';
+  day_of_week?: string | null;
+  schedule_date?: string | null;
+  start_time: string;
+  end_time: string;
+  room?: string | null;
+  notes?: string | null;
+  classes?: {
+    name?: string | null;
+    room?: string | null;
+    batches?: {
+      name?: string | null;
+      code?: string | null;
+    } | null;
+  } | null;
+  courses?: {
+    name?: string | null;
+    course_code?: string | null;
+  } | null;
+};
+
+type TeacherScheduleEntry = TeacherScheduleRow & {
   className: string;
   classLabel: string;
   dateLabel: string;
+  source: 'class' | 'teacher';
 };
 
 function trimTime(value?: string | null) {
@@ -53,12 +83,20 @@ function classLabelForRow(classRow?: AssignedClassRow | null) {
   return batch ? `${classRow.name?.trim() || 'Class'} | ${batch}` : (classRow.name?.trim() || 'Class');
 }
 
+function isMissingTeacherSchedulesTable(error: any) {
+  const msg = String(error?.message || error?.code || '').toLowerCase();
+  return msg.includes('relation') && msg.includes('does not exist') || msg.includes('42p01');
+}
+
 export default function TeacherSchedulePage() {
   const { user } = useAuth();
   const [entries, setEntries] = useState<TeacherScheduleEntry[]>([]);
+  const [assignedClasses, setAssignedClasses] = useState<AssignedClassRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [noScheduleAssigned, setNoScheduleAssigned] = useState(false);
+  const [isTeacherScheduleUnavailable, setIsTeacherScheduleUnavailable] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const todayDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
   const loadSchedule = useCallback(async () => {
@@ -68,134 +106,110 @@ export default function TeacherSchedulePage() {
     setError('');
     setNoScheduleAssigned(false);
 
-    try {
-      // Step 1: Get classes assigned to this teacher
-      const { data: classData, error: classError } = await supabase
+    const [classResult, scheduleResult, classScheduleResult] = await Promise.all([
+      supabase
         .from('classes')
         .select('id, name, room, batches(name, code)')
         .or(`teacher_id.eq.${user.id},teacher_ids.cs.{${user.id}}`)
-        .order('name', { ascending: true });
-
-      if (classError) {
-        setError(classError.message);
-        setEntries([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const classes = (classData as AssignedClassRow[] | null) ?? [];
-      const classMap = new Map(classes.map((c) => [c.id, c]));
-      const classIds = classes.map((c) => c.id);
-
-      console.log('schedule debug — teacher classes:', classes.length, classIds);
-
-      // Step 2: Try teacher_schedules first
-      const { data: tsData, error: tsError } = await supabase
+        .order('name', { ascending: true }),
+      supabase
         .from('teacher_schedules')
-        .select('*')
+        .select('id, teacher_id, class_id, schedule_type, day_of_week, schedule_date, start_time, end_time, title, room, notes, is_cancelled')
         .eq('teacher_id', user.id)
-        .order('start_time', { ascending: true });
-
-      console.log('schedule data (teacher_schedules):', tsData, 'error:', tsError);
-
-      // If teacher_schedules exists and has data, use it
-      if (!tsError && tsData && tsData.length > 0) {
-        const mapped = tsData
-          .filter((row: any) => !row.is_cancelled)
-          .map((row: any) => {
-            const classRow = row.class_id ? classMap.get(row.class_id) : null;
-            return {
-              id: row.id,
-              teacher_id: row.teacher_id,
-              class_id: row.class_id ?? null,
-              schedule_type: row.schedule_type ?? 'weekly',
-              day_of_week: row.day_of_week ?? null,
-              schedule_date: row.schedule_date ?? null,
-              start_time: row.start_time,
-              end_time: row.end_time,
-              title: row.title || classRow?.name?.trim() || 'Teaching Block',
-              room: row.room || classRow?.room || null,
-              notes: row.notes ?? null,
-              is_cancelled: row.is_cancelled ?? false,
-              className: classLabelForRow(classRow),
-              classLabel: classRow?.name?.trim() || 'Independent teaching block',
-              dateLabel: (row.schedule_type ?? 'weekly') === 'weekly'
-                ? (row.day_of_week || 'Weekly')
-                : formatDate(row.schedule_date),
-            } as TeacherScheduleEntry;
-          });
-
-        setEntries(mapped);
-        setIsLoading(false);
-        return;
-      }
-
-      // Step 3: Fallback — fetch from class_schedules for this teacher's classes
-      if (classIds.length === 0) {
-        setNoScheduleAssigned(true);
-        setEntries([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: csData, error: csError } = await supabase
+        .order('schedule_type', { ascending: true })
+        .order('day_of_week', { ascending: true })
+        .order('schedule_date', { ascending: true })
+        .order('start_time', { ascending: true }),
+      supabase
         .from('class_schedules')
-        .select('*')
-        .in('class_id', classIds)
-        .order('start_time', { ascending: true });
+        .select('id, class_id, course_id, teacher_id, schedule_type, day_of_week, schedule_date, start_time, end_time, room, notes, classes(name, room, batches(name, code)), courses(name, course_code)')
+        .eq('teacher_id', user.id)
+        .order('schedule_type', { ascending: true })
+        .order('day_of_week', { ascending: true })
+        .order('schedule_date', { ascending: true })
+        .order('start_time', { ascending: true }),
+    ]);
 
-      console.log('schedule data (class_schedules):', csData, 'error:', csError);
-
-      if (csError) {
-        setError(csError.message);
-        setEntries([]);
-        setIsLoading(false);
-        return;
-      }
-
-      if (!csData || csData.length === 0) {
-        setNoScheduleAssigned(true);
-        setEntries([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const mapped = csData.map((row: any) => {
-        const classRow = classMap.get(row.class_id);
-        return {
-          id: `class-${row.id}`,
-          teacher_id: user.id,
-          class_id: row.class_id,
-          schedule_type: row.schedule_type ?? 'weekly',
-          day_of_week: row.day_of_week ?? null,
-          schedule_date: row.schedule_date ?? null,
-          start_time: row.start_time,
-          end_time: row.end_time,
-          title: classRow?.name?.trim() || 'Class schedule',
-          room: row.room || classRow?.room || null,
-          notes: row.notes ?? null,
-          is_cancelled: false,
-          className: classLabelForRow(classRow),
-          classLabel: classRow?.name?.trim() || 'Class',
-          dateLabel: (row.schedule_type ?? 'weekly') === 'weekly'
-            ? (row.day_of_week || 'Weekly')
-            : formatDate(row.schedule_date),
-        } as TeacherScheduleEntry;
-      });
-
-      setEntries(mapped);
-      setIsLoading(false);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'An unexpected error occurred';
-      setError(message);
+    if (classResult.error) {
+      setError(classResult.error.message);
+      setAssignedClasses([]);
       setEntries([]);
       setIsLoading(false);
+      return;
     }
+
+    const classes = (classResult.data as AssignedClassRow[] | null) ?? [];
+    const classMap = new Map(classes.map((classRow) => [classRow.id, classRow]));
+    const classScheduleEntries: TeacherScheduleEntry[] = classScheduleResult.error
+      ? []
+      : ((classScheduleResult.data as ClassScheduleRow[] | null) ?? []).map((entry) => ({
+        id: `class-${entry.id}`,
+        teacher_id: user.id,
+        class_id: entry.class_id,
+        schedule_type: entry.schedule_type,
+        day_of_week: entry.day_of_week,
+        schedule_date: entry.schedule_date,
+        start_time: entry.start_time,
+        end_time: entry.end_time,
+        title: entry.courses?.name?.trim() || entry.courses?.course_code?.trim() || entry.classes?.name?.trim() || 'Class schedule',
+        room: entry.room || entry.classes?.room || null,
+        notes: entry.notes,
+        is_cancelled: false,
+        className: classLabelForRow(entry.classes ?? classMap.get(entry.class_id)),
+        classLabel: entry.classes?.name?.trim() || classMap.get(entry.class_id)?.name?.trim() || 'Class',
+        dateLabel: entry.schedule_type === 'weekly'
+          ? (entry.day_of_week || 'Weekly')
+          : formatDate(entry.schedule_date),
+        source: 'class',
+      }));
+
+    if (scheduleResult.error && isMissingTeacherSchedulesTable(scheduleResult.error)) {
+      setAssignedClasses(classes);
+      setEntries(classScheduleEntries);
+      setIsTeacherScheduleUnavailable(true);
+      setIsLoading(false);
+      return;
+    }
+
+    const rows = (scheduleResult.data as TeacherScheduleRow[] | null) ?? [];
+
+    setAssignedClasses(classes);
+    const teacherScheduleEntries: TeacherScheduleEntry[] = rows
+      .filter((entry) => !entry.is_cancelled)
+      .map((entry) => ({
+        ...entry,
+        className: classLabelForRow(entry.class_id ? classMap.get(entry.class_id) : null),
+        classLabel: entry.class_id ? (classMap.get(entry.class_id)?.name?.trim() || 'Class') : 'Independent teaching block',
+        dateLabel: entry.schedule_type === 'weekly'
+          ? (entry.day_of_week || 'Weekly')
+          : formatDate(entry.schedule_date),
+        source: 'teacher',
+      }));
+
+    setEntries(sortByTime([...classScheduleEntries, ...teacherScheduleEntries]));
+
+    setIsLoading(false);
   }, [user?.id]);
 
   useEffect(() => {
     loadSchedule();
   }, [loadSchedule]);
+
+  // Placeholder editor/delete functions — extend as needed
+  const openEditor = (_entry: TeacherScheduleEntry) => {
+    // TODO: implement schedule entry editing
+  };
+
+  const deleteEntry = async (entryId: string) => {
+    if (!entryId.startsWith('class-')) {
+      setIsSaving(true);
+      const { error: delError } = await supabase.from('teacher_schedules').delete().eq('id', entryId);
+      setIsSaving(false);
+      if (!delError) {
+        setEntries(prev => prev.filter(e => e.id !== entryId));
+      }
+    }
+  };
 
   const todaysEntries = useMemo(
     () => sortByTime(entries.filter((entry) =>
@@ -246,6 +260,26 @@ export default function TeacherSchedulePage() {
         <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || 'Room not set'}</span>
         <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {entry.classLabel}</span>
       </div>
+      {entry.notes && <p className="text-[12px] text-[#475569] mt-3">{entry.notes}</p>}
+      {!isTeacherScheduleUnavailable && entry.source === 'teacher' && (
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            type="button"
+            onClick={() => openEditor(entry)}
+            className="text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => deleteEntry(entry.id)}
+            disabled={isSaving}
+            className="text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer disabled:opacity-60"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 

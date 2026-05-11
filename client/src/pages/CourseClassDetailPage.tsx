@@ -413,6 +413,7 @@ export default function CourseClassDetailPage() {
       ? scheduleDays.map((day) => ({
         class_id: courseClass.id,
         course_id: courseId,
+        teacher_id: courseClass.teacher_id ?? null,
         schedule_type: 'weekly',
         day_of_week: day,
         schedule_date: null,
@@ -424,6 +425,7 @@ export default function CourseClassDetailPage() {
       : [{
         class_id: courseClass.id,
         course_id: courseId,
+        teacher_id: courseClass.teacher_id ?? null,
         schedule_type: 'one_time',
         day_of_week: null,
         schedule_date: scheduleDate,
