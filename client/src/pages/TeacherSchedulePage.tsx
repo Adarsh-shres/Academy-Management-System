@@ -7,7 +7,7 @@ import { CalendarCheck2, MapPin, Users } from '../components/shared/icons';
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 type AssignedClassRow = {
-  id: string;
+  id?: string;
   name?: string | null;
   room?: string | null;
   batches?: {
@@ -34,6 +34,8 @@ type TeacherScheduleRow = {
 type ClassScheduleRow = {
   id: string;
   class_id: string;
+  course_id?: string | null;
+  teacher_id?: string | null;
   schedule_type: 'weekly' | 'one_time';
   day_of_week?: string | null;
   schedule_date?: string | null;
@@ -41,12 +43,25 @@ type ClassScheduleRow = {
   end_time: string;
   room?: string | null;
   notes?: string | null;
+  classes?: {
+    name?: string | null;
+    room?: string | null;
+    batches?: {
+      name?: string | null;
+      code?: string | null;
+    } | null;
+  } | null;
+  courses?: {
+    name?: string | null;
+    course_code?: string | null;
+  } | null;
 };
 
 type TeacherScheduleEntry = TeacherScheduleRow & {
   className: string;
   classLabel: string;
   dateLabel: string;
+  source: 'class' | 'teacher';
 };
 
 type FormState = {
@@ -123,7 +138,7 @@ export default function TeacherSchedulePage() {
     setError('');
     setIsTeacherScheduleUnavailable(false);
 
-    const [classResult, scheduleResult] = await Promise.all([
+    const [classResult, scheduleResult, classScheduleResult] = await Promise.all([
       supabase
         .from('classes')
         .select('id, name, room, batches(name, code)')
@@ -132,6 +147,14 @@ export default function TeacherSchedulePage() {
       supabase
         .from('teacher_schedules')
         .select('id, teacher_id, class_id, schedule_type, day_of_week, schedule_date, start_time, end_time, title, room, notes, is_cancelled')
+        .eq('teacher_id', user.id)
+        .order('schedule_type', { ascending: true })
+        .order('day_of_week', { ascending: true })
+        .order('schedule_date', { ascending: true })
+        .order('start_time', { ascending: true }),
+      supabase
+        .from('class_schedules')
+        .select('id, class_id, course_id, teacher_id, schedule_type, day_of_week, schedule_date, start_time, end_time, room, notes, classes(name, room, batches(name, code)), courses(name, course_code)')
         .eq('teacher_id', user.id)
         .order('schedule_type', { ascending: true })
         .order('day_of_week', { ascending: true })
@@ -149,60 +172,32 @@ export default function TeacherSchedulePage() {
 
     const classes = (classResult.data as AssignedClassRow[] | null) ?? [];
     const classMap = new Map(classes.map((classRow) => [classRow.id, classRow]));
+    const classScheduleEntries: TeacherScheduleEntry[] = classScheduleResult.error
+      ? []
+      : ((classScheduleResult.data as ClassScheduleRow[] | null) ?? []).map((entry) => ({
+        id: `class-${entry.id}`,
+        teacher_id: user.id,
+        class_id: entry.class_id,
+        schedule_type: entry.schedule_type,
+        day_of_week: entry.day_of_week,
+        schedule_date: entry.schedule_date,
+        start_time: entry.start_time,
+        end_time: entry.end_time,
+        title: entry.courses?.name?.trim() || entry.courses?.course_code?.trim() || entry.classes?.name?.trim() || 'Class schedule',
+        room: entry.room || entry.classes?.room || null,
+        notes: entry.notes,
+        is_cancelled: false,
+        className: classLabelForRow(entry.classes ?? classMap.get(entry.class_id)),
+        classLabel: entry.classes?.name?.trim() || classMap.get(entry.class_id)?.name?.trim() || 'Class',
+        dateLabel: entry.schedule_type === 'weekly'
+          ? (entry.day_of_week || 'Weekly')
+          : formatDate(entry.schedule_date),
+        source: 'class',
+      }));
 
     if (scheduleResult.error && isMissingTeacherSchedulesTable(scheduleResult.error)) {
-      const classIds = classes.map((classRow) => classRow.id);
-
-      if (classIds.length === 0) {
-        setAssignedClasses(classes);
-        setEntries([]);
-        setIsTeacherScheduleUnavailable(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: classScheduleRows, error: classScheduleError } = await supabase
-        .from('class_schedules')
-        .select('id, class_id, schedule_type, day_of_week, schedule_date, start_time, end_time, room, notes')
-        .in('class_id', classIds)
-        .order('schedule_type', { ascending: true })
-        .order('day_of_week', { ascending: true })
-        .order('schedule_date', { ascending: true })
-        .order('start_time', { ascending: true });
-
-      if (classScheduleError) {
-        setError(classScheduleError.message);
-        setAssignedClasses(classes);
-        setEntries([]);
-        setIsTeacherScheduleUnavailable(true);
-        setIsLoading(false);
-        return;
-      }
-
       setAssignedClasses(classes);
-      setEntries(((classScheduleRows as ClassScheduleRow[] | null) ?? []).map((entry) => {
-        const classRow = classMap.get(entry.class_id);
-
-        return {
-          id: `class-${entry.id}`,
-          teacher_id: user.id,
-          class_id: entry.class_id,
-          schedule_type: entry.schedule_type,
-          day_of_week: entry.day_of_week,
-          schedule_date: entry.schedule_date,
-          start_time: entry.start_time,
-          end_time: entry.end_time,
-          title: classRow?.name?.trim() || 'Class schedule',
-          room: entry.room || classRow?.room || null,
-          notes: entry.notes,
-          is_cancelled: false,
-          className: classLabelForRow(classRow),
-          classLabel: classRow?.name?.trim() || 'Class',
-          dateLabel: entry.schedule_type === 'weekly'
-            ? (entry.day_of_week || 'Weekly')
-            : formatDate(entry.schedule_date),
-        };
-      }));
+      setEntries(classScheduleEntries);
       setIsTeacherScheduleUnavailable(true);
       setIsLoading(false);
       return;
@@ -219,7 +214,7 @@ export default function TeacherSchedulePage() {
     const rows = (scheduleResult.data as TeacherScheduleRow[] | null) ?? [];
 
     setAssignedClasses(classes);
-    setEntries(rows
+    const teacherScheduleEntries: TeacherScheduleEntry[] = rows
       .filter((entry) => !entry.is_cancelled)
       .map((entry) => ({
         ...entry,
@@ -228,7 +223,10 @@ export default function TeacherSchedulePage() {
         dateLabel: entry.schedule_type === 'weekly'
           ? (entry.day_of_week || 'Weekly')
           : formatDate(entry.schedule_date),
-      })));
+        source: 'teacher',
+      }));
+
+    setEntries(sortByTime([...classScheduleEntries, ...teacherScheduleEntries]));
 
     setIsLoading(false);
   }, [user?.id]);
@@ -408,7 +406,7 @@ export default function TeacherSchedulePage() {
         <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {entry.classLabel}</span>
       </div>
       {entry.notes && <p className="text-[12px] text-[#475569] mt-3">{entry.notes}</p>}
-      {!isTeacherScheduleUnavailable && (
+      {!isTeacherScheduleUnavailable && entry.source === 'teacher' && (
         <div className="flex items-center gap-3 mt-4">
           <button
             type="button"

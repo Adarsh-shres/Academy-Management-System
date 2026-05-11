@@ -5,6 +5,7 @@ import { Calendar, MapPin, Users } from '../components/shared/icons';
 import AppModal from '../components/shared/AppModal';
 import { useCourses } from '../context/CourseContext';
 import { getScheduleCourseId } from '../lib/scheduleCourseSelection';
+import { getScheduleTeacherId } from '../lib/scheduleTeacherSelection';
 import { supabase } from '../lib/supabase';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -29,6 +30,7 @@ type ScheduleEntry = {
   id: string;
   class_id: string;
   course_id?: string | null;
+  teacher_id?: string | null;
   schedule_type: 'weekly' | 'one_time';
   day_of_week?: string | null;
   schedule_date?: string | null;
@@ -41,6 +43,7 @@ type ScheduleEntry = {
 type TodayDraft = {
   sourceId: string;
   course_id: string;
+  teacher_id: string;
   day_of_week?: string;
   start_time: string;
   end_time: string;
@@ -67,10 +70,16 @@ function formatEntry(entry: ScheduleEntry) {
   return `${trimTime(entry.start_time)} - ${trimTime(entry.end_time)}`;
 }
 
-function makeDraft(entry: ScheduleEntry, courseId: string): TodayDraft {
+type TeacherOption = {
+  id: string;
+  name: string;
+};
+
+function makeDraft(entry: ScheduleEntry, courseId: string, teacherId: string): TodayDraft {
   return {
     sourceId: entry.id,
     course_id: entry.course_id || courseId,
+    teacher_id: entry.teacher_id || teacherId,
     start_time: trimTime(entry.start_time),
     end_time: trimTime(entry.end_time),
     room: entry.room ?? '',
@@ -88,6 +97,7 @@ export default function ScheduleClassDetailPage() {
   const { courses } = useCourses();
   const [courseClass, setCourseClass] = useState<CourseClass | null>(null);
   const [teacherNames, setTeacherNames] = useState<string[]>([]);
+  const [teacherOptions, setTeacherOptions] = useState<TeacherOption[]>([]);
   const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
   const [activeTab, setActiveTab] = useState<'weekly' | 'today'>('weekly');
   const [isLoading, setIsLoading] = useState(true);
@@ -124,14 +134,23 @@ export default function ScheduleClassDetailPage() {
     const nextClass = classRow as CourseClass;
     setCourseClass(nextClass);
 
+    const { data: allTeacherRows } = await supabase
+      .from('users')
+      .select('id, name')
+      .eq('role', 'teacher')
+      .order('name', { ascending: true });
+
+    const nextTeacherOptions = ((allTeacherRows as Array<{ id: string; name?: string | null }> | null) ?? [])
+      .map((teacher) => ({
+        id: teacher.id,
+        name: teacher.name?.trim() || 'Unnamed Teacher',
+      }));
+    setTeacherOptions(nextTeacherOptions);
+
     const teacherIds = teacherIdsForClass(nextClass);
     if (teacherIds.length > 0) {
-      const { data: teacherRows } = await supabase
-        .from('users')
-        .select('name')
-        .in('id', teacherIds);
-
-      setTeacherNames(((teacherRows as Array<{ name?: string | null }> | null) ?? []).map((teacher) => teacher.name?.trim() || 'Unnamed Teacher'));
+      const nameById = new Map(nextTeacherOptions.map((teacher) => [teacher.id, teacher.name]));
+      setTeacherNames(teacherIds.map((teacherId) => nameById.get(teacherId)).filter((name): name is string => Boolean(name)));
     } else {
       setTeacherNames([]);
     }
@@ -181,6 +200,10 @@ export default function ScheduleClassDetailPage() {
   const batchCourseIds = courseClass?.batches?.course_ids ?? [];
   const batchCourseOptions = courses.filter((course) => batchCourseIds.includes(course.id));
   const defaultCourseId = getScheduleCourseId({}, { course_id: courseClass?.course_id, batchCourseIds });
+  const defaultTeacherId = getScheduleTeacherId({}, {
+    teacher_id: courseClass?.teacher_id,
+    teacher_ids: courseClass?.teacher_ids,
+  });
 
   const weeklyMap = useMemo(() => {
     const map: Record<string, ScheduleEntry[]> = {};
@@ -203,14 +226,14 @@ export default function ScheduleClassDetailPage() {
 
   const openTodayEditor = () => {
     const sourceEntries = todayOverrideEntries.length > 0 ? todayOverrideEntries : todayWeeklyEntries;
-    setTodayDrafts(sourceEntries.map((entry) => makeDraft(entry, defaultCourseId)));
+    setTodayDrafts(sourceEntries.map((entry) => makeDraft(entry, defaultCourseId, defaultTeacherId)));
     setTodayError('');
     setIsTodayEditorOpen(true);
   };
 
   const openWeeklyEditor = () => {
     setWeeklyDrafts(weeklyEntries.map((entry) => ({
-      ...makeDraft(entry, defaultCourseId),
+      ...makeDraft(entry, defaultCourseId, defaultTeacherId),
       day_of_week: entry.day_of_week || todayDay,
     })));
     setWeeklyError('');
@@ -237,6 +260,7 @@ export default function ScheduleClassDetailPage() {
     setTodayDrafts((prev) => [...prev, {
       sourceId: `new-${Date.now()}`,
       course_id: defaultCourseId,
+      teacher_id: defaultTeacherId,
       start_time: '',
       end_time: '',
       room: courseClass?.room ?? '',
@@ -248,6 +272,7 @@ export default function ScheduleClassDetailPage() {
     setWeeklyDrafts((prev) => [...prev, {
       sourceId: `new-weekly-${Date.now()}`,
       course_id: defaultCourseId,
+      teacher_id: defaultTeacherId,
       day_of_week: todayDay,
       start_time: '',
       end_time: '',
@@ -263,9 +288,9 @@ export default function ScheduleClassDetailPage() {
   const saveWeeklySchedule = async () => {
     if (!classId) return;
 
-    const invalidDraft = weeklyDrafts.find((draft) => !draft.course_id || !draft.day_of_week || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
+    const invalidDraft = weeklyDrafts.find((draft) => !draft.course_id || !draft.teacher_id || !draft.day_of_week || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
     if (invalidDraft) {
-      setWeeklyError('Each weekly row needs a course, day, and valid start and end times.');
+      setWeeklyError('Each weekly row needs a course, teacher, day, and valid start and end times.');
       return;
     }
 
@@ -290,6 +315,7 @@ export default function ScheduleClassDetailPage() {
         .insert(weeklyDrafts.map((draft) => ({
           class_id: classId,
           course_id: draft.course_id || null,
+          teacher_id: draft.teacher_id || null,
           schedule_type: 'weekly',
           day_of_week: draft.day_of_week,
           schedule_date: null,
@@ -314,9 +340,9 @@ export default function ScheduleClassDetailPage() {
   const saveTodayOverride = async () => {
     if (!classId) return;
 
-    const invalidDraft = todayDrafts.find((draft) => !draft.course_id || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
+    const invalidDraft = todayDrafts.find((draft) => !draft.course_id || !draft.teacher_id || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
     if (invalidDraft) {
-      setTodayError('Each today schedule row needs a course plus a valid start and end time.');
+      setTodayError('Each today schedule row needs a course, teacher, and valid start and end time.');
       return;
     }
 
@@ -342,6 +368,7 @@ export default function ScheduleClassDetailPage() {
         .insert(todayDrafts.map((draft) => ({
           class_id: classId,
           course_id: draft.course_id || null,
+          teacher_id: draft.teacher_id || null,
           schedule_type: 'one_time',
           day_of_week: null,
           schedule_date: todayDate,
@@ -436,6 +463,13 @@ export default function ScheduleClassDetailPage() {
     const courseId = getScheduleCourseId(entry, { course_id: courseClass.course_id, batchCourseIds });
     return courses.find((course) => course.id === courseId)?.name ?? 'Course not selected';
   };
+  const teacherNameForEntry = (entry: ScheduleEntry) => {
+    const teacherId = getScheduleTeacherId(entry, {
+      teacher_id: courseClass.teacher_id,
+      teacher_ids: courseClass.teacher_ids,
+    });
+    return teacherOptions.find((teacher) => teacher.id === teacherId)?.name ?? 'Teacher not selected';
+  };
 
   const renderScheduleCard = (entry: ScheduleEntry) => (
     <div key={entry.id} className="rounded-sm border border-[#e2d9ed] bg-white p-4">
@@ -450,7 +484,8 @@ export default function ScheduleClassDetailPage() {
       <h4 className="text-[15px] font-bold text-[#4b3f68] mt-3">{courseNameForEntry(entry)}</h4>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-[#475569] mt-3">
         <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || courseClass.room || 'Room not set'}</span>
-        <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {courseClass.student_ids?.length ?? 0}</span>
+        <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {teacherNameForEntry(entry)}</span>
+        <span>{courseClass.student_ids?.length ?? 0} students</span>
       </div>
       {entry.notes && <p className="text-[12px] text-[#475569] mt-3">{entry.notes}</p>}
       <div className="mt-4 border-t border-[#edf2f7] pt-3">
@@ -624,6 +659,14 @@ export default function ScheduleClassDetailPage() {
                     {batchCourseOptions.map((course) => <option key={course.id} value={course.id}>{course.name}</option>)}
                   </select>
                   <select
+                    value={draft.teacher_id}
+                    onChange={(event) => updateWeeklyDraft(index, 'teacher_id', event.target.value)}
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                  >
+                    <option value="">Select teacher</option>
+                    {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
+                  </select>
+                  <select
                     value={draft.day_of_week || todayDay}
                     onChange={(event) => updateWeeklyDraft(index, 'day_of_week', event.target.value)}
                     className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
@@ -737,6 +780,14 @@ export default function ScheduleClassDetailPage() {
                   >
                     <option value="">Select course</option>
                     {batchCourseOptions.map((course) => <option key={course.id} value={course.id}>{course.name}</option>)}
+                  </select>
+                  <select
+                    value={draft.teacher_id}
+                    onChange={(event) => updateTodayDraft(index, 'teacher_id', event.target.value)}
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                  >
+                    <option value="">Select teacher</option>
+                    {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
                   </select>
                   <input
                     type="time"
