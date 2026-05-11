@@ -3,11 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users } from '../components/shared/icons';
 import { useCourses } from '../context/CourseContext';
+import { getScheduleCourseId } from '../lib/scheduleCourseSelection';
 import { supabase } from '../lib/supabase';
 
 type BatchClass = {
   id: string;
   batch_id?: string | null;
+  course_id?: string | null;
   name?: string | null;
   teacher_id?: string | null;
   teacher_ids?: string[] | null;
@@ -23,6 +25,7 @@ type BatchClass = {
 type ScheduleEntry = {
   id: string;
   class_id: string;
+  course_id?: string | null;
   schedule_type: 'weekly' | 'one_time';
   day_of_week?: string | null;
   schedule_date?: string | null;
@@ -78,7 +81,7 @@ export default function SchedulePage() {
     const [classResult, teacherResult] = await Promise.all([
       supabase
         .from('classes')
-        .select('id, batch_id, name, teacher_id, teacher_ids, room, student_ids, batches(name, code, course_ids)')
+        .select('id, batch_id, course_id, name, teacher_id, teacher_ids, room, student_ids, batches(name, code, course_ids)')
         .not('batch_id', 'is', null)
         .order('name', { ascending: true }),
       supabase
@@ -148,6 +151,17 @@ export default function SchedulePage() {
       const courseIds = courseClass.batches?.course_ids ?? [];
       const names = courses.filter((course) => courseIds.includes(course.id)).map((course) => course.name);
       return names.length > 0 ? names.join(', ') : 'No batch courses';
+    },
+    [courses],
+  );
+
+  const courseNameForSchedule = useCallback(
+    (entry: ScheduleEntry, courseClass: BatchClass) => {
+      const courseId = getScheduleCourseId(entry, {
+        course_id: courseClass.course_id,
+        batchCourseIds: courseClass.batches?.course_ids ?? [],
+      });
+      return courses.find((course) => course.id === courseId)?.name ?? 'Course not selected';
     },
     [courses],
   );
@@ -256,7 +270,7 @@ export default function SchedulePage() {
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[14px] font-extrabold text-[#4b3f68]">{courseClass.name || 'Class'}</p>
-            <p className="text-[12.5px] text-[#64748b] mt-1">{courseClass.batches?.name || 'Batch'} | {courseNamesForClass(courseClass)}</p>
+            <p className="text-[12.5px] text-[#64748b] mt-1">{courseClass.batches?.name || 'Batch'} | {courseNameForSchedule(entry, courseClass)}</p>
           </div>
           <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold ${entry.usesOverride ? 'bg-[#fef3c7] text-[#92400e]' : 'bg-[#f3eff7] text-[#6a5182]'}`}>
             {entry.usesOverride ? 'Edited Today' : 'Weekly'}
