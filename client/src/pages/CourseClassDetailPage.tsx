@@ -89,6 +89,13 @@ function trimTime(value?: string | null) {
   return value.slice(0, 5);
 }
 
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function formatScheduleEntry(entry: ClassScheduleEntry) {
   const time = `${trimTime(entry.start_time)} - ${trimTime(entry.end_time)}`;
   const day = entry.schedule_type === 'weekly'
@@ -256,7 +263,10 @@ export default function CourseClassDetailPage() {
   );
 
   const oneTimeScheduleEntries = useMemo(
-    () => scheduleEntries.filter((entry) => entry.schedule_type === 'one_time'),
+    () => {
+      const todayDate = getLocalDateString();
+      return scheduleEntries.filter((entry) => entry.schedule_type === 'one_time' && (!entry.schedule_date || entry.schedule_date >= todayDate));
+    },
     [scheduleEntries],
   );
 
@@ -895,7 +905,7 @@ export default function CourseClassDetailPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-[12px] font-extrabold text-[#64748b] uppercase tracking-wider mb-3">One-Day</h4>
+                  <h4 className="text-[12px] font-extrabold text-[#64748b] uppercase tracking-wider mb-3">Upcoming One-Day</h4>
                   {oneTimeScheduleEntries.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {oneTimeScheduleEntries.map((entry) => (
@@ -921,7 +931,7 @@ export default function CourseClassDetailPage() {
                     </div>
                   ) : (
                     <div className="rounded-sm border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-4 py-6 text-center text-[13px] font-semibold text-[#64748b]">
-                      No one-day schedule entries yet.
+                      No upcoming one-day schedule entries.
                     </div>
                   )}
                 </div>

@@ -40,6 +40,13 @@ function trimTime(value?: string | null) {
   return value ? value.slice(0, 5) : '';
 }
 
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function sortByTime(entries: TeacherScheduleRow[]) {
   return [...entries].sort((a, b) => `${a.start_time}${a.end_time}`.localeCompare(`${b.start_time}${b.end_time}`));
 }
@@ -51,6 +58,7 @@ export default function AdminTeacherSchedulePage() {
   const [scheduleEntries, setScheduleEntries] = useState<TeacherScheduleRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const todayDate = getLocalDateString();
 
   const loadTeacherSchedule = useCallback(async () => {
     if (!teacherId) return;
@@ -122,8 +130,8 @@ export default function AdminTeacherSchedulePage() {
   }, [scheduleEntries]);
 
   const oneTimeEntries = useMemo(
-    () => sortByTime(scheduleEntries.filter((entry) => entry.schedule_type === 'one_time')),
-    [scheduleEntries],
+    () => sortByTime(scheduleEntries.filter((entry) => entry.schedule_type === 'one_time' && (!entry.schedule_date || entry.schedule_date >= todayDate))),
+    [scheduleEntries, todayDate],
   );
 
   const renderEntry = (entry: TeacherScheduleRow) => {
@@ -221,7 +229,7 @@ export default function AdminTeacherSchedulePage() {
 
       <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-          <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">One-Day Schedule</h2>
+          <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Upcoming One-Day Schedule</h2>
         </div>
         <div className="p-5">
           {oneTimeEntries.length > 0 ? (
@@ -231,8 +239,8 @@ export default function AdminTeacherSchedulePage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-14 px-4 bg-[#f8fafc] border border-dashed border-[#cbd5e1] rounded-sm text-center">
               <Calendar size={42} className="text-[#cbd5e1] mb-4" />
-              <h3 className="text-[17px] font-bold text-[#4b3f68] mb-1">No One-Day Entries</h3>
-              <p className="text-[13px] text-[#64748b] max-w-md">One-day schedule changes assigned to this teacher will appear here.</p>
+              <h3 className="text-[17px] font-bold text-[#4b3f68] mb-1">No Upcoming One-Day Entries</h3>
+              <p className="text-[13px] text-[#64748b] max-w-md">Upcoming one-day schedule changes assigned to this teacher will appear here.</p>
             </div>
           )}
         </div>

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { CalendarCheck2, MapPin, Users } from '../components/shared/icons';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { CalendarCheck2, MapPin, Users } from '../components/shared/icons';
+import { isMissingTeacherSchedulesTable } from '../lib/supabaseErrors';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -42,14 +43,7 @@ type ClassScheduleRow = {
   end_time: string;
   room?: string | null;
   notes?: string | null;
-  classes?: {
-    name?: string | null;
-    room?: string | null;
-    batches?: {
-      name?: string | null;
-      code?: string | null;
-    } | null;
-  } | null;
+  classes?: AssignedClassRow | null;
   courses?: {
     name?: string | null;
     course_code?: string | null;
@@ -59,13 +53,19 @@ type ClassScheduleRow = {
 type TeacherScheduleEntry = TeacherScheduleRow & {
   className: string;
   classLabel: string;
-  dateLabel: string;
   source: 'class' | 'teacher';
 };
 
 function trimTime(value?: string | null) {
   if (!value) return 'Time not set';
   return value.slice(0, 5);
+}
+
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function sortByTime(entries: TeacherScheduleEntry[]) {
@@ -83,30 +83,21 @@ function classLabelForRow(classRow?: AssignedClassRow | null) {
   return batch ? `${classRow.name?.trim() || 'Class'} | ${batch}` : (classRow.name?.trim() || 'Class');
 }
 
-function isMissingTeacherSchedulesTable(error: any) {
-  const msg = String(error?.message || error?.code || '').toLowerCase();
-  return msg.includes('relation') && msg.includes('does not exist') || msg.includes('42p01');
-}
-
 export default function TeacherSchedulePage() {
   const { user } = useAuth();
   const [entries, setEntries] = useState<TeacherScheduleEntry[]>([]);
-  const [assignedClasses, setAssignedClasses] = useState<AssignedClassRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [noScheduleAssigned, setNoScheduleAssigned] = useState(false);
-  const [isTeacherScheduleUnavailable, setIsTeacherScheduleUnavailable] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const todayDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  const todayDate = getLocalDateString();
 
   const loadSchedule = useCallback(async () => {
     if (!user?.id) return;
 
     setIsLoading(true);
     setError('');
-    setNoScheduleAssigned(false);
 
-    const [classResult, scheduleResult, classScheduleResult] = await Promise.all([
+    const [classResult, teacherScheduleResult, classScheduleResult] = await Promise.all([
       supabase
         .from('classes')
         .select('id, name, room, batches(name, code)')
@@ -132,7 +123,13 @@ export default function TeacherSchedulePage() {
 
     if (classResult.error) {
       setError(classResult.error.message);
-      setAssignedClasses([]);
+      setEntries([]);
+      setIsLoading(false);
+      return;
+    }
+
+    if (classScheduleResult.error) {
+      setError(classScheduleResult.error.message);
       setEntries([]);
       setIsLoading(false);
       return;
@@ -140,88 +137,67 @@ export default function TeacherSchedulePage() {
 
     const classes = (classResult.data as AssignedClassRow[] | null) ?? [];
     const classMap = new Map(classes.map((classRow) => [classRow.id, classRow]));
-    const classScheduleEntries: TeacherScheduleEntry[] = classScheduleResult.error
-      ? []
-      : ((classScheduleResult.data as ClassScheduleRow[] | null) ?? []).map((entry) => ({
-        id: `class-${entry.id}`,
-        teacher_id: user.id,
-        class_id: entry.class_id,
-        schedule_type: entry.schedule_type,
-        day_of_week: entry.day_of_week,
-        schedule_date: entry.schedule_date,
-        start_time: entry.start_time,
-        end_time: entry.end_time,
-        title: entry.courses?.name?.trim() || entry.courses?.course_code?.trim() || entry.classes?.name?.trim() || 'Class schedule',
-        room: entry.room || entry.classes?.room || null,
-        notes: entry.notes,
-        is_cancelled: false,
-        className: classLabelForRow(entry.classes ?? classMap.get(entry.class_id)),
-        classLabel: entry.classes?.name?.trim() || classMap.get(entry.class_id)?.name?.trim() || 'Class',
-        dateLabel: entry.schedule_type === 'weekly'
-          ? (entry.day_of_week || 'Weekly')
-          : formatDate(entry.schedule_date),
-        source: 'class',
-      }));
 
-    if (scheduleResult.error && isMissingTeacherSchedulesTable(scheduleResult.error)) {
-      setAssignedClasses(classes);
+    const classScheduleEntries: TeacherScheduleEntry[] = ((classScheduleResult.data as ClassScheduleRow[] | null) ?? []).map((entry) => ({
+      id: `class-${entry.id}`,
+      teacher_id: user.id,
+      class_id: entry.class_id,
+      schedule_type: entry.schedule_type,
+      day_of_week: entry.day_of_week,
+      schedule_date: entry.schedule_date,
+      start_time: entry.start_time,
+      end_time: entry.end_time,
+      title: entry.courses?.name?.trim() || entry.courses?.course_code?.trim() || entry.classes?.name?.trim() || 'Class schedule',
+      room: entry.room || entry.classes?.room || null,
+      notes: entry.notes,
+      is_cancelled: false,
+      className: classLabelForRow(entry.classes ?? classMap.get(entry.class_id)),
+      classLabel: entry.classes?.name?.trim() || classMap.get(entry.class_id)?.name?.trim() || 'Class',
+      source: 'class',
+    }));
+
+    const teacherScheduleEntries: TeacherScheduleEntry[] = teacherScheduleResult.error
+      ? []
+      : ((teacherScheduleResult.data as TeacherScheduleRow[] | null) ?? [])
+        .filter((entry) => !entry.is_cancelled)
+        .map((entry) => ({
+          ...entry,
+          className: classLabelForRow(entry.class_id ? classMap.get(entry.class_id) : null),
+          classLabel: entry.class_id ? (classMap.get(entry.class_id)?.name?.trim() || 'Class') : 'Independent teaching block',
+          source: 'teacher',
+        }));
+
+    if (teacherScheduleResult.error && !isMissingTeacherSchedulesTable(teacherScheduleResult.error)) {
+      setError(teacherScheduleResult.error.message);
       setEntries(classScheduleEntries);
-      setIsTeacherScheduleUnavailable(true);
       setIsLoading(false);
       return;
     }
 
-    const rows = (scheduleResult.data as TeacherScheduleRow[] | null) ?? [];
-
-    setAssignedClasses(classes);
-    const teacherScheduleEntries: TeacherScheduleEntry[] = rows
-      .filter((entry) => !entry.is_cancelled)
-      .map((entry) => ({
-        ...entry,
-        className: classLabelForRow(entry.class_id ? classMap.get(entry.class_id) : null),
-        classLabel: entry.class_id ? (classMap.get(entry.class_id)?.name?.trim() || 'Class') : 'Independent teaching block',
-        dateLabel: entry.schedule_type === 'weekly'
-          ? (entry.day_of_week || 'Weekly')
-          : formatDate(entry.schedule_date),
-        source: 'teacher',
-      }));
-
     setEntries(sortByTime([...classScheduleEntries, ...teacherScheduleEntries]));
-
     setIsLoading(false);
   }, [user?.id]);
 
   useEffect(() => {
-    loadSchedule();
+    void loadSchedule();
   }, [loadSchedule]);
 
-  // Placeholder editor/delete functions — extend as needed
-  const openEditor = (_entry: TeacherScheduleEntry) => {
-    // TODO: implement schedule entry editing
-  };
-
-  const deleteEntry = async (entryId: string) => {
-    if (!entryId.startsWith('class-')) {
-      setIsSaving(true);
-      const { error: delError } = await supabase.from('teacher_schedules').delete().eq('id', entryId);
-      setIsSaving(false);
-      if (!delError) {
-        setEntries(prev => prev.filter(e => e.id !== entryId));
-      }
-    }
-  };
-
   const todaysEntries = useMemo(
-    () => sortByTime(entries.filter((entry) =>
-      (entry.schedule_type === 'weekly' || !entry.schedule_type) &&
-      entry.day_of_week?.toLowerCase() === todayDay.toLowerCase()
-    )),
-    [entries, todayDay],
+    () => sortByTime(entries.filter((entry) => (
+      (entry.schedule_type === 'weekly' && entry.day_of_week === todayDay)
+      || (entry.schedule_type === 'one_time' && entry.schedule_date === todayDate)
+    ))),
+    [entries, todayDate, todayDay],
   );
 
   const weeklyEntries = useMemo(
     () => sortByTime(entries.filter((entry) => entry.schedule_type === 'weekly')),
     [entries],
+  );
+
+  const oneTimeEntries = useMemo(
+    () => sortByTime(entries.filter((entry) => entry.schedule_type === 'one_time' && (!entry.schedule_date || entry.schedule_date >= todayDate))),
+    [entries, todayDate],
   );
 
   const weeklyMap = useMemo(() => {
@@ -231,9 +207,8 @@ export default function TeacherSchedulePage() {
     });
 
     weeklyEntries.forEach((entry) => {
-      const dayKey = DAYS_OF_WEEK.find((d) => d.toLowerCase() === entry.day_of_week?.toLowerCase());
-      if (dayKey && map[dayKey]) {
-        map[dayKey].push(entry);
+      if (entry.day_of_week && map[entry.day_of_week]) {
+        map[entry.day_of_week].push(entry);
       }
     });
 
@@ -261,25 +236,6 @@ export default function TeacherSchedulePage() {
         <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {entry.classLabel}</span>
       </div>
       {entry.notes && <p className="text-[12px] text-[#475569] mt-3">{entry.notes}</p>}
-      {!isTeacherScheduleUnavailable && entry.source === 'teacher' && (
-        <div className="flex items-center gap-3 mt-4">
-          <button
-            type="button"
-            onClick={() => openEditor(entry)}
-            className="text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => deleteEntry(entry.id)}
-            disabled={isSaving}
-            className="text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer disabled:opacity-60"
-          >
-            Delete
-          </button>
-        </div>
-      )}
     </div>
   );
 
@@ -288,7 +244,7 @@ export default function TeacherSchedulePage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">Teacher Schedule</h1>
-          <p className="text-[#64748b] font-medium mt-1">Your assigned schedule from the admin. View your weekly and daily teaching blocks.</p>
+          <p className="text-[#64748b] font-medium mt-1">View-only timetable for assigned class sessions across batches.</p>
         </div>
       </div>
 
@@ -299,83 +255,97 @@ export default function TeacherSchedulePage() {
       )}
 
       {isLoading ? (
-        <div className="flex flex-col gap-6">
-          <div className="h-[200px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
-          <div className="h-[400px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
+        <div className="grid grid-cols-1 gap-6">
+          <div className="h-[220px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
+          <div className="h-[780px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-            <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-              <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CalendarCheck2 size={18} className="text-[#6a5182]" />
-                    <h2 className="text-[16px] font-extrabold text-[#4b3f68]">Today Schedule</h2>
-                  </div>
-                  <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{todayDay}</p>
+          <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-start justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <CalendarCheck2 size={18} className="text-[#6a5182]" />
+                  <h2 className="text-[16px] font-extrabold text-[#4b3f68]">Today Schedule</h2>
                 </div>
-                <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[12px] font-bold text-[#64748b]">
-                  {todaysEntries.length}
-                </span>
+                <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{todayDay}</p>
               </div>
+              <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[12px] font-bold text-[#64748b]">
+                {todaysEntries.length}
+              </span>
+            </div>
 
-              <div className="p-5 flex flex-col gap-3.5">
-                {todaysEntries.length > 0 ? (
-                  todaysEntries.map((entry) => renderEntry(entry, true))
-                ) : (
-                  <div className="flex flex-col items-center justify-center p-8 bg-[#f8fafc] rounded-sm text-center border border-dashed border-[#cbd5e1] min-h-[180px]">
-                    <p className="text-[13.5px] font-bold text-[#4b3f68]">No teaching blocks today</p>
-                    <p className="text-[12.5px] text-[#64748b] mt-1">{noScheduleAssigned ? 'No schedule has been assigned by admin yet.' : `No blocks scheduled for ${todayDay}.`}</p>
-                  </div>
-                )}
-              </div>
-            </section>
-
-
-
-            <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-              <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
-                <div>
-                  <h2 className="text-[16px] font-extrabold text-[#4b3f68]">Weekly Schedule</h2>
-                  <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{noScheduleAssigned ? 'No schedule has been assigned by admin yet.' : 'Recurring teaching blocks from Sunday through Friday.'}</p>
+            <div className="p-5 flex flex-col gap-3.5">
+              {todaysEntries.length > 0 ? (
+                todaysEntries.map((entry) => renderEntry(entry, true))
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 bg-[#f8fafc] rounded-sm text-center border border-dashed border-[#cbd5e1] min-h-[180px]">
+                  <p className="text-[13.5px] font-bold text-[#4b3f68]">No teaching sessions today</p>
+                  <p className="text-[12.5px] text-[#64748b] mt-1">Assigned class sessions for today will appear here.</p>
                 </div>
-                <span className="rounded-sm bg-white border border-[#e2d9ed] px-3 py-2 text-[12px] font-bold text-[#64748b]">
-                  {weeklyEntries.length} {weeklyEntries.length === 1 ? 'entry' : 'entries'}
-                </span>
+              )}
+            </div>
+          </section>
+
+          <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe]">
+              <h2 className="text-[16px] font-extrabold text-[#4b3f68]">One-Time Schedule</h2>
+              <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{oneTimeEntries.length} upcoming date-specific sessions.</p>
+            </div>
+            <div className="p-5 flex flex-col gap-3">
+              {oneTimeEntries.length > 0 ? (
+                oneTimeEntries.map((entry) => renderEntry(entry))
+              ) : (
+                <p className="text-[13px] font-semibold text-[#64748b] rounded-sm border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-4 py-6 text-center">
+                  No upcoming one-time sessions scheduled.
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <h2 className="text-[16px] font-extrabold text-[#4b3f68]">Weekly Schedule</h2>
+                <p className="text-[12.5px] text-[#64748b] font-medium mt-1">Recurring sessions from Sunday through Friday.</p>
               </div>
+              <span className="rounded-sm bg-white border border-[#e2d9ed] px-3 py-2 text-[12px] font-bold text-[#64748b]">
+                {weeklyEntries.length} {weeklyEntries.length === 1 ? 'entry' : 'entries'}
+              </span>
+            </div>
 
-              <div className="divide-y divide-[#edf2f7]">
-                {DAYS_OF_WEEK.map((day) => {
-                  const dayEntries = weeklyMap[day] ?? [];
-                  const isToday = day === todayDay;
+            <div className="divide-y divide-[#edf2f7]">
+              {DAYS_OF_WEEK.map((day) => {
+                const dayEntries = weeklyMap[day] ?? [];
+                const isToday = day === todayDay;
 
-                  return (
-                    <div key={day} className={`grid grid-cols-1 lg:grid-cols-[170px_1fr] ${isToday ? 'bg-[#fbf8fe]' : 'bg-white'}`}>
-                      <div className="p-5 border-b lg:border-b-0 lg:border-r border-[#edf2f7] flex lg:flex-col items-center lg:items-start justify-between gap-3">
-                        <div>
-                          <h3 className="text-[15px] font-extrabold text-[#4b3f68]">{day}</h3>
-                          {isToday && <p className="text-[11px] font-bold text-[#6a5182] mt-1 uppercase tracking-wide">Today</p>}
-                        </div>
-                        <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
-                          {dayEntries.length}
-                        </span>
+                return (
+                  <div key={day} className={`grid grid-cols-1 lg:grid-cols-[170px_1fr] ${isToday ? 'bg-[#fbf8fe]' : 'bg-white'}`}>
+                    <div className="p-5 border-b lg:border-b-0 lg:border-r border-[#edf2f7] flex lg:flex-col items-center lg:items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-[15px] font-extrabold text-[#4b3f68]">{day}</h3>
+                        {isToday && <p className="text-[11px] font-bold text-[#6a5182] mt-1 uppercase tracking-wide">Today</p>}
                       </div>
-                      <div className="p-5">
-                        {dayEntries.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            {dayEntries.map((entry) => renderEntry(entry))}
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center p-6 bg-[#f8fafc] rounded-sm border border-dashed border-[#cbd5e1] text-center min-h-[96px]">
-                            <span className="text-[13.5px] font-medium text-[#64748b]">No teacher blocks scheduled for {day}.</span>
-                          </div>
-                        )}
-                      </div>
+                      <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
+                        {dayEntries.length}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            </section>
+                    <div className="p-5">
+                      {dayEntries.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {dayEntries.map((entry) => renderEntry(entry))}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center p-6 bg-[#f8fafc] rounded-sm border border-dashed border-[#cbd5e1] text-center min-h-[96px]">
+                          <span className="text-[13.5px] font-medium text-[#64748b]">No sessions scheduled for {day}.</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         </div>
       )}
     </div>
