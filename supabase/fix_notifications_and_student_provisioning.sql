@@ -4,10 +4,17 @@
 
 create extension if not exists pgcrypto;
 
+alter table if exists public.assignments
+  add column if not exists deadline_notified_at timestamptz;
+
+alter table if exists public.quizzes
+  add column if not exists deadline_notified_at timestamptz;
+
 alter table public.notifications
   add column if not exists user_id uuid references public.users(id) on delete cascade,
   add column if not exists title text,
-  add column if not exists is_read boolean not null default false;
+  add column if not exists is_read boolean not null default false,
+  add column if not exists assignment_id uuid;
 
 alter table public.notifications
   alter column class_id drop not null,
@@ -22,6 +29,20 @@ where title is null or btrim(title) = '';
 alter table public.notifications
   alter column title set default 'Notification',
   alter column title set not null;
+
+alter table public.notifications
+  drop constraint if exists notifications_type_check;
+
+update public.notifications
+set type = 'announcement'
+where type is null
+  or type not in ('announcement', 'content', 'update', 'assignment_open', 'manual', 'deadline', 'schedule');
+
+alter table public.notifications
+  alter column type set default 'announcement',
+  alter column type set not null,
+  add constraint notifications_type_check
+    check (type in ('announcement', 'content', 'update', 'assignment_open', 'manual', 'deadline', 'schedule'));
 
 create index if not exists notifications_user_id_idx on public.notifications(user_id);
 create index if not exists notifications_class_id_idx on public.notifications(class_id);
@@ -80,6 +101,164 @@ as $$
       and coalesce(c.student_ids::text[], '{}'::text[]) @> array[target_user_id::text]
   )
 $$;
+
+create or replace function public.reset_assignment_deadline_notification()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if old.due_date is distinct from new.due_date
+     or old.due_time is distinct from new.due_time then
+    new.deadline_notified_at = null;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists reset_assignment_deadline_notification on public.assignments;
+create trigger reset_assignment_deadline_notification
+  before update of due_date, due_time on public.assignments
+  for each row
+  execute function public.reset_assignment_deadline_notification();
+
+create or replace function public.reset_quiz_deadline_notification()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if old.due_date is distinct from new.due_date then
+    new.deadline_notified_at = null;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists reset_quiz_deadline_notification on public.quizzes;
+create trigger reset_quiz_deadline_notification
+  before update of due_date on public.quizzes
+  for each row
+  execute function public.reset_quiz_deadline_notification();
+
+create or replace function public.create_due_deadline_teacher_notifications()
+returns table(assignments_notified integer, quizzes_notified integer)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  assignment_count integer := 0;
+  quiz_count integer := 0;
+begin
+  with due_assignments as (
+    select
+      a.id,
+      a.teacher_id,
+      a.class_id,
+      coalesce(nullif(a.title, ''), 'Assignment') as title
+    from public.assignments a
+    where a.teacher_id is not null
+      and a.due_date is not null
+      and a.deadline_notified_at is null
+      and (
+        case
+          when nullif(a.due_time::text, '') is not null
+            then (a.due_date::date + a.due_time::time)::timestamptz
+          else a.due_date::timestamptz
+        end
+      ) <= now()
+  ),
+  inserted_assignment_notifications as (
+    insert into public.notifications (
+      user_id,
+      teacher_id,
+      class_id,
+      assignment_id,
+      title,
+      message,
+      type,
+      is_read,
+      created_at
+    )
+    select
+      due_assignments.teacher_id,
+      due_assignments.teacher_id,
+      due_assignments.class_id,
+      due_assignments.id,
+      'Assignment Deadline Ended',
+      'The assignment "' || due_assignments.title || '" has reached its deadline.',
+      'deadline',
+      false,
+      now()
+    from due_assignments
+    returning assignment_id
+  ),
+  updated_assignments as (
+    update public.assignments a
+    set deadline_notified_at = now()
+    where a.id in (select assignment_id from inserted_assignment_notifications)
+    returning a.id
+  )
+  select count(*) into assignment_count from updated_assignments;
+
+  with due_quizzes as (
+    select
+      q.id,
+      q.teacher_id,
+      q.class_id,
+      coalesce(nullif(q.title, ''), 'Quiz') as title
+    from public.quizzes q
+    where q.teacher_id is not null
+      and q.due_date is not null
+      and q.deadline_notified_at is null
+      and coalesce(q.is_published, false) = true
+      and q.due_date::timestamptz <= now()
+  ),
+  inserted_quiz_notifications as (
+    insert into public.notifications (
+      user_id,
+      teacher_id,
+      class_id,
+      title,
+      message,
+      type,
+      is_read,
+      created_at
+    )
+    select
+      due_quizzes.teacher_id,
+      due_quizzes.teacher_id,
+      due_quizzes.class_id,
+      'Quiz Deadline Ended',
+      'The quiz "' || due_quizzes.title || '" has reached its deadline.',
+      'deadline',
+      false,
+      now()
+    from due_quizzes
+    returning class_id
+  ),
+  updated_quizzes as (
+    update public.quizzes q
+    set deadline_notified_at = now()
+    where q.id in (select id from due_quizzes)
+    returning q.id
+  )
+  select count(*) into quiz_count from updated_quizzes;
+
+  assignments_notified := assignment_count;
+  quizzes_notified := quiz_count;
+  return next;
+end;
+$$;
+
+-- Run this once to test deadline notifications immediately:
+-- select * from public.create_due_deadline_teacher_notifications();
+--
+-- To make this automatic in Supabase, schedule that select to run every few minutes
+-- using the Dashboard scheduler/pg_cron if it is enabled for your project.
 
 alter table public.notifications enable row level security;
 
