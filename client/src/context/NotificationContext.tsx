@@ -31,6 +31,31 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+// ─── Helper: filter rows that belong to this user ─────────────────────────────
+
+function isNotificationForUser(row: any, currentUserId: string): boolean {
+  // The notifications table has user_id (recipient) and teacher_id (sender).
+  // A teacher sees notifications where they are the recipient (user_id) OR
+  // where teacher_id matches (notifications they sent — useful for tracking).
+  // Most importantly, user_id is the actual recipient column.
+  return row.user_id === currentUserId || row.teacher_id === currentUserId;
+}
+
+function mapRow(n: any): Notification {
+  return {
+    id: n.id,
+    user_id: n.user_id ?? undefined,
+    class_id: n.class_id ?? undefined,
+    teacher_id: n.teacher_id ?? undefined,
+    assignment_id: n.assignment_id ?? undefined,
+    title: n.title ?? 'Notification',
+    message: n.message,
+    type: n.type ?? 'announcement',
+    is_read: n.is_read ?? false,
+    created_at: n.created_at,
+  };
+}
+
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
@@ -64,27 +89,19 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
+        // Fetch all notifications, no .or() filter — avoids 400 from non-existent columns
         const { data, error } = await supabase
           .from('notifications')
           .select('*')
-          .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
           .order('created_at', { ascending: false });
 
+        console.log('notifications schema:', data?.slice(0, 2), error);
+
         if (error) throw error;
-        
-        const mapped: Notification[] = (data || []).map((n: any) => ({
-          id: n.id,
-          user_id: n.user_id ?? n.teacher_id,
-          class_id: n.class_id ?? undefined,
-          teacher_id: n.teacher_id ?? undefined,
-          assignment_id: n.assignment_id ?? undefined,
-          title: n.title ?? 'Notification',
-          message: n.message,
-          type: n.type ?? 'announcement',
-          is_read: n.is_read ?? false,
-          created_at: n.created_at,
-        }));
-        setNotifications(mapped);
+
+        // Client-side filter: only keep rows where user_id or teacher_id matches
+        const filtered = (data || []).filter((n: any) => isNotificationForUser(n, userId));
+        setNotifications(filtered.map(mapRow));
       } catch (error) {
         console.error('Error fetching notifications:', error);
       } finally {
@@ -94,7 +111,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     fetchNotifications();
 
-    // Realtime: listen for new rows where user_id OR teacher_id matches
+    // Realtime: listen for new rows on the notifications table
     const channel = supabase
       .channel(`notif-user-${userId}`)
       .on(
@@ -106,24 +123,10 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         },
         (payload) => {
           const row = (payload.new ?? {}) as any;
-          const isForMe =
-            row.user_id === userId || row.teacher_id === userId;
 
-          if (!isForMe) return;
+          if (!isNotificationForUser(row, userId)) return;
 
-          // Normalise to the Notification interface
-          const normalised: Notification = {
-            id: row.id,
-            user_id: row.user_id ?? row.teacher_id,
-            class_id: row.class_id ?? undefined,
-            teacher_id: row.teacher_id ?? undefined,
-            assignment_id: row.assignment_id ?? undefined,
-            title: row.title ?? 'Notification',
-            message: row.message,
-            type: row.type ?? 'announcement',
-            is_read: row.is_read ?? false,
-            created_at: row.created_at,
-          };
+          const normalised = mapRow(row);
 
           if (payload.eventType === 'INSERT') {
             setNotifications((prev) => [normalised, ...prev]);
@@ -161,10 +164,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     if (!userId) return;
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     try {
+      // Mark all where user is the recipient
       await supabase
         .from('notifications')
         .update({ is_read: true })
-        .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
+        .eq('user_id', userId)
         .eq('is_read', false);
     } catch (err) {
       console.error('markAllAsRead error:', err);

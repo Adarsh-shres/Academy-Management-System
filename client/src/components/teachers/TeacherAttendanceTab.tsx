@@ -1,7 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import * as XLSX from 'xlsx';
 import { Calendar, Users } from '../shared/icons';
+
+const exportToCSV = (data: Record<string, unknown>[], filename: string) => {
+  if (!data || data.length === 0) return;
+  const headers = Object.keys(data[0]).join(",");
+  const rows = data.map(row => Object.values(row).join(",")).join("\n");
+  const csv = `${headers}\n${rows}`;
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 interface Student {
   id: string;
@@ -148,7 +161,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
     }
   };
 
-  // Export attendance to Excel (.xlsx)
+  // Export attendance to CSV
   const handleExport = async () => {
     if (!classId) return;
     setIsExporting(true);
@@ -175,7 +188,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
       const studentMap: Record<string, { name: string; email: string }> = {};
       students.forEach(s => { studentMap[s.id] = { name: s.name, email: s.email }; });
 
-      // Build rows for Excel
+      // Build rows for CSV
       const rows = data.map((rec: any) => {
         const d = new Date(rec.date + 'T00:00:00');
         const day = d.toLocaleDateString('en-US', { weekday: 'long' });
@@ -184,102 +197,16 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
           'Date': rec.date,
           'Day': day,
           'Time': rec.time || '',
-          'Student Name': student.name,
+          'Student Name': `"${student.name}"`,
           'Email': student.email,
           'Status': rec.status === 'present' ? 'Present' : 'Absent',
         };
       });
 
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
+      const fileName = `Attendance_${courseName.replace(/\s+/g, '_')}_${className.replace(/\s+/g, '_')}`;
+      exportToCSV(rows, fileName);
 
-      // Title rows
-      const titleData = [
-        [`Attendance Report - ${courseName} (${className})`],
-        [`Generated on: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`],
-        [],
-      ];
-      const ws = XLSX.utils.aoa_to_sheet(titleData);
-
-      // Append data rows starting after the title
-      XLSX.utils.sheet_add_json(ws, rows, { origin: 'A4' });
-
-      // Set column widths for readability
-      ws['!cols'] = [
-        { wch: 14 },  // Date
-        { wch: 12 },  // Day
-        { wch: 12 },  // Time
-        { wch: 24 },  // Student Name
-        { wch: 28 },  // Email
-        { wch: 10 },  // Status
-      ];
-
-      XLSX.utils.book_append_sheet(wb, ws, 'Attendance Records');
-
-      // --- Student Summary Sheet ---
-      // Calculate per-student stats
-      const studentStats: Record<string, { present: number; absent: number; total: number }> = {};
-      data.forEach((rec: any) => {
-        if (!studentStats[rec.student_id]) {
-          studentStats[rec.student_id] = { present: 0, absent: 0, total: 0 };
-        }
-        studentStats[rec.student_id].total++;
-        if (rec.status === 'present') studentStats[rec.student_id].present++;
-        else studentStats[rec.student_id].absent++;
-      });
-
-      const summaryRows = students.map((s, idx) => {
-        const stat = studentStats[s.id] || { present: 0, absent: 0, total: 0 };
-        const pct = stat.total > 0 ? Math.round((stat.present / stat.total) * 100) : 0;
-        return {
-          'S.No': idx + 1,
-          'Student Name': s.name,
-          'Email': s.email,
-          'Total Present': stat.present,
-          'Total Absent': stat.absent,
-          'Total Classes': stat.total,
-          'Attendance %': `${pct}%`,
-        };
-      });
-
-      // Create summary sheet
-      const summaryTitle = [
-        [`Student Attendance Summary - ${courseName} (${className})`],
-        [`Generated on: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`],
-        [],
-      ];
-      const ws2 = XLSX.utils.aoa_to_sheet(summaryTitle);
-      XLSX.utils.sheet_add_json(ws2, summaryRows, { origin: 'A4' });
-
-      // Overall class totals at the bottom
-      const overallPresent = data.filter((r: any) => r.status === 'present').length;
-      const overallAbsent = data.filter((r: any) => r.status === 'absent').length;
-      const overallTotal = data.length;
-      const overallPct = overallTotal > 0 ? Math.round((overallPresent / overallTotal) * 100) : 0;
-
-      const classTotalRow = 4 + summaryRows.length + 1; // title(3) + header(1) + data + 1 blank
-      XLSX.utils.sheet_add_aoa(ws2, [
-        [],
-        ['', '', 'CLASS TOTAL', '', overallPresent, overallAbsent, overallTotal, `${overallPct}%`],
-      ], { origin: `A${classTotalRow}` });
-
-      ws2['!cols'] = [
-        { wch: 6 },   // S.No
-        { wch: 24 },  // Student Name
-        { wch: 28 },  // Email
-        { wch: 14 },  // Total Present
-        { wch: 14 },  // Total Absent
-        { wch: 14 },  // Total Classes
-        { wch: 14 },  // Attendance %
-      ];
-
-      XLSX.utils.book_append_sheet(wb, ws2, 'Student Summary');
-
-      // Generate and download
-      const fileName = `Attendance_${courseName.replace(/\s+/g, '_')}_${className.replace(/\s+/g, '_')}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-
-      setSaveMessage({ type: 'success', text: 'Attendance exported to Excel successfully!' });
+      setSaveMessage({ type: 'success', text: 'Attendance exported to CSV successfully!' });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (err: any) {
       console.error('Export failed:', err.message);
@@ -357,7 +284,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
             ) : (
               <>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" /><path d="M10 9h4" /></svg>
-                Export Excel
+                Export CSV
               </>
             )}
           </button>
