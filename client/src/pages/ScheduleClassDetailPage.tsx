@@ -6,6 +6,7 @@ import AppModal from '../components/shared/AppModal';
 import { useCourses } from '../context/CourseContext';
 import { getScheduleCourseId } from '../lib/scheduleCourseSelection';
 import { getScheduleTeacherId } from '../lib/scheduleTeacherSelection';
+import { sendNotificationToUsers } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -89,6 +90,10 @@ function makeDraft(entry: ScheduleEntry, courseId: string, teacherId: string): T
 
 function teacherIdsForClass(classRow: CourseClass) {
   return Array.from(new Set([...(classRow.teacher_ids ?? []), ...(classRow.teacher_id ? [classRow.teacher_id] : [])]));
+}
+
+function uniqueTeacherIds(ids: Array<string | null | undefined>) {
+  return Array.from(new Set(ids.filter((id): id is string => Boolean(id))));
 }
 
 export default function ScheduleClassDetailPage() {
@@ -285,6 +290,27 @@ export default function ScheduleClassDetailPage() {
     setWeeklyDrafts((prev) => prev.filter((_, draftIndex) => draftIndex !== index));
   };
 
+  const notifyTeachersOfScheduleChange = async (
+    teacherIds: string[],
+    title: string,
+    message: string,
+  ) => {
+    const recipients = uniqueTeacherIds(teacherIds);
+    if (recipients.length === 0) return;
+
+    try {
+      await sendNotificationToUsers(recipients.map((teacherId) => ({
+        userId: teacherId,
+        title,
+        message,
+        type: 'schedule',
+        classId: classId ?? null,
+      })));
+    } catch (notificationError) {
+      console.error('Failed to notify teachers about schedule change:', notificationError);
+    }
+  };
+
   const saveWeeklySchedule = async () => {
     if (!classId) return;
 
@@ -332,7 +358,17 @@ export default function ScheduleClassDetailPage() {
       }
     }
 
+    const affectedTeacherIds = uniqueTeacherIds([
+      ...weeklyEntries.map((entry) => entry.teacher_id),
+      ...weeklyDrafts.map((draft) => draft.teacher_id),
+    ]);
+
     await loadClassSchedule();
+    await notifyTeachersOfScheduleChange(
+      affectedTeacherIds,
+      'Weekly Schedule Updated',
+      `The weekly schedule for ${courseClass?.name || 'your class'} has been updated.`,
+    );
     setIsSavingWeekly(false);
     setIsWeeklyEditorOpen(false);
   };
@@ -385,7 +421,18 @@ export default function ScheduleClassDetailPage() {
       }
     }
 
+    const affectedTeacherIds = uniqueTeacherIds([
+      ...todayOverrideEntries.map((entry) => entry.teacher_id),
+      ...todayWeeklyEntries.map((entry) => entry.teacher_id),
+      ...todayDrafts.map((draft) => draft.teacher_id),
+    ]);
+
     await loadClassSchedule();
+    await notifyTeachersOfScheduleChange(
+      affectedTeacherIds,
+      'Today Schedule Updated',
+      `Today's schedule for ${courseClass?.name || 'your class'} has been updated for ${new Date(`${todayDate}T00:00:00`).toLocaleDateString()}.`,
+    );
     setIsSavingToday(false);
     setIsTodayEditorOpen(false);
   };
@@ -409,7 +456,14 @@ export default function ScheduleClassDetailPage() {
       return;
     }
 
+    const affectedTeacherIds = uniqueTeacherIds(todayOverrideEntries.map((entry) => entry.teacher_id));
+
     await loadClassSchedule();
+    await notifyTeachersOfScheduleChange(
+      affectedTeacherIds,
+      'Today Schedule Cleared',
+      `The one-time schedule edit for ${courseClass?.name || 'your class'} on ${new Date(`${todayDate}T00:00:00`).toLocaleDateString()} has been cleared.`,
+    );
     setIsSavingToday(false);
     setIsTodayEditorOpen(false);
   };
@@ -417,6 +471,7 @@ export default function ScheduleClassDetailPage() {
   const removeScheduleEntry = async (entryId: string) => {
     setDeletingScheduleId(entryId);
     setDeleteError('');
+    const removedEntry = scheduleEntries.find((entry) => entry.id === entryId);
 
     const { error: removeError } = await supabase
       .from('class_schedules')
@@ -431,6 +486,11 @@ export default function ScheduleClassDetailPage() {
     }
 
     await loadClassSchedule();
+    await notifyTeachersOfScheduleChange(
+      removedEntry?.teacher_id ? [removedEntry.teacher_id] : [],
+      'Schedule Row Removed',
+      `A ${removedEntry?.schedule_type === 'weekly' ? 'weekly' : 'one-time'} schedule row for ${courseClass?.name || 'your class'} has been removed.`,
+    );
     setDeletingScheduleId('');
   };
 

@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-export type NotificationType = 'announcement' | 'content' | 'update' | 'assignment_open' | 'manual';
+export type NotificationType = 'announcement' | 'content' | 'update' | 'assignment_open' | 'manual' | 'deadline' | 'schedule';
 
 interface NotificationRowInput {
   userId: string;

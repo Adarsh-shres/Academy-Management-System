@@ -108,50 +108,51 @@ export default function NotificationsPage() {
       {/* Detailed View Modal */}
       {selectedNotification && (
         <div 
-          className="fixed inset-0 bg-[#391f56]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 bg-[rgba(15,23,42,0.18)] backdrop-blur-[2px] z-[100] flex items-start justify-center overflow-y-auto p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={() => {
             if (!selectedNotification.is_read) handleMarkAsRead(selectedNotification.id);
             setSelectedNotification(null);
           }}
         >
           <div 
-            className="bg-white rounded-[12px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] p-0 w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 relative border border-[#e7dff0]"
+            className="bg-white rounded-[10px] shadow-[0_18px_45px_rgba(15,23,42,0.14)] p-0 w-full max-w-[520px] overflow-hidden animate-in zoom-in-95 duration-200 relative border border-[#e7dff0] my-8 sm:my-12"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-7 border-b border-[#f3eff7] bg-gradient-to-br from-[#f5effa] to-white relative">
+            <div className="px-6 py-5 border-b border-[#f3eff7] bg-[#fbf8fe] relative">
                <button
                 onClick={() => {
                   if (!selectedNotification.is_read) handleMarkAsRead(selectedNotification.id);
                   setSelectedNotification(null);
                 }}
-                className="absolute top-5 right-5 w-8 h-8 rounded-[8px] bg-white border border-[#e7dff0] flex items-center justify-center text-[#7c8697] hover:text-[#4b3f68] hover:shadow-sm transition-all"
+                className="absolute top-4 right-4 w-8 h-8 rounded-[8px] bg-white border border-[#e7dff0] flex items-center justify-center text-[#7c8697] hover:text-[#4b3f68] hover:shadow-sm transition-all"
+                aria-label="Close notification"
                >
                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                  </svg>
                </button>
-               <h3 className="font-sans text-[20px] font-bold text-[#4b3f68] tracking-tight leading-tight pr-8">
+               <h3 className="font-sans text-[18px] font-bold text-[#4b3f68] tracking-tight leading-tight pr-10">
                  {selectedNotification.title}
                </h3>
-               <div className="flex items-center gap-3 mt-3 text-[13px] text-[#7c8697] font-medium">
-                 <span className="uppercase tracking-wider">{selectedNotification.type}</span>
+               <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-3 text-[12px] text-[#7c8697] font-semibold">
+                 <span className="uppercase tracking-wider text-[#6a5182]">{selectedNotification.type.replaceAll('_', ' ')}</span>
                  <span className="w-1 h-1 rounded-full bg-[#d3c8e0]"></span>
                  <span>{new Date(selectedNotification.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</span>
                </div>
             </div>
             
-            <div className="p-7">
-              <div className="text-[14px] leading-relaxed text-[#4b3f68] whitespace-pre-wrap min-h-[100px]">
+            <div className="px-6 py-5">
+              <div className="text-[14px] leading-6 text-[#4b3f68] whitespace-pre-wrap break-words">
                 {selectedNotification.message}
               </div>
               
-              <div className="pt-8 flex justify-end">
+              <div className="pt-5 mt-5 border-t border-[#f3eff7] flex justify-end">
                 <button
                   onClick={() => {
                     if (!selectedNotification.is_read) handleMarkAsRead(selectedNotification.id);
                     setSelectedNotification(null);
                   }}
-                  className="px-6 py-2.5 rounded-[8px] text-[13px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity uppercase tracking-wider"
+                  className="px-5 py-2.5 rounded-[8px] text-[12px] font-bold text-white bg-primary hover:opacity-90 transition-opacity uppercase tracking-wider"
                 >
                   Close
                 </button>
