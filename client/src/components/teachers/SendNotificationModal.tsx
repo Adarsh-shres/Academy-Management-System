@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { sendClassNotification } from '../../lib/notifications';
 
 interface SendNotificationModalProps {
   isOpen: boolean;
@@ -37,11 +38,12 @@ export default function SendNotificationModal({ isOpen, onClose, course }: SendN
     setIsSending(true);
 
     try {
-      // TODO: Implement Supabase insert query into a `notifications` table once it exists.
-      // e.g. await supabase.from('notifications').insert({ course_id: course.id, title, message })
-      
-      // Simulating network delay for now
-      await new Promise(res => setTimeout(res, 800));
+      await sendClassNotification({
+        classId: course.id,
+        title,
+        message,
+        type: 'manual',
+      });
       
       alert('Notification sent successfully!');
       onClose();

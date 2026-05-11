@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
+import { sendClassNotification, sendGeneralNotification, sendRoleNotification } from "../lib/notifications";
 
 export default function SendNotificationPage() {
   const [recipient, setRecipient] = useState("general");
@@ -7,14 +8,18 @@ export default function SendNotificationPage() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null, text: string }>({ type: null, text: "" });
-  const [courses, setCourses] = useState<any[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
 
   useEffect(() => {
-    async function fetchCourses() {
-      const { data } = await supabase.from('courses').select('id, name');
-      if (data) setCourses(data);
+    async function fetchClasses() {
+      const { data } = await supabase
+        .from('classes')
+        .select('id, name, courses(name)')
+        .order('name', { ascending: true });
+
+      if (data) setClasses(data);
     }
-    fetchCourses();
+    fetchClasses();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,32 +30,19 @@ export default function SendNotificationPage() {
     setStatus({ type: null, text: "" });
 
     try {
-      let target = 'general';
-      let classId = undefined;
-
       if (recipient === 'teacher') {
-        target = 'teacher';
+        await sendRoleNotification('teacher', subject, message);
       } else if (recipient === 'student') {
-        target = 'student';
+        await sendRoleNotification('student', subject, message);
       } else if (recipient !== 'general') {
-        target = 'class';
-        classId = recipient;
-      }
-
-      const response = await fetch('http://localhost:5000/notifications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        await sendClassNotification({
+          classId: recipient,
           title: subject,
           message,
           type: 'announcement',
-          target,
-          classId
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send notification');
+        });
+      } else {
+        await sendGeneralNotification(subject, message);
       }
       
       setStatus({ type: 'success', text: 'Notification sent successfully.' });
@@ -58,7 +50,8 @@ export default function SendNotificationPage() {
       setMessage("");
       setTimeout(() => setStatus({ type: null, text: "" }), 3000);
     } catch (error) {
-      setStatus({ type: 'error', text: 'Failed to send notification. Please try again.' });
+      const text = error instanceof Error ? error.message : 'Failed to send notification. Please try again.';
+      setStatus({ type: 'error', text });
     } finally {
       setIsSubmitting(false);
     }
@@ -108,8 +101,11 @@ export default function SendNotificationPage() {
                 <option value="general">All Users</option>
                 <option value="student">Students</option>
                 <option value="teacher">Teachers</option>
-                {courses.map(course => (
-                  <option key={course.id} value={course.id}>Class: {course.name}</option>
+                {classes.map((classRow) => (
+                  <option key={classRow.id} value={classRow.id}>
+                    Class: {classRow.name}
+                    {classRow.courses?.name ? ` (${classRow.courses.name})` : ''}
+                  </option>
                 ))}
               </select>
             </div>

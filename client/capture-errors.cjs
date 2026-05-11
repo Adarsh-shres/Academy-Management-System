@@ -14,9 +14,6 @@ const { chromium } = require('playwright');
     console.log(`UNCAUGHT ERROR: ${error.message}`);
   });
 
-  // Set mock session in local storage to force login state if possible, 
-  // or just navigate to /dashboard and see if it crashes before redirect,
-  // or if it redirects to /login.
   console.log('Navigating to http://localhost:5174/teacher/dashboard...');
   await page.goto('http://localhost:5174/teacher/dashboard', { waitUntil: 'networkidle' });
   

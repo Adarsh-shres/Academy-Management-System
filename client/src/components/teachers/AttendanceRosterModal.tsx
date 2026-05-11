@@ -20,21 +20,9 @@ interface AttendanceRosterModalProps {
   courseName?: string;
 }
 
-const MOCK_STUDENTS: Omit<StudentAttendance, 'status' | 'note'>[] = [
-  { id: '1', name: 'Adarsh Shrestha', rollNo: 'CS-2024-001', initials: 'AS' },
-  { id: '2', name: 'Aarav Patel', rollNo: 'CS-2024-002', initials: 'AP' },
-  { id: '3', name: 'Elena Rodriguez', rollNo: 'CS-2024-003', initials: 'ER' },
-  { id: '4', name: 'James Chen', rollNo: 'CS-2024-004', initials: 'JC' },
-  { id: '5', name: 'Maria Garcia', rollNo: 'CS-2024-005', initials: 'MG' },
-  { id: '6', name: 'Oliver Smith', rollNo: 'CS-2024-006', initials: 'OS' },
-  { id: '7', name: 'Sophia Kim', rollNo: 'CS-2024-007', initials: 'SK' },
-];
-
 /** Shows a teacher-facing attendance sheet for a single class session. */
 export default function AttendanceRosterModal({ isOpen, onClose, date = new Date(), courseName }: AttendanceRosterModalProps) {
-  const [students, setStudents] = useState<StudentAttendance[]>(
-    MOCK_STUDENTS.map(s => ({ ...s, status: 'present' }))
-  );
+  const [students, setStudents] = useState<StudentAttendance[]>([]);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
@@ -55,10 +43,8 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
 
   const handleSave = () => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onClose();
-    }, 800);
+    setIsSubmitting(false);
+    onClose();
   };
 
   const formattedDate = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
@@ -107,6 +93,11 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 hide-scrollbar">
+          {students.length === 0 && (
+            <div className="rounded-sm border border-dashed border-[#d8c8e9] bg-[#fbf8fe] p-8 text-center text-[13px] font-semibold text-[#7c8697]">
+              No students are loaded for this roster yet.
+            </div>
+          )}
           {students.map((student, idx) => (
             <div 
               key={student.id} 

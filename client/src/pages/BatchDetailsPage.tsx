@@ -240,6 +240,16 @@ export default function BatchDetailsPage() {
     setCsvResult(getCsvImportResult(text, importableStudents));
   };
 
+  const downloadCsvTemplate = () => {
+    const blob = new Blob(['email,student_id\n'], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'batch-student-import-template.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleAddImportedStudents = async () => {
     if (!batch || !csvResult) return;
 
@@ -740,6 +750,16 @@ export default function BatchDetailsPage() {
             </div>
 
             <div className="p-6 flex flex-col gap-5">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={downloadCsvTemplate}
+                  className="rounded-sm border border-[#e2d9ed] bg-white px-4 py-2 text-[13px] font-bold text-[#6a5182] transition-all hover:bg-[#f3eff7]"
+                >
+                  Download Template
+                </button>
+              </div>
+
               <label className="flex flex-col items-center justify-center gap-3 rounded-sm border-2 border-dashed border-[#d8c8e9] bg-[#fbf8fe] px-6 py-10 text-center cursor-pointer hover:bg-[#f3eff7] transition-colors">
                 <input
                   ref={fileInputRef}

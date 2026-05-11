@@ -268,7 +268,7 @@ export function useStudentData() {
           // Build courses list from enrolled classes
           const seenCourses = new Set<string>();
           mappedCourses = [];
-          enrolledClasses.forEach((cls: any, idx: number) => {
+          enrolledClasses.forEach((cls: any) => {
             const course = courseMap.get(cls.course_id);
             if (!course || seenCourses.has(course.id)) return;
             seenCourses.add(course.id);
@@ -331,7 +331,7 @@ export function useStudentData() {
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
             const classObj = (classesData2 || []).find((c: any) => c.id === assign.class_id);
-            const courseObj = classObj?.courses;
+            const courseObj = Array.isArray(classObj?.courses) ? classObj.courses[0] : classObj?.courses;
             const sub = submissionMap[assign.id];
             
             return {

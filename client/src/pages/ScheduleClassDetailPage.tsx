@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Calendar, MapPin, Users } from '../components/shared/icons';
 import AppModal from '../components/shared/AppModal';
 import { useCourses } from '../context/CourseContext';
+import { getScheduleCourseId } from '../lib/scheduleCourseSelection';
 import { supabase } from '../lib/supabase';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -11,6 +12,7 @@ const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'F
 type CourseClass = {
   id: string;
   batch_id?: string | null;
+  course_id?: string | null;
   name?: string | null;
   teacher_id?: string | null;
   teacher_ids?: string[] | null;
@@ -26,6 +28,7 @@ type CourseClass = {
 type ScheduleEntry = {
   id: string;
   class_id: string;
+  course_id?: string | null;
   schedule_type: 'weekly' | 'one_time';
   day_of_week?: string | null;
   schedule_date?: string | null;
@@ -37,6 +40,7 @@ type ScheduleEntry = {
 
 type TodayDraft = {
   sourceId: string;
+  course_id: string;
   day_of_week?: string;
   start_time: string;
   end_time: string;
@@ -63,9 +67,10 @@ function formatEntry(entry: ScheduleEntry) {
   return `${trimTime(entry.start_time)} - ${trimTime(entry.end_time)}`;
 }
 
-function makeDraft(entry: ScheduleEntry): TodayDraft {
+function makeDraft(entry: ScheduleEntry, courseId: string): TodayDraft {
   return {
     sourceId: entry.id,
+    course_id: entry.course_id || courseId,
     start_time: trimTime(entry.start_time),
     end_time: trimTime(entry.end_time),
     room: entry.room ?? '',
@@ -95,6 +100,8 @@ export default function ScheduleClassDetailPage() {
   const [todayDrafts, setTodayDrafts] = useState<TodayDraft[]>([]);
   const [isSavingToday, setIsSavingToday] = useState(false);
   const [todayError, setTodayError] = useState('');
+  const [deletingScheduleId, setDeletingScheduleId] = useState('');
+  const [deleteError, setDeleteError] = useState('');
 
   const loadClassSchedule = useCallback(async () => {
     if (!classId) return;
@@ -104,7 +111,7 @@ export default function ScheduleClassDetailPage() {
 
     const { data: classRow, error: classError } = await supabase
       .from('classes')
-      .select('id, batch_id, name, teacher_id, teacher_ids, room, student_ids, batches(name, code, course_ids)')
+      .select('id, batch_id, course_id, name, teacher_id, teacher_ids, room, student_ids, batches(name, code, course_ids)')
       .eq('id', classId)
       .maybeSingle();
 
@@ -171,6 +178,9 @@ export default function ScheduleClassDetailPage() {
 
   const displayedTodayEntries = todayOverrideEntries.length > 0 ? todayOverrideEntries : todayWeeklyEntries;
   const todayUsesOverride = todayOverrideEntries.length > 0;
+  const batchCourseIds = courseClass?.batches?.course_ids ?? [];
+  const batchCourseOptions = courses.filter((course) => batchCourseIds.includes(course.id));
+  const defaultCourseId = getScheduleCourseId({}, { course_id: courseClass?.course_id, batchCourseIds });
 
   const weeklyMap = useMemo(() => {
     const map: Record<string, ScheduleEntry[]> = {};
@@ -193,14 +203,14 @@ export default function ScheduleClassDetailPage() {
 
   const openTodayEditor = () => {
     const sourceEntries = todayOverrideEntries.length > 0 ? todayOverrideEntries : todayWeeklyEntries;
-    setTodayDrafts(sourceEntries.map(makeDraft));
+    setTodayDrafts(sourceEntries.map((entry) => makeDraft(entry, defaultCourseId)));
     setTodayError('');
     setIsTodayEditorOpen(true);
   };
 
   const openWeeklyEditor = () => {
     setWeeklyDrafts(weeklyEntries.map((entry) => ({
-      ...makeDraft(entry),
+      ...makeDraft(entry, defaultCourseId),
       day_of_week: entry.day_of_week || todayDay,
     })));
     setWeeklyError('');
@@ -226,6 +236,7 @@ export default function ScheduleClassDetailPage() {
   const addTodayDraft = () => {
     setTodayDrafts((prev) => [...prev, {
       sourceId: `new-${Date.now()}`,
+      course_id: defaultCourseId,
       start_time: '',
       end_time: '',
       room: courseClass?.room ?? '',
@@ -236,6 +247,7 @@ export default function ScheduleClassDetailPage() {
   const addWeeklyDraft = () => {
     setWeeklyDrafts((prev) => [...prev, {
       sourceId: `new-weekly-${Date.now()}`,
+      course_id: defaultCourseId,
       day_of_week: todayDay,
       start_time: '',
       end_time: '',
@@ -251,9 +263,9 @@ export default function ScheduleClassDetailPage() {
   const saveWeeklySchedule = async () => {
     if (!classId) return;
 
-    const invalidDraft = weeklyDrafts.find((draft) => !draft.day_of_week || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
+    const invalidDraft = weeklyDrafts.find((draft) => !draft.course_id || !draft.day_of_week || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
     if (invalidDraft) {
-      setWeeklyError('Each weekly row needs a day plus valid start and end times.');
+      setWeeklyError('Each weekly row needs a course, day, and valid start and end times.');
       return;
     }
 
@@ -277,6 +289,7 @@ export default function ScheduleClassDetailPage() {
         .from('class_schedules')
         .insert(weeklyDrafts.map((draft) => ({
           class_id: classId,
+          course_id: draft.course_id || null,
           schedule_type: 'weekly',
           day_of_week: draft.day_of_week,
           schedule_date: null,
@@ -301,9 +314,9 @@ export default function ScheduleClassDetailPage() {
   const saveTodayOverride = async () => {
     if (!classId) return;
 
-    const invalidDraft = todayDrafts.find((draft) => !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
+    const invalidDraft = todayDrafts.find((draft) => !draft.course_id || !draft.start_time || !draft.end_time || draft.end_time <= draft.start_time);
     if (invalidDraft) {
-      setTodayError('Each today schedule row needs a valid start and end time.');
+      setTodayError('Each today schedule row needs a course plus a valid start and end time.');
       return;
     }
 
@@ -328,6 +341,7 @@ export default function ScheduleClassDetailPage() {
         .from('class_schedules')
         .insert(todayDrafts.map((draft) => ({
           class_id: classId,
+          course_id: draft.course_id || null,
           schedule_type: 'one_time',
           day_of_week: null,
           schedule_date: todayDate,
@@ -373,6 +387,26 @@ export default function ScheduleClassDetailPage() {
     setIsTodayEditorOpen(false);
   };
 
+  const removeScheduleEntry = async (entryId: string) => {
+    setDeletingScheduleId(entryId);
+    setDeleteError('');
+
+    const { error: removeError } = await supabase
+      .from('class_schedules')
+      .delete()
+      .eq('id', entryId)
+      .eq('class_id', classId);
+
+    if (removeError) {
+      setDeleteError(removeError.message);
+      setDeletingScheduleId('');
+      return;
+    }
+
+    await loadClassSchedule();
+    setDeletingScheduleId('');
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -397,11 +431,11 @@ export default function ScheduleClassDetailPage() {
     );
   }
 
-  const batchCourseNames = courses
-    .filter((course) => (courseClass.batches?.course_ids ?? []).includes(course.id))
-    .map((course) => course.name);
-  const courseDisplay = batchCourseNames.length > 0 ? batchCourseNames.join(', ') : 'No batch courses';
   const teacherDisplay = teacherNames.length > 0 ? teacherNames.join(', ') : 'No teacher assigned';
+  const courseNameForEntry = (entry: ScheduleEntry) => {
+    const courseId = getScheduleCourseId(entry, { course_id: courseClass.course_id, batchCourseIds });
+    return courses.find((course) => course.id === courseId)?.name ?? 'Course not selected';
+  };
 
   const renderScheduleCard = (entry: ScheduleEntry) => (
     <div key={entry.id} className="rounded-sm border border-[#e2d9ed] bg-white p-4">
@@ -413,12 +447,22 @@ export default function ScheduleClassDetailPage() {
           {courseClass.batches?.code || 'Batch'}
         </span>
       </div>
-      <h4 className="text-[15px] font-bold text-[#4b3f68] mt-3">{courseDisplay}</h4>
+      <h4 className="text-[15px] font-bold text-[#4b3f68] mt-3">{courseNameForEntry(entry)}</h4>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-[#475569] mt-3">
         <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || courseClass.room || 'Room not set'}</span>
         <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {courseClass.student_ids?.length ?? 0}</span>
       </div>
       {entry.notes && <p className="text-[12px] text-[#475569] mt-3">{entry.notes}</p>}
+      <div className="mt-4 border-t border-[#edf2f7] pt-3">
+        <button
+          type="button"
+          onClick={() => void removeScheduleEntry(entry.id)}
+          disabled={deletingScheduleId === entry.id}
+          className="text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {deletingScheduleId === entry.id ? 'Removing...' : 'Remove'}
+        </button>
+      </div>
     </div>
   );
 
@@ -435,7 +479,7 @@ export default function ScheduleClassDetailPage() {
               Back to Schedule
             </button>
             <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">{courseClass.name || 'Class Schedule'}</h1>
-            <p className="text-[14px] text-[#64748b] mt-1">{courseClass.batches?.name || 'Batch'} | {courseDisplay} | {teacherDisplay}</p>
+            <p className="text-[14px] text-[#64748b] mt-1">{courseClass.batches?.name || 'Batch'} | {teacherDisplay}</p>
           </div>
         </div>
 
@@ -475,6 +519,11 @@ export default function ScheduleClassDetailPage() {
 
           {activeTab === 'weekly' ? (
             <div className="divide-y divide-[#edf2f7]">
+              {deleteError && (
+                <div className="m-5 rounded-sm border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[13px] font-semibold text-[#dc2626]">
+                  {deleteError}
+                </div>
+              )}
               {DAYS_OF_WEEK.map((day) => {
                 const dayEntries = weeklyMap[day] ?? [];
                 const isToday = day === todayDay;
@@ -507,6 +556,11 @@ export default function ScheduleClassDetailPage() {
             </div>
           ) : (
             <div className="p-5">
+              {deleteError && (
+                <div className="mb-5 rounded-sm border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[13px] font-semibold text-[#dc2626]">
+                  {deleteError}
+                </div>
+              )}
               <div className="mb-5 rounded-sm border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
                   <p className="text-[13px] font-extrabold text-[#4b3f68]">{todayDay} | {new Date(`${todayDate}T00:00:00`).toLocaleDateString()}</p>
@@ -560,7 +614,15 @@ export default function ScheduleClassDetailPage() {
 
             <div className="p-6 flex flex-col gap-4">
               {weeklyDrafts.map((draft, index) => (
-                <div key={draft.sourceId} className="grid grid-cols-1 lg:grid-cols-[130px_120px_120px_1fr_1fr_auto] gap-3 rounded-sm border border-[#e2e8f0] bg-[#f8fafc] p-3">
+                <div key={draft.sourceId} className="grid grid-cols-1 gap-3 rounded-sm border border-[#e2e8f0] bg-[#f8fafc] p-3 md:grid-cols-2 xl:grid-cols-3">
+                  <select
+                    value={draft.course_id}
+                    onChange={(event) => updateWeeklyDraft(index, 'course_id', event.target.value)}
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                  >
+                    <option value="">Select course</option>
+                    {batchCourseOptions.map((course) => <option key={course.id} value={course.id}>{course.name}</option>)}
+                  </select>
                   <select
                     value={draft.day_of_week || todayDay}
                     onChange={(event) => updateWeeklyDraft(index, 'day_of_week', event.target.value)}
@@ -597,7 +659,7 @@ export default function ScheduleClassDetailPage() {
                   <button
                     type="button"
                     onClick={() => removeWeeklyDraft(index)}
-                    className="px-3 py-2 text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer"
+                    className="justify-self-start px-3 py-2 text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer"
                   >
                     Remove
                   </button>
@@ -667,7 +729,15 @@ export default function ScheduleClassDetailPage() {
 
             <div className="p-6 flex flex-col gap-4">
               {todayDrafts.map((draft, index) => (
-                <div key={draft.sourceId} className="grid grid-cols-1 lg:grid-cols-[120px_120px_1fr_1fr_auto] gap-3 rounded-sm border border-[#e2e8f0] bg-[#f8fafc] p-3">
+                <div key={draft.sourceId} className="grid grid-cols-1 gap-3 rounded-sm border border-[#e2e8f0] bg-[#f8fafc] p-3 md:grid-cols-2 xl:grid-cols-3">
+                  <select
+                    value={draft.course_id}
+                    onChange={(event) => updateTodayDraft(index, 'course_id', event.target.value)}
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                  >
+                    <option value="">Select course</option>
+                    {batchCourseOptions.map((course) => <option key={course.id} value={course.id}>{course.name}</option>)}
+                  </select>
                   <input
                     type="time"
                     value={draft.start_time}
@@ -697,7 +767,7 @@ export default function ScheduleClassDetailPage() {
                   <button
                     type="button"
                     onClick={() => removeTodayDraft(index)}
-                    className="px-3 py-2 text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer"
+                    className="justify-self-start px-3 py-2 text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer"
                   >
                     Remove
                   </button>

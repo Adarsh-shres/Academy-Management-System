@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { Todo } from '../types/todo';
-import { MOCK_TODOS } from '../data/mockTodos';
 
 /* ─── Context shape ─────────────────────────────────────────── */
 
@@ -17,10 +16,10 @@ const TodoContext = createContext<TodoContextValue | null>(null);
 
 /* ─── Provider ──────────────────────────────────────────────── */
 
-let nextId = MOCK_TODOS.length + 1;
+let nextId = 1;
 
 export function TodoProvider({ children }: { children: ReactNode }) {
-  const [todos, setTodos] = useState<Todo[]>(MOCK_TODOS);
+  const [todos, setTodos] = useState<Todo[]>([]);
 
   const addTodo = useCallback((text: string): Todo => {
     const newTodo: Todo = { id: nextId++, text, done: false };

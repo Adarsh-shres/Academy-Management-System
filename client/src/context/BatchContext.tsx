@@ -19,32 +19,10 @@ interface BatchContextValue {
 
 const BatchContext = createContext<BatchContextValue | null>(null);
 
-const FALLBACK_BATCHES: Batch[] = [
-  {
-    id: 'batch-spring-2026',
-    name: 'Spring 2026 Intake',
-    code: 'BATCH-2026-SPR',
-    description: 'Starter intake for the active course catalogue.',
-    status: 'Active',
-    courseIds: ['5cs01', '5cs02'],
-    studentIds: ['stu-001', 'stu-002'],
-    createdAt: new Date(2026, 0, 15).toISOString(),
-  },
-];
-
-function createLocalBatch(input: BatchInput): Batch {
-  return {
-    ...input,
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-  };
-}
-
 export function BatchProvider({ children }: { children: ReactNode }) {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [usingFallback, setUsingFallback] = useState(false);
 
   const fetchBatches = useCallback(async () => {
     setLoading(true);
@@ -57,8 +35,7 @@ export function BatchProvider({ children }: { children: ReactNode }) {
 
     if (fetchError) {
       console.error('[BatchContext] Failed to load batches:', fetchError.message);
-      setBatches(FALLBACK_BATCHES);
-      setUsingFallback(true);
+      setBatches([]);
       setError(fetchError.code === '42P01' ? 'Create the batches table to enable persistence.' : fetchError.message);
       setLoading(false);
       return;
@@ -66,7 +43,6 @@ export function BatchProvider({ children }: { children: ReactNode }) {
 
     const mappedBatches = ((data as BatchRow[]) ?? []).map(rowToBatch);
     setBatches(mappedBatches);
-    setUsingFallback(false);
     setLoading(false);
   }, []);
 
@@ -87,12 +63,6 @@ export function BatchProvider({ children }: { children: ReactNode }) {
     async (data: BatchInput): Promise<Batch> => {
       setError(null);
 
-      if (usingFallback) {
-        const newBatch = createLocalBatch(data);
-        setBatches((prev) => [newBatch, ...prev]);
-        return newBatch;
-      }
-
       const { data: row, error: insertError } = await supabase
         .from('batches')
         .insert([batchToRow(data)])
@@ -108,17 +78,12 @@ export function BatchProvider({ children }: { children: ReactNode }) {
       setBatches((prev) => [newBatch, ...prev]);
       return newBatch;
     },
-    [usingFallback],
+    [],
   );
 
   const updateBatch = useCallback(
     async (id: string, data: Partial<Batch>) => {
       setError(null);
-
-      if (usingFallback) {
-        setBatches((prev) => prev.map((batch) => (batch.id === id ? { ...batch, ...data } : batch)));
-        return;
-      }
 
       const { error: updateError } = await supabase
         .from('batches')
@@ -132,17 +97,12 @@ export function BatchProvider({ children }: { children: ReactNode }) {
 
       setBatches((prev) => prev.map((batch) => (batch.id === id ? { ...batch, ...data } : batch)));
     },
-    [usingFallback],
+    [],
   );
 
   const deleteBatch = useCallback(
     async (id: string) => {
       setError(null);
-
-      if (usingFallback) {
-        setBatches((prev) => prev.filter((batch) => batch.id !== id));
-        return;
-      }
 
       const { error: deleteError } = await supabase
         .from('batches')
@@ -156,7 +116,7 @@ export function BatchProvider({ children }: { children: ReactNode }) {
 
       setBatches((prev) => prev.filter((batch) => batch.id !== id));
     },
-    [usingFallback],
+    [],
   );
 
   const assignStudentsToBatch = useCallback(

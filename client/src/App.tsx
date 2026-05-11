@@ -88,6 +88,7 @@ function App() {
         <Route path="/teachers" element={<TeachersPage />} />
         <Route path="/user-management" element={<AdminUsersPage />} />
         <Route path="/send-notification" element={<SendNotificationPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/under-development" element={<UnderDevelopment />} />
         <Route path="*" element={<UnderDevelopment />} />
       </Route>

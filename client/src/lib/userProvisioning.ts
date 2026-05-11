@@ -44,9 +44,18 @@ export async function provisionUser(payload: ProvisionUserRequest): Promise<Prov
       let errorBody: ProvisionUserResponse | null = null;
 
       try {
-        errorBody = (await httpContext.json()) as ProvisionUserResponse;
+        errorBody = (await httpContext.clone().json()) as ProvisionUserResponse;
       } catch {
-        // Fall back to the generic function error below if the body isn't JSON.
+        try {
+          const text = await httpContext.text();
+          if (text.trim()) {
+            throw new Error(text);
+          }
+        } catch (bodyError) {
+          if (bodyError instanceof Error && bodyError.message.trim()) {
+            throw bodyError;
+          }
+        }
       }
 
       if (errorBody?.error) {

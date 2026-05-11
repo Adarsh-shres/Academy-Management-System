@@ -5,7 +5,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useBatches } from '../context/BatchContext';
 import { useCourses } from '../context/CourseContext';
 import { useStudents } from '../context/StudentContext';
+import { CLASS_STUDENT_DEPARTMENTS, filterAvailableClassStudents } from '../lib/classStudentFilters';
 import { supabase } from '../lib/supabase';
+import type { StudentDepartmentFilter } from '../lib/classStudentFilters';
 
 type BatchClass = {
   id: string;
@@ -38,10 +40,12 @@ export default function ClassFormPage() {
 
   const batch = batchId ? getBatchById(batchId) : undefined;
   const [className, setClassName] = useState('');
+  const [selectedCourseId, setSelectedCourseId] = useState('');
   const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([]);
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [teacherOptions, setTeacherOptions] = useState<TeacherOption[]>([]);
   const [studentSearch, setStudentSearch] = useState('');
+  const [studentDepartmentFilter, setStudentDepartmentFilter] = useState<StudentDepartmentFilter>('All');
   const [error, setError] = useState('');
   const [isLoadingForm, setIsLoadingForm] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -62,16 +66,8 @@ export default function ClassFormPage() {
   );
 
   const availableStudents = useMemo(() => {
-    const search = studentSearch.trim().toLowerCase();
-
-    return batchStudents.filter((student) => {
-      if (selectedStudentIds.includes(student.id)) return false;
-      if (!search) return true;
-
-      const name = `${student.firstName} ${student.lastName}`.trim().toLowerCase();
-      return name.includes(search) || student.email.toLowerCase().includes(search);
-    });
-  }, [batchStudents, selectedStudentIds, studentSearch]);
+    return filterAvailableClassStudents(batchStudents, selectedStudentIds, studentSearch, studentDepartmentFilter);
+  }, [batchStudents, selectedStudentIds, studentDepartmentFilter, studentSearch]);
 
   const loadFormData = useCallback(async () => {
     if (!batchId) return;
@@ -112,6 +108,7 @@ export default function ClassFormPage() {
       } else {
         const selectedClass = classRow as BatchClass;
         setClassName(selectedClass.name || '');
+        setSelectedCourseId(selectedClass.course_id || '');
         setSelectedTeacherIds(teacherIdsForClass(selectedClass));
         setSelectedStudentIds(selectedClass.student_ids ?? []);
       }
@@ -127,10 +124,11 @@ export default function ClassFormPage() {
 
     const nextNumber = ((existingClasses as Array<{ id: string }> | null) ?? []).length + 1;
     setClassName(`Class ${String(nextNumber).padStart(2, '0')}`);
+    setSelectedCourseId(batch?.courseIds[0] ?? '');
     setSelectedTeacherIds([]);
     setSelectedStudentIds([]);
     setIsLoadingForm(false);
-  }, [batchId, classId]);
+  }, [batch?.courseIds, batchId, classId]);
 
   useEffect(() => {
     void loadFormData();
@@ -166,13 +164,17 @@ export default function ClassFormPage() {
       setError('Enter a class name.');
       return;
     }
+    if (batchCourses.length > 0 && !selectedCourseId) {
+      setError('Select which batch course this class is for.');
+      return;
+    }
 
     setIsSaving(true);
     setError('');
 
     const payload = {
       batch_id: batchId,
-      course_id: batch.courseIds[0] ?? null,
+      course_id: selectedCourseId || null,
       name: className.trim(),
       teacher_id: selectedTeacherIds[0] ?? null,
       teacher_ids: selectedTeacherIds,
@@ -257,6 +259,22 @@ export default function ClassFormPage() {
               />
             </div>
 
+            <div>
+              <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course</label>
+              <select
+                value={selectedCourseId}
+                onChange={(event) => setSelectedCourseId(event.target.value)}
+                className="mt-2 bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+              >
+                <option value="">Select batch course</option>
+                {batchCourses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="rounded-sm border border-[#e2e8f0] bg-[#f8fafc] p-4 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Batch Students</p>
@@ -305,6 +323,7 @@ export default function ClassFormPage() {
                     <div className="min-w-0">
                       <p className="text-[13.5px] font-bold text-[#1e293b] truncate">{student.firstName} {student.lastName}</p>
                       <p className="text-[12px] text-[#64748b] truncate">{student.email}</p>
+                      <p className="mt-0.5 text-[11.5px] font-bold uppercase tracking-wide text-[#6a5182]">{student.department || 'Department not set'}</p>
                     </div>
                     <button type="button" onClick={() => removeStudent(student.id)} className="text-[12px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer">
                       Remove
@@ -335,13 +354,25 @@ export default function ClassFormPage() {
               </button>
             </div>
 
-            <div className="p-5 border-b border-[#e2e8f0]">
+            <div className="grid gap-3 p-5 border-b border-[#e2e8f0] md:grid-cols-[1fr_180px]">
               <input
                 value={studentSearch}
                 onChange={(event) => setStudentSearch(event.target.value)}
                 placeholder="Search batch students"
                 className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
               />
+              <select
+                value={studentDepartmentFilter}
+                onChange={(event) => setStudentDepartmentFilter(event.target.value as StudentDepartmentFilter)}
+                className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+              >
+                <option value="All">All Departments</option>
+                {CLASS_STUDENT_DEPARTMENTS.map((department) => (
+                  <option key={department} value={department}>
+                    {department}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="max-h-[500px] overflow-y-auto divide-y divide-[#edf2f7]">
@@ -351,6 +382,7 @@ export default function ClassFormPage() {
                     <span className="min-w-0">
                       <span className="block text-[13.5px] font-bold text-[#1e293b] truncate">{student.firstName} {student.lastName}</span>
                       <span className="block text-[12px] text-[#64748b] truncate">{student.email}</span>
+                      <span className="mt-0.5 block text-[11.5px] font-bold uppercase tracking-wide text-[#6a5182]">{student.department || 'Department not set'}</span>
                     </span>
                     <span className="shrink-0 text-[12px] font-bold text-[#6a5182]">Add</span>
                   </button>

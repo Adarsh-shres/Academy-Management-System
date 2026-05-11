@@ -11,7 +11,7 @@ import ViewSubmissionsModal from '../components/teachers/ViewSubmissionsModal';
 export default function TeacherAssignmentPage() {
   const [assignments, setAssignments] = useState<any[]>([]);
   const [submissionsCountMap, setSubmissionsCountMap] = useState<Record<string, number>>({});
-  const [totalStudents, setTotalStudents] = useState(0);
+  const [totalStudents] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

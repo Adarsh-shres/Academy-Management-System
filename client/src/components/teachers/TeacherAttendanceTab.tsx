@@ -9,11 +9,6 @@ interface Student {
   email: string;
 }
 
-interface AttendanceRecord {
-  student_id: string;
-  status: 'present' | 'absent';
-}
-
 interface TeacherAttendanceTabProps {
   classId: string | undefined;
   students: Student[];

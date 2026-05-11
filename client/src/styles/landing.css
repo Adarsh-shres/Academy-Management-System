@@ -120,22 +120,22 @@
 }
 .landing-root .hero-image img:hover { transform: translate(-3px, -3px); box-shadow: 10px 10px 0px 0px var(--on-surface); }
 
-/* MOCK BOX */
-.landing-root .mock-box {
+/* PREVIEW BOX */
+.landing-root .preview-box {
     background: var(--white); padding: 28px 32px; border: 2px solid var(--on-surface);
     box-shadow: var(--shadow-lg); min-width: 260px;
     animation: l-slideInRight 0.8s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both, l-float 5s 1s ease-in-out infinite;
 }
-.landing-root .mock-box h3 {
+.landing-root .preview-box h3 {
     font-size: 12px; font-weight: 800; color: var(--on-surface); margin-bottom: 16px; margin-top: 0;
     padding-bottom: 12px; border-bottom: 2px solid var(--on-surface); text-transform: uppercase; letter-spacing: 0.08em;
 }
-.landing-root .mock-box p {
+.landing-root .preview-box p {
     font-size: 13px; color: var(--on-surface-muted); padding: 9px 0; margin: 0;
     border-bottom: 1px solid var(--border); font-weight: 500; position: relative; overflow: hidden;
 }
-.landing-root .mock-box p::before { content: '▸ '; color: var(--primary-mid); font-size: 11px; }
-.landing-root .mock-box p:last-child { border-bottom: none; }
+.landing-root .preview-box p::before { content: '▸ '; color: var(--primary-mid); font-size: 11px; }
+.landing-root .preview-box p:last-child { border-bottom: none; }
 
 /* FEATURES */
 .landing-root .features {
@@ -150,7 +150,7 @@
 }
 .landing-root .feature-box:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 .landing-root .feature-box > div { flex: 1; }
-.landing-root .feature-box > div:not(.mock-box)::before {
+.landing-root .feature-box > div:not(.preview-box)::before {
     content: attr(data-label); display: block; font-size: 10px; font-weight: 800;
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary-mid); margin-bottom: 10px;
 }
@@ -258,5 +258,5 @@
     .landing-root .hero-image { max-width: 100%; order: -1; }
     .landing-root .cards { grid-template-columns: 1fr; padding: 60px 24px; }
     .landing-root .features { padding: 60px 24px; }
-    .landing-root .contact-right, .landing-root .mock-box { min-width: unset; width: 100%; box-sizing: border-box; }
+    .landing-root .contact-right, .landing-root .preview-box { min-width: unset; width: 100%; box-sizing: border-box; }
 }

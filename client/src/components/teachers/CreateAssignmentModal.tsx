@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { sendNotificationToUsers } from '../../lib/notifications';
 
 interface CreateAssignmentModalProps {
   isOpen: boolean;
@@ -212,14 +213,15 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
           await supabase.from('submissions').insert(submissions);
 
           // 2. Create notifications for enrolled students
-          const notifications = studentIds.map((studentId: string) => ({
-            user_id: studentId,
+          await sendNotificationToUsers(studentIds.map((studentId: string) => ({
+            userId: studentId,
             title: 'New Assignment Posted',
             message: `A new assignment "${title}" has been added for your course.`,
             type: 'update',
-            is_read: false,
-          }));
-          await supabase.from('notifications').insert(notifications);
+            classId,
+            assignmentId: newAssignment.id,
+            teacherId: user.id,
+          })));
         }
       }
 

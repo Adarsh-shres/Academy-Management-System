@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { sendClassNotification } from '../lib/notifications';
 import { useAuth } from '../context/AuthContext';
 import { Bell, Mail, ChevronLeft, Users, Send, ClipboardList } from '../components/shared/icons';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
@@ -249,18 +250,14 @@ export default function TeacherClassDetailPage() {
 
     setIsSending(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not logged in");
+      if (!classId) throw new Error('Class could not be resolved.');
 
-      const { error } = await supabase.from('notifications').insert({
-        class_id: classId,
-        teacher_id: user.id,
-        message: `${title.toUpperCase()}\n\n${message}`,
+      await sendClassNotification({
+        classId,
+        title,
+        message,
         type: 'manual',
-        created_at: new Date().toISOString()
       });
-
-      if (error) throw error;
 
       alert('Notification broadcasted to all enrolled students!');
       setTitle('');

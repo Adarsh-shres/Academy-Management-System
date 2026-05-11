@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNotificationContext } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
 
 type FilterType = 'all' | 'unread' | 'class' | 'personal';
 
@@ -10,7 +11,9 @@ export default function NotificationBell() {
   const [showToast, setShowToast] = useState(false);
   
   const { notifications, unreadCount, markAsRead, markAllAsRead, latestNotification, clearLatestNotification } = useNotificationContext();
+  const { user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const historyPath = user?.role === 'student' ? '/student/notifications' : '/notifications';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -156,7 +159,7 @@ export default function NotificationBell() {
           
           <div className="border-t border-[#e7dff0] p-3 bg-white">
             <Link 
-              to="/notifications" 
+              to={historyPath} 
               onClick={() => setIsOpen(false)}
               className="flex items-center justify-center gap-2 w-full py-2 text-[12px] font-extrabold text-[#4b3f68] hover:bg-[#f3eff7] rounded-[8px] transition-colors uppercase tracking-wider"
             >

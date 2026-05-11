@@ -22,7 +22,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 /** Loads the app profile linked to an authenticated Supabase user. */
-async function fetchUserProfile(userId: string, email?: string): Promise<AuthUser | null> {
+async function fetchUserProfile(userId: string): Promise<AuthUser | null> {
   const { data, error } = await supabase
     .from('users')
     .select('id, email, name, role')
@@ -37,17 +37,6 @@ async function fetchUserProfile(userId: string, email?: string): Promise<AuthUse
   const row = data?.[0];
   if (!row) {
     console.warn('[AuthContext] No profile row found for user', userId);
-
-    // Keeps local teacher login working when the users table is not seeded.
-    if (email === 'ram@s.edu') {
-      return {
-        id: userId,
-        email,
-        name: 'Ram (Teacher)',
-        role: 'teacher',
-      };
-    }
-
     return null;
   }
 
@@ -71,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id, session.user.email);
+        const profile = await fetchUserProfile(session.user.id);
         if (isMounted) {
           setUser(profile);
         }
@@ -95,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (event === 'TOKEN_REFRESHED') {
-          const profile = await fetchUserProfile(session.user.id, session.user.email);
+          const profile = await fetchUserProfile(session.user.id);
           if (isMounted) {
             setUser(profile);
             setIsLoading(false);
@@ -118,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: error.message };
       }
 
-      const profile = await fetchUserProfile(data.user.id, data.user.email);
+      const profile = await fetchUserProfile(data.user.id);
       if (!profile) {
         await supabase.auth.signOut();
         return {

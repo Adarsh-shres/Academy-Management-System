@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ScheduleEntry } from '../types/schedule';
-import { MOCK_SCHEDULE } from '../data/mockSchedule';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import { isMissingTeacherSchedulesTable } from '../lib/supabaseErrors';
@@ -79,7 +78,7 @@ interface ScheduleContextValue {
 
 const ScheduleContext = createContext<ScheduleContextValue | null>(null);
 
-let nextId = MOCK_SCHEDULE.length + 1;
+let nextId = 1;
 
 function teacherIdsForClass(classRow: TeacherClassRow) {
   return Array.from(new Set([...(classRow.teacher_ids ?? []), ...(classRow.teacher_id ? [classRow.teacher_id] : [])]));
@@ -97,7 +96,7 @@ function sortTeacherEntries(entries: ScheduleEntry[]) {
 /** Stores schedule data and exposes local schedule mutations. */
 export function ScheduleProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [schedule, setSchedule] = useState<ScheduleEntry[]>(MOCK_SCHEDULE);
+  const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
   const [teacherSchedule, setTeacherSchedule] = useState<ScheduleEntry[]>([]);
 
   useEffect(() => {
@@ -221,7 +220,6 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       return teacherSchedule;
     }
 
-    // Students still use the mock schedule for now.
     return schedule.slice(-4);
   }, [schedule, teacherSchedule, user]);
 
