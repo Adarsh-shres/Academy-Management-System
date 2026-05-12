@@ -308,7 +308,7 @@ export function useStudentData() {
         if (classIds.length > 0) {
           const { data: assignmentsData, error: aError } = await supabase
             .from('assignments')
-            .select('*')
+            .select('*, courses(name, course_code)')
             .in('class_id', classIds);
 
           if (aError) {
@@ -330,8 +330,7 @@ export function useStudentData() {
           }, {});
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
-            const classObj = (classesData2 || []).find((c: any) => c.id === assign.class_id);
-            const courseObj = Array.isArray(classObj?.courses) ? classObj.courses[0] : classObj?.courses;
+            const courseObj = Array.isArray(assign.courses) ? assign.courses[0] : assign.courses;
             const sub = submissionMap[assign.id];
             
             return {

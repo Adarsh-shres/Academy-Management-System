@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
@@ -47,11 +46,7 @@ export function BatchProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const loadBatches = async () => {
-      await fetchBatches();
-    };
-
-    void loadBatches();
+    void fetchBatches();
   }, [fetchBatches]);
 
   const getBatchById = useCallback(
