@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Course, CourseRow } from '../types/course';

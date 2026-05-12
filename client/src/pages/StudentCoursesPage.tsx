@@ -71,7 +71,7 @@ export default function StudentCoursesPage() {
       {/* Course detail modal */}
       {selectedCourse && createPortal(
         <div
-          className="fixed inset-0 bg-[#391f56]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setSelectedCourse(null)}
         >
           <div

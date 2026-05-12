@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 interface Assignment {
   deadline: string;
@@ -6,9 +8,13 @@ interface Assignment {
 }
 
 export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsList?: Assignment[] }) {
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
-  const [notes, setNotes] = useState<Record<number, string>>({});
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [currentNote, setCurrentNote] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingNote, setIsLoadingNote] = useState(false);
+  const [noteError, setNoteError] = useState<string | null>(null);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -17,6 +23,124 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  /** Format a day number into YYYY-MM-DD for consistent storage */
+  const formatDate = useCallback((day: number) => {
+    const m = String(month + 1).padStart(2, '0');
+    const d = String(day).padStart(2, '0');
+    return `${year}-${m}-${d}`;
+  }, [year, month]);
+
+  /** Fetch all notes for the current month on mount */
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchMonthNotes = async () => {
+      try {
+        const startDate = formatDate(1);
+        const endDate = formatDate(daysInMonth);
+
+        const { data, error } = await supabase
+          .from('calendar_notes')
+          .select('date, note')
+          .eq('user_id', user.id)
+          .gte('date', startDate)
+          .lte('date', endDate);
+
+        if (error) {
+          console.error('Error fetching calendar notes:', error);
+          return;
+        }
+
+        if (data) {
+          const notesMap: Record<string, string> = {};
+          data.forEach((row: any) => {
+            notesMap[row.date] = row.note;
+          });
+          setNotes(notesMap);
+        }
+      } catch (err: any) {
+        console.error('Error fetching calendar notes:', err);
+      }
+    };
+
+    void fetchMonthNotes();
+  }, [user, formatDate, daysInMonth]);
+
+  /** Fetch a specific note when a date is clicked */
+  useEffect(() => {
+    if (selectedDate === null || !user) return;
+
+    const dateStr = formatDate(selectedDate);
+
+    // Use cached note if available
+    if (notes[dateStr] !== undefined) {
+      setCurrentNote(notes[dateStr]);
+      return;
+    }
+
+    const fetchNote = async () => {
+      setIsLoadingNote(true);
+      setNoteError(null);
+      try {
+        const { data, error } = await supabase
+          .from('calendar_notes')
+          .select('note')
+          .eq('user_id', user.id)
+          .eq('date', dateStr)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching note:', error);
+          setNoteError('Failed to load note');
+          return;
+        }
+
+        const noteText = data?.note || '';
+        setCurrentNote(noteText);
+        setNotes(prev => ({ ...prev, [dateStr]: noteText }));
+      } catch (err: any) {
+        console.error('Error fetching note:', err);
+        setNoteError('Failed to load note');
+      } finally {
+        setIsLoadingNote(false);
+      }
+    };
+
+    void fetchNote();
+  }, [selectedDate, user, formatDate]);
+
+  /** Save note via upsert */
+  const handleSaveNote = async () => {
+    if (selectedDate === null || !user) return;
+
+    const dateStr = formatDate(selectedDate);
+    setIsSaving(true);
+    setNoteError(null);
+
+    try {
+      const { error } = await supabase
+        .from('calendar_notes')
+        .upsert(
+          { user_id: user.id, date: dateStr, note: currentNote },
+          { onConflict: 'user_id,date' }
+        );
+
+      if (error) {
+        console.error('Error saving note:', error);
+        setNoteError('Failed to save note');
+        return;
+      }
+
+      setNotes(prev => ({ ...prev, [dateStr]: currentNote }));
+      setSelectedDate(null);
+    } catch (err: any) {
+      console.error('Error saving note:', err);
+      setNoteError('Failed to save note');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const getDayStatus = (day: number) => {
     const date = new Date(year, month, day);
@@ -66,20 +190,26 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
             if (!day) return <div key={`empty-${i}`} className="min-h-[46px]" />;
             const statusCls = getDayStatus(day);
             const isToday = day === today.getDate() && month === today.getMonth();
+            const dateStr = formatDate(day);
+            const hasNote = !!notes[dateStr];
 
             return (
               <div
                 key={day}
                 onClick={() => {
                   setSelectedDate(day);
-                  setCurrentNote(notes[day] || "");
+                  setCurrentNote(notes[dateStr] || "");
+                  setNoteError(null);
                 }}
                 className={`
-                  min-h-[46px] flex flex-col items-center justify-center text-[13px] font-semibold transition-all cursor-pointer rounded-[6px] hover:border-primary hover:text-primary hover:shadow-md
+                  min-h-[46px] flex flex-col items-center justify-center text-[13px] font-semibold transition-all cursor-pointer rounded-[6px] hover:border-primary hover:text-primary hover:shadow-md relative
                   ${statusCls ? statusCls : isToday ? "bg-[#f3eff7] text-primary border border-[#e7dff0]" : "text-[#4b3f68] hover:bg-[#faf8fc]"}
                 `}
               >
                 {day}
+                {hasNote && (
+                  <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[#8b6ca8]" />
+                )}
               </div>
             );
           })}
@@ -100,30 +230,39 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
             </div>
             
             <div className="flex flex-col gap-3">
-              <textarea
-                value={currentNote}
-                onChange={(e) => setCurrentNote(e.target.value)}
-                placeholder="Type your notes or reminders here..."
-                className="w-full min-h-[120px] bg-[#f8fafc] border border-[#cbd5e1] rounded-[8px] p-3 text-[14px] text-[#1e293b] outline-none focus:border-[#6a5182] focus:ring-1 focus:ring-[#6a5182] resize-y transition-all"
-              />
+              {isLoadingNote ? (
+                <div className="flex items-center justify-center py-8 text-[13px] text-[#7c8697] font-semibold animate-pulse">
+                  Loading note...
+                </div>
+              ) : (
+                <textarea
+                  value={currentNote}
+                  onChange={(e) => setCurrentNote(e.target.value)}
+                  placeholder="Type your notes or reminders here..."
+                  className="w-full min-h-[120px] bg-[#f8fafc] border border-[#cbd5e1] rounded-[8px] p-3 text-[14px] text-[#1e293b] outline-none focus:border-[#6a5182] focus:ring-1 focus:ring-[#6a5182] resize-y transition-all"
+                />
+              )}
+
+              {noteError && (
+                <p className="text-[12px] font-semibold text-red-500">{noteError}</p>
+              )}
               
               <div className="flex gap-3 mt-4">
                 <button
                   type="button"
                   onClick={() => setSelectedDate(null)}
-                  className="flex-1 bg-[#f3eff7] hover:bg-[#e2d9ed] text-[#4b3f68] text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors cursor-pointer"
+                  disabled={isSaving}
+                  className="flex-1 bg-[#f3eff7] hover:bg-[#e2d9ed] text-[#4b3f68] text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setNotes({ ...notes, [selectedDate]: currentNote });
-                    setSelectedDate(null);
-                  }}
-                  className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors shadow-sm cursor-pointer"
+                  onClick={handleSaveNote}
+                  disabled={isSaving || isLoadingNote}
+                  className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors shadow-sm cursor-pointer disabled:opacity-70"
                 >
-                  Save Note
+                  {isSaving ? 'Saving...' : 'Save Note'}
                 </button>
               </div>
             </div>

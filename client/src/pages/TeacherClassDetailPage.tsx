@@ -1,6 +1,3 @@
-// SQL Required before testing:
-// ALTER TABLE quizzes ADD COLUMN IF NOT EXISTS access_code TEXT DEFAULT NULL;
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
