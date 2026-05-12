@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { ChevronLeft, ChevronRight, ClipboardList, FileText } from '../components/shared/icons';
 import NotificationBell from '../components/shared/NotificationBell';
@@ -94,7 +95,6 @@ const TeacherInstitutionalCalendar = () => {
   );
 };
 
-import { useLocation } from 'react-router-dom';
 
 /** Coordinates teacher dashboard tabs and dashboard-side actions. */
 export default function TeacherDashboardPage() {
