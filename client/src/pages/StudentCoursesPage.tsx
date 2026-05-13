@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { useStudentData } from "../hooks/useStudentData";
 import StudentCourseCard from "../components/students/StudentCourseCard";
 import type { Course } from "../components/students/StudentCourseCard";
 
 export default function StudentCoursesPage() {
+  const navigate = useNavigate();
   const { courses, isLoading, error } = useStudentData();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
@@ -64,6 +66,7 @@ export default function StudentCoursesPage() {
             key={course.id}
             course={course}
             onViewDetails={setSelectedCourse}
+            onViewFolders={(selected) => navigate(`/student/courses/${selected.id}/folders`)}
           />
         ))}
       </div>

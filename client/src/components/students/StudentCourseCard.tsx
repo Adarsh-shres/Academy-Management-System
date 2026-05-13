@@ -14,9 +14,10 @@ export interface Course {
 interface StudentCourseCardProps {
   course: Course;
   onViewDetails?: (course: Course) => void;
+  onViewFolders?: (course: Course) => void;
 }
 
-export default function StudentCourseCard({ course, onViewDetails }: StudentCourseCardProps) {
+export default function StudentCourseCard({ course, onViewDetails, onViewFolders }: StudentCourseCardProps) {
   const { name, code, instructor, attendance, totalClasses, attendedClasses, color } = course;
 
   const getAttendanceColor = (pct: number) => {
@@ -78,12 +79,20 @@ export default function StudentCourseCard({ course, onViewDetails }: StudentCour
         </div>
 
         {/* Action */}
-        <button
-          onClick={() => onViewDetails && onViewDetails(course)}
-          className="w-full py-3 rounded-[8px] text-[13px] font-semibold uppercase tracking-wider text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors duration-200"
-        >
-          View Details
-        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button
+            onClick={() => onViewDetails && onViewDetails(course)}
+            className="w-full py-3 rounded-[8px] text-[12px] font-semibold uppercase tracking-wider text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors duration-200"
+          >
+            View Details
+          </button>
+          <button
+            onClick={() => onViewFolders && onViewFolders(course)}
+            className="w-full py-3 rounded-[8px] text-[12px] font-semibold uppercase tracking-wider text-white bg-primary hover:opacity-90 transition-opacity duration-200"
+          >
+            View Folders
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -147,8 +147,8 @@ function App() {
         <Route path="/student/attendance/:classId" element={<StudentAttendanceDetailPage />} />
         <Route path="/student/profile" element={<StudentProfilePage />} />
         <Route path="/student/notifications" element={<NotificationsPage />} />
-        <Route path="/student/folders" element={<StudentFoldersPage />} />
-        <Route path="/student/folders/:folderId" element={<FolderContentsPage />} />
+        <Route path="/student/courses/:courseId/folders" element={<StudentFoldersPage />} />
+        <Route path="/student/courses/:courseId/folders/:folderId" element={<FolderContentsPage />} />
       </Route>
     </Routes>
     <AIChatBot />
