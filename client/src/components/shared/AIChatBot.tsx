@@ -62,7 +62,7 @@ export default function AIChatBot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "**YOGIFY BOT ONLINE** ⚡\n\nYour Academy AI assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
+      content: "**LEARNIFY ONLINE** ⚡\n\nYour Learnify assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
     },
   ]);
   const [input, setInput] = useState('');
@@ -126,7 +126,7 @@ export default function AIChatBot() {
   function clearChat() {
     setMessages([{
       role: 'assistant',
-      content: "**YOGIFY BOT ONLINE** ⚡\n\nYour Academy AI assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
+      content: "**LEARNIFY ONLINE** ⚡\n\nYour Learnify assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
     }]);
     setError(null);
   }
@@ -137,7 +137,7 @@ export default function AIChatBot() {
       <button
         id="ai-chatbot-toggle"
         onClick={() => setOpen(o => !o)}
-        title="Yogify Bot AI Assistant"
+        title="Learnify AI Assistant"
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
           width: 54, height: 54, borderRadius: '50%', border: 'none', cursor: 'pointer',
@@ -193,7 +193,7 @@ export default function AIChatBot() {
           {BOT_AVATAR}
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#e2d9f3', letterSpacing: '0.05em' }}>
-              YOGIFY BOT
+              LEARNIFY
             </div>
             <div style={{ fontSize: 10.5, color: '#7c6b9e', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 5 }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 6px #4ade80' }}/>
@@ -310,7 +310,7 @@ export default function AIChatBot() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask Yogify Bot..."
+            placeholder="Ask Learnify..."
             rows={1}
             style={{
               flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(106,81,130,0.3)',
