@@ -15,7 +15,6 @@ export default function StudentProfilePage() {
   const fields: { label: string, key: keyof StudentProfileData }[] = [
     { label: "Full Name", key: "name" },
     { label: "Email Address", key: "email" },
-    { label: "Roll Number", key: "rollNo" },
     { label: "Department", key: "department" },
     { label: "Course", key: "course" },
     { label: "Semester", key: "semester" },
@@ -49,7 +48,6 @@ export default function StudentProfilePage() {
             <h2 className="font-sans text-[24px] font-bold leading-tight tracking-tight">{studentProfile.name}</h2>
             <p className="text-[#efe8f5] text-[14px] font-medium mt-[2px] mb-3">{studentProfile.email}</p>
             <div className="flex items-center justify-center md:justify-start gap-2.5 flex-wrap">
-              <span className="text-[11px] font-semibold bg-[#412e54]/30 px-3 py-1 rounded-[6px] uppercase tracking-wide border border-white/10">{studentProfile.rollNo}</span>
               <span className="text-[11px] font-semibold bg-[#412e54]/30 px-3 py-1 rounded-[6px] uppercase tracking-wide border border-white/10">{studentProfile.semester}</span>
             </div>
           </div>

@@ -23,14 +23,28 @@ export interface AssignmentData {
   courseCode: string;
   deadline: string;
   status: 'pending' | 'submitted';
-  marks: string;
-  grade: string | null;
+  grade: number | null;
+  gradeStatus: 'pending' | 'partial' | 'completed';
+  feedback: string | null;
+  gradedAt: string | null;
   submittedOn: string | null;
   isPending: boolean;
   description?: string;
   fileUrl?: string;
   portalOpen: boolean;
   isPastDue: boolean;
+  submissionHistory: SubmissionHistoryItem[];
+}
+
+export interface SubmissionHistoryItem {
+  id: string;
+  fileUrl: string | null;
+  status: string;
+  grade: number | null;
+  gradeStatus: 'pending' | 'partial' | 'completed';
+  feedback: string | null;
+  gradedAt: string | null;
+  submittedAt: string | null;
 }
 
 export interface StudentProfileData {
@@ -112,7 +126,7 @@ export function useStudentData() {
           avatar: buildStudentAvatar(currentUser.name || 'Student'),
           course: 'Course assigned through batches',
           semester: 'Semester not set',
-          rollNo: `STD-${currentUser.id.substring(0, 4).toUpperCase()}`,
+          rollNo: '',
           department: profileRow?.department || 'Department not set yet',
           batch: enrolledYear ? `${enrolledYear}-${enrolledYear + 4}` : 'Batch not set',
           phone: profileRow?.mobile_no || 'N/A',
@@ -318,20 +332,31 @@ export function useStudentData() {
           const { data: submissionsData, error: subError } = await supabase
             .from('submissions')
             .select('*')
-            .eq('student_id', currentUser.id);
+            .eq('student_id', currentUser.id)
+            .order('submitted_at', { ascending: false });
 
           if (subError) {
             console.error('Fetch Submissions Error:', subError);
           }
 
-          const submissionMap = (submissionsData || []).reduce((acc: any, sub: any) => {
-            acc[sub.assignment_id] = sub;
+          const toGradeStatus = (grade: number | null | undefined): 'pending' | 'partial' | 'completed' => {
+            if (grade === null || grade === undefined) return 'pending';
+            return grade >= 80 ? 'completed' : 'partial';
+          };
+
+          const submissionMap = (submissionsData || []).reduce((acc: Record<string, any[]>, sub: any) => {
+            const isActualSubmission = !!sub.file_url || sub.status !== 'pending' || sub.grade !== null;
+            if (!isActualSubmission) return acc;
+            if (!acc[sub.assignment_id]) acc[sub.assignment_id] = [];
+            acc[sub.assignment_id].push(sub);
             return acc;
           }, {});
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
             const courseObj = Array.isArray(assign.courses) ? assign.courses[0] : assign.courses;
-            const sub = submissionMap[assign.id];
+            const submissionHistoryRows = submissionMap[assign.id] || [];
+            const sub = submissionHistoryRows[0];
+            const grade = sub?.grade ?? null;
             
             return {
               id: assign.id,
@@ -340,14 +365,26 @@ export function useStudentData() {
               courseCode: courseObj?.course_code || '---',
               deadline: assign.due_date || new Date().toISOString(),
               status: sub ? 'submitted' : 'pending',
-              marks: sub?.grade !== null && sub?.grade !== undefined ? `${sub.grade} marks` : 'Pending',
-              grade: sub?.grade !== undefined ? String(sub.grade) : null,
+              grade,
+              gradeStatus: toGradeStatus(grade),
+              feedback: sub?.feedback || null,
+              gradedAt: sub?.graded_at || null,
               submittedOn: sub?.submitted_at || null,
               isPending: !sub,
               description: assign.description,
               fileUrl: sub?.file_url,
               portalOpen: assign.portal_open ?? true,
               isPastDue: assign.due_date ? new Date(assign.due_date) < new Date() : false,
+              submissionHistory: submissionHistoryRows.map((row: any) => ({
+                id: row.id,
+                fileUrl: row.file_url || null,
+                status: row.status || 'submitted',
+                grade: row.grade ?? null,
+                gradeStatus: toGradeStatus(row.grade),
+                feedback: row.feedback || null,
+                gradedAt: row.graded_at || null,
+                submittedAt: row.submitted_at || null,
+              })),
             };
           });
         }
