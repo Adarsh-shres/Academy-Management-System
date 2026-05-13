@@ -8,12 +8,11 @@ export interface CourseData {
   name: string;
   code: string;
   instructor: string;
-  credits: number;
   attendance: number;
   totalClasses: number;
   attendedClasses: number;
   color: string;
-  schedule: string;
+  classNames: string[];
 }
 
 export interface AssignmentData {
@@ -265,17 +264,22 @@ export function useStudentData() {
             const totalClasses = courseAtt.total;
             const attendedClasses = courseAtt.present;
             const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
+            const courseClasses = enrolledClasses.filter((cls: any) => cls.course_id === course?.id);
+            const classNames = courseClasses.map((cls: any) => cls.name).filter(Boolean);
+            const instructor = courseClasses
+              .map((cls: any) => teacherMap.get(cls.teacher_id))
+              .find(Boolean) || course?.faculty_lead || '';
+
             return {
               id: course.id,
-              name: course.name || 'Unknown Course',
-              code: course.course_code || '---',
-              instructor: course.faculty_lead || 'Unknown',
-              credits: 3,
+              name: course.name || 'Untitled Course',
+              code: course.course_code || '',
+              instructor,
               attendance: attendancePercent,
               totalClasses,
               attendedClasses,
               color: uiColors[idx % uiColors.length],
-              schedule: 'See assigned class schedule',
+              classNames,
             };
           });
         } else {
@@ -292,15 +296,17 @@ export function useStudentData() {
             const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
             mappedCourses.push({
               id: course.id,
-              name: course.name || 'Unknown Course',
-              code: course.course_code || '---',
-              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || 'Unknown',
-              credits: 3,
+              name: course.name || 'Untitled Course',
+              code: course.course_code || '',
+              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || '',
               attendance: attendancePercent,
               totalClasses,
               attendedClasses,
               color: uiColors[mappedCourses.length % uiColors.length],
-              schedule: 'See assigned class schedule',
+              classNames: enrolledClasses
+                .filter((classRow: any) => classRow.course_id === course.id)
+                .map((classRow: any) => classRow.name)
+                .filter(Boolean),
             });
           });
         }

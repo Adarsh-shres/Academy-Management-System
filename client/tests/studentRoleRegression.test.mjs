@@ -30,3 +30,12 @@ test('student data includes classes through batch roster membership', () => {
   assert.match(schedulePage, /\.from\('batches'\)/);
   assert.match(schedulePage, /\.in\('batch_id', batchIds\)/);
 });
+
+test('student course details avoid fake fields and use real available course data', () => {
+  assert.match(coursesPage, /courseDetailRows/);
+  assert.match(coursesPage, /No verified course details are available yet/);
+  assert.doesNotMatch(coursesPage, /Credit Hours/);
+  assert.doesNotMatch(coursesPage, /credit hours/);
+  assert.doesNotMatch(useStudentData, /credits: 3/);
+  assert.doesNotMatch(useStudentData, /See assigned class schedule/);
+});
