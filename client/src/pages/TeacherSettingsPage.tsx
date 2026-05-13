@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import NotificationBell from '../components/shared/NotificationBell';
+import { Bell, Mail } from '../components/shared/icons';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 
@@ -19,7 +19,12 @@ export default function TeacherSettingsPage() {
         <header className="h-[58px] bg-white border-b border-[#e7dff0] px-7 flex items-center gap-3.5 sticky top-0 z-50 shrink-0">
 
           <div className="flex items-center gap-4 ml-auto">
-            <NotificationBell />
+            <button className="relative text-[#64748b] hover:text-primary transition-colors cursor-pointer">
+              <Mail size={18} />
+            </button>
+            <button className="relative text-[#64748b] hover:text-primary transition-colors cursor-pointer">
+              <Bell size={18} />
+            </button>
             
             <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
             
