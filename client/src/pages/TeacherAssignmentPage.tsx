@@ -20,8 +20,8 @@ export default function TeacherAssignmentPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
 
-  const fetchAssignmentsData = async () => {
-    setIsLoading(true);
+  const fetchAssignmentsData = async (isBackground = false) => {
+    if (!isBackground) setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -125,7 +125,7 @@ export default function TeacherAssignmentPage() {
     fetchAssignmentsData();
 
     const intervalId = setInterval(() => {
-      fetchAssignmentsData();
+      fetchAssignmentsData(true);
     }, 60000);
 
     return () => clearInterval(intervalId);
