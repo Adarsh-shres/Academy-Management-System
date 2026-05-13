@@ -13,6 +13,7 @@ export interface Assignment {
   marks: string;
   submittedOn?: string | null;
   grade?: string | null;
+  isLate?: boolean;
   fileUrl?: string;
   portalOpen?: boolean;
   isPastDue?: boolean;
@@ -27,7 +28,7 @@ interface StudentAssignmentCardProps {
 export default function StudentAssignmentCard({ assignment, compact = false, onSubmitted }: StudentAssignmentCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const { title, course, courseCode, deadline, status, marks, submittedOn, grade } = assignment;
+  const { title, course, courseCode, deadline, status, marks, submittedOn, grade, isLate } = assignment;
 
   const isPending = status === "pending";
   const isClosed = status === "closed";
@@ -70,11 +71,12 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
             <span
               className={`text-[10px] font-semibold px-2 py-[2px] uppercase tracking-wide rounded-full border flex-shrink-0 ${
                 isClosed ? "text-[#94a3b8] bg-[#faf8fc] border-[#e2d9ed]" :
-                isPending ? "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" : 
+                isPending ? "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" :
+                isLate ? "text-[#b45309] bg-[#fffbeb] border-[#fde68a]" :
                 "text-primary bg-[#f3eff7] border-[#e7dff0]"
               }`}
             >
-              {isClosed ? "Closed" : isPending ? "Pending" : "Submitted"}
+              {isClosed ? (assignment.isPastDue ? "Overdue" : "Closed") : isPending ? "Pending" : isLate ? "Submitted Late" : "Submitted"}
             </span>
           </div>
 
@@ -108,7 +110,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
               disabled
               className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-[#94a3b8] bg-[#f1f5f9] cursor-not-allowed"
             >
-              Portal Closed
+              {assignment.isPastDue ? 'Overdue' : 'Portal Closed'}
             </button>
           ) : isPending ? (
             <button 

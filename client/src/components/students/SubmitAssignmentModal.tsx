@@ -52,28 +52,73 @@ export default function SubmitAssignmentModal({ isOpen, onClose, assignment, onS
       alert('Please upload a file to submit.');
       return;
     }
+    if (assignment.status === 'closed' || assignment.portalOpen === false || assignment.isPastDue) {
+      alert('This assignment is overdue or closed and can no longer be submitted.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
+      const { data: latestAssignment, error: assignmentError } = await supabase
+        .from('assignments')
+        .select('due_date, due_time, portal_open')
+        .eq('id', assignment.id)
+        .single();
+
+      if (assignmentError) throw assignmentError;
+
+      const dueDateValue = latestAssignment?.due_date ? String(latestAssignment.due_date) : '';
+      const dueDateTime = dueDateValue
+        ? new Date(dueDateValue.includes('T') ? dueDateValue : `${dueDateValue}T${latestAssignment.due_time || '23:59:00'}`)
+        : null;
+
+      if (latestAssignment?.portal_open === false || (dueDateTime && dueDateTime < new Date())) {
+        alert('This assignment is overdue or closed and can no longer be submitted.');
+        onClose();
+        onSubmitted();
+        return;
+      }
+
       const fileUrl = await handleFileUpload(file);
 
-      const { error: insertError } = await supabase
+      const { data: existingSubmissions, error: existingError } = await supabase
+        .from('submissions')
+        .select('id, status')
+        .eq('assignment_id', assignment.id)
+        .eq('student_id', user.id)
+        .order('submitted_at', { ascending: false, nullsFirst: false })
+        .limit(1);
+
+      if (existingError) throw existingError;
+
+      const existingSubmission = existingSubmissions?.[0];
+      const submissionPayload = {
+        file_url: fileUrl,
+        status: 'submitted',
+        submitted_at: new Date().toISOString(),
+      };
+
+      const { error: saveError } = existingSubmission
+        ? await supabase
+          .from('submissions')
+          .update(submissionPayload)
+          .eq('id', existingSubmission.id)
+        : await supabase
         .from('submissions')
         .insert({
           assignment_id: assignment.id,
           student_id: user.id,
-          file_url: fileUrl,
-          status: 'submitted',
-          submitted_at: new Date().toISOString(),
+          ...submissionPayload,
         });
 
-      if (insertError) throw insertError;
+      if (saveError) throw saveError;
 
       onSubmitted();
       onClose();
-    } catch (err: any) {
-      console.error('Submission error:', err.message);
-      alert('Failed to submit assignment: ' + err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Submission error:', message);
+      alert('Failed to submit assignment: ' + message);
     } finally {
       setIsSubmitting(false);
     }

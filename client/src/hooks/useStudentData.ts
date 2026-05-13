@@ -22,10 +22,11 @@ export interface AssignmentData {
   course: string;
   courseCode: string;
   deadline: string;
-  status: 'pending' | 'submitted';
+  status: 'pending' | 'submitted' | 'closed';
   marks: string;
   grade: string | null;
   submittedOn: string | null;
+  isLate: boolean;
   isPending: boolean;
   description?: string;
   fileUrl?: string;
@@ -325,29 +326,39 @@ export function useStudentData() {
           }
 
           const submissionMap = (submissionsData || []).reduce((acc: any, sub: any) => {
-            acc[sub.assignment_id] = sub;
+            const previous = acc[sub.assignment_id];
+            if (!previous || sub.status === 'submitted') {
+              acc[sub.assignment_id] = sub;
+            }
             return acc;
           }, {});
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
             const courseObj = Array.isArray(assign.courses) ? assign.courses[0] : assign.courses;
             const sub = submissionMap[assign.id];
+            const dueDateTime = assign.due_date
+              ? (String(assign.due_date).includes('T') ? String(assign.due_date) : `${assign.due_date}T${assign.due_time || '23:59:00'}`)
+              : new Date().toISOString();
+            const isSubmitted = sub?.status === 'submitted';
+            const isPastDue = new Date(dueDateTime) < new Date();
+            const submittedOn = isSubmitted ? sub?.submitted_at || null : null;
             
             return {
               id: assign.id,
               title: assign.title || 'Untitled',
               course: courseObj?.name || 'Uncategorized',
               courseCode: courseObj?.course_code || '---',
-              deadline: assign.due_date || new Date().toISOString(),
-              status: sub ? 'submitted' : 'pending',
-              marks: sub?.grade !== null && sub?.grade !== undefined ? `${sub.grade} marks` : 'Pending',
-              grade: sub?.grade !== undefined ? String(sub.grade) : null,
-              submittedOn: sub?.submitted_at || null,
-              isPending: !sub,
+              deadline: dueDateTime,
+              status: isSubmitted ? 'submitted' : (!assign.portal_open || isPastDue ? 'closed' : 'pending'),
+              marks: isSubmitted && sub?.grade !== null && sub?.grade !== undefined ? `${sub.grade} marks` : 'Pending',
+              grade: isSubmitted && sub?.grade !== undefined ? String(sub.grade) : null,
+              submittedOn,
+              isLate: Boolean(submittedOn && new Date(submittedOn) > new Date(dueDateTime)),
+              isPending: !isSubmitted,
               description: assign.description,
-              fileUrl: sub?.file_url,
+              fileUrl: isSubmitted ? sub?.file_url : undefined,
               portalOpen: assign.portal_open ?? true,
-              isPastDue: assign.due_date ? new Date(assign.due_date) < new Date() : false,
+              isPastDue,
             };
           });
         }
