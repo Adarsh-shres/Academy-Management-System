@@ -51,6 +51,7 @@ export default function StudentClassDetailPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [quizLoadError, setQuizLoadError] = useState('');
 
   // Use a ref for answers to ensure the timer auto-submit gets the latest state without being a dependency
   const answersRef = useRef(answers);
@@ -64,6 +65,7 @@ export default function StudentClassDetailPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setCurrentUserId(user.id);
+      setQuizLoadError('');
 
       try {
         const { data: qData, error: qError } = await supabase
@@ -89,8 +91,9 @@ export default function StudentClassDetailPage() {
           }, {} as Record<string, QuizSubmission>);
           setSubmissions(subsMap);
         }
-      } catch (err) {
-        console.error('Failed to load data', err);
+      } catch (err: any) {
+        console.error('Failed to load quizzes', err);
+        setQuizLoadError(err.message || 'Failed to load quizzes.');
         setQuizzes([]);
       }
     }
@@ -352,7 +355,12 @@ export default function StudentClassDetailPage() {
     <div className="p-8 max-w-4xl mx-auto flex flex-col gap-6">
       <h1 className="text-2xl font-extrabold text-[#4b3f68] tracking-tight">Class Quizzes</h1>
       
-      {quizzes.length === 0 ? (
+      {quizLoadError ? (
+        <div className="bg-white rounded-md border border-[#fecaca] p-8 text-center">
+          <p className="text-[#dc2626] font-semibold">Failed to load quizzes.</p>
+          <p className="text-[13px] text-[#64748b] mt-2">{quizLoadError}</p>
+        </div>
+      ) : quizzes.length === 0 ? (
         <div className="bg-white rounded-md border border-dashed border-[#e7dff0] p-12 text-center">
           <p className="text-[#94a3b8] font-semibold">No quizzes available for this class.</p>
         </div>

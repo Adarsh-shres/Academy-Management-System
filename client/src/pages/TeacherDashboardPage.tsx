@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Bell, ChevronLeft, ChevronRight, ClipboardList, FileText, CalendarCheck2, MapPin, Users, PenLine } from '../components/shared/icons';
+import { Bell, ChevronLeft, ChevronRight, FileText, CalendarCheck2, MapPin, Users, PenLine } from '../components/shared/icons';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherWhatsDue from '../components/teachers/TeacherWhatsDue';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
@@ -114,7 +114,7 @@ const TeacherNotificationBell = () => {
 
 const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDate: Date, setSelectedDate: (d: Date) => void }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [refresh, setRefresh] = useState(0);
+  const [, setRefresh] = useState(0);
 
   useEffect(() => {
     const handler = () => setRefresh(r => r + 1);
@@ -643,11 +643,6 @@ export default function TeacherDashboardPage() {
   };
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [selectedClassForAttendance, setSelectedClassForAttendance] = useState<any>(null);
-
-  const handleTakeAttendance = (course: any) => {
-    setSelectedClassForAttendance(course);
-    setIsAttendanceModalOpen(true);
-  };
 
   const getRelativeTime = (dateStr: string) => {
     const d = new Date(dateStr);

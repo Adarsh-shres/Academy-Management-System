@@ -16,6 +16,10 @@ export default function ViewStudentSubmissionModal({ isOpen, onClose, assignment
   }, [isOpen]);
 
   if (!isOpen || !assignment) return null;
+  const gradeStatusLabel =
+    assignment.gradeStatus === 'completed' ? 'Completed' :
+    assignment.gradeStatus === 'partial' ? 'Partial' :
+    'Pending';
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -55,11 +59,19 @@ export default function ViewStudentSubmissionModal({ isOpen, onClose, assignment
           <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-[8px] p-4 flex flex-col gap-4">
             <div className="flex justify-between items-center border-b border-[#e2e8f0] pb-3">
               <span className="text-[13px] font-bold text-[#64748b] uppercase tracking-wider">Grade</span>
-              <span className="text-[15px] font-bold text-[#4b3f68]">{assignment.grade || 'Not Graded Yet'}</span>
+              <span className="text-[15px] font-bold text-[#4b3f68]">
+                {assignment.grade !== null && assignment.grade !== undefined ? assignment.grade : 'Not Graded Yet'}
+              </span>
             </div>
             <div className="flex justify-between items-center border-b border-[#e2e8f0] pb-3">
-              <span className="text-[13px] font-bold text-[#64748b] uppercase tracking-wider">Marks Awarded</span>
-              <span className="text-[15px] font-bold text-[#4b3f68]">{assignment.marks !== 'Pending' ? assignment.marks : '—'}</span>
+              <span className="text-[13px] font-bold text-[#64748b] uppercase tracking-wider">Status</span>
+              <span className="text-[15px] font-bold text-[#4b3f68]">{gradeStatusLabel}</span>
+            </div>
+            <div className="border-b border-[#e2e8f0] pb-3">
+              <span className="text-[13px] font-bold text-[#64748b] uppercase tracking-wider">Teacher Remarks</span>
+              <p className="mt-2 text-[13px] font-medium text-[#4b3f68] leading-relaxed">
+                {assignment.feedback || 'No remarks yet.'}
+              </p>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-[13px] font-bold text-[#64748b] uppercase tracking-wider">Your File</span>

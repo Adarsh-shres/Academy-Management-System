@@ -8,12 +8,11 @@ export interface CourseData {
   name: string;
   code: string;
   instructor: string;
-  credits: number;
   attendance: number;
   totalClasses: number;
   attendedClasses: number;
   color: string;
-  schedule: string;
+  classNames: string[];
 }
 
 export interface AssignmentData {
@@ -22,16 +21,29 @@ export interface AssignmentData {
   course: string;
   courseCode: string;
   deadline: string;
-  status: 'pending' | 'submitted' | 'closed';
-  marks: string;
-  grade: string | null;
+  status: 'pending' | 'submitted';
+  grade: number | null;
+  gradeStatus: 'pending' | 'partial' | 'completed';
+  feedback: string | null;
+  gradedAt: string | null;
   submittedOn: string | null;
-  isLate: boolean;
   isPending: boolean;
   description?: string;
   fileUrl?: string;
   portalOpen: boolean;
   isPastDue: boolean;
+  submissionHistory: SubmissionHistoryItem[];
+}
+
+export interface SubmissionHistoryItem {
+  id: string;
+  fileUrl: string | null;
+  status: string;
+  grade: number | null;
+  gradeStatus: 'pending' | 'partial' | 'completed';
+  feedback: string | null;
+  gradedAt: string | null;
+  submittedAt: string | null;
 }
 
 export interface StudentProfileData {
@@ -113,7 +125,7 @@ export function useStudentData() {
           avatar: buildStudentAvatar(currentUser.name || 'Student'),
           course: 'Course assigned through batches',
           semester: 'Semester not set',
-          rollNo: `STD-${currentUser.id.substring(0, 4).toUpperCase()}`,
+          rollNo: '',
           department: profileRow?.department || 'Department not set yet',
           batch: enrolledYear ? `${enrolledYear}-${enrolledYear + 4}` : 'Batch not set',
           phone: profileRow?.mobile_no || 'N/A',
@@ -122,15 +134,40 @@ export function useStudentData() {
         // ── Fetch classes where this student is enrolled (student_ids contains user id) ──
         const { data: classesData, error: classesError } = await supabase
           .from('classes')
-          .select('id, name, course_id, teacher_id, student_ids')
+          .select('id, name, course_id, teacher_id, student_ids, batch_id')
           .contains('student_ids', [currentUser.id]);
 
         if (classesError && classesError.code !== '42P01') {
           console.error('Fetch Classes Error:', classesError);
         }
 
+        const { data: batchesData, error: batchesError } = await supabase
+          .from('batches')
+          .select('id, student_ids')
+          .contains('student_ids', [currentUser.id]);
+
+        if (batchesError && batchesError.code !== '42P01') {
+          console.error('Fetch Batches Error:', batchesError);
+        }
+
+        const batchIds = ((batchesData as Array<{ id: string }> | null) ?? []).map((batch) => batch.id);
+        let batchClassesData: any[] = [];
+
+        if (batchIds.length > 0) {
+          const { data: batchClasses, error: batchClassesError } = await supabase
+            .from('classes')
+            .select('id, name, course_id, teacher_id, student_ids, batch_id')
+            .in('batch_id', batchIds);
+
+          if (batchClassesError && batchClassesError.code !== '42P01') {
+            console.error('Fetch Batch Classes Error:', batchClassesError);
+          }
+
+          batchClassesData = batchClasses || [];
+        }
+
         // Deduplicate classes by ID to prevent the same class from showing twice
-        const rawClasses = classesData || [];
+        const rawClasses = [...(classesData || []), ...batchClassesData];
         const seenClassIds = new Set<string>();
         const enrolledClasses = rawClasses.filter((cls: any) => {
           if (seenClassIds.has(cls.id)) return false;
@@ -252,17 +289,22 @@ export function useStudentData() {
             const totalClasses = courseAtt.total;
             const attendedClasses = courseAtt.present;
             const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
+            const courseClasses = enrolledClasses.filter((cls: any) => cls.course_id === course?.id);
+            const classNames = courseClasses.map((cls: any) => cls.name).filter(Boolean);
+            const instructor = courseClasses
+              .map((cls: any) => teacherMap.get(cls.teacher_id))
+              .find(Boolean) || course?.faculty_lead || '';
+
             return {
               id: course.id,
-              name: course.name || 'Unknown Course',
-              code: course.course_code || '---',
-              instructor: course.faculty_lead || 'Unknown',
-              credits: 3,
+              name: course.name || 'Untitled Course',
+              code: course.course_code || '',
+              instructor,
               attendance: attendancePercent,
               totalClasses,
               attendedClasses,
               color: uiColors[idx % uiColors.length],
-              schedule: 'See assigned class schedule',
+              classNames,
             };
           });
         } else {
@@ -279,31 +321,24 @@ export function useStudentData() {
             const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
             mappedCourses.push({
               id: course.id,
-              name: course.name || 'Unknown Course',
-              code: course.course_code || '---',
-              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || 'Unknown',
-              credits: 3,
+              name: course.name || 'Untitled Course',
+              code: course.course_code || '',
+              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || '',
               attendance: attendancePercent,
               totalClasses,
               attendedClasses,
               color: uiColors[mappedCourses.length % uiColors.length],
-              schedule: 'See assigned class schedule',
+              classNames: enrolledClasses
+                .filter((classRow: any) => classRow.course_id === course.id)
+                .map((classRow: any) => classRow.name)
+                .filter(Boolean),
             });
           });
         }
 
         setCourses(mappedCourses);
 
-        const { data: classesData2, error: classesError2 } = await supabase
-          .from('classes')
-          .select('id, courses(name, course_code)')
-          .contains('student_ids', [currentUser.id]);
-
-        if (classesError2) {
-          console.error('Fetch Classes Error:', classesError2);
-        }
-
-        const classIds = (classesData2 || []).map(c => c.id);
+        const classIds = enrolledClassIds;
 
         let mappedAssignments: AssignmentData[] = [];
         if (classIds.length > 0) {
@@ -319,46 +354,59 @@ export function useStudentData() {
           const { data: submissionsData, error: subError } = await supabase
             .from('submissions')
             .select('*')
-            .eq('student_id', currentUser.id);
+            .eq('student_id', currentUser.id)
+            .order('submitted_at', { ascending: false });
 
           if (subError) {
             console.error('Fetch Submissions Error:', subError);
           }
 
-          const submissionMap = (submissionsData || []).reduce((acc: any, sub: any) => {
-            const previous = acc[sub.assignment_id];
-            if (!previous || sub.status === 'submitted') {
-              acc[sub.assignment_id] = sub;
-            }
+          const toGradeStatus = (grade: number | null | undefined): 'pending' | 'partial' | 'completed' => {
+            if (grade === null || grade === undefined) return 'pending';
+            return grade >= 80 ? 'completed' : 'partial';
+          };
+
+          const submissionMap = (submissionsData || []).reduce((acc: Record<string, any[]>, sub: any) => {
+            const isActualSubmission = !!sub.file_url || sub.status !== 'pending' || sub.grade !== null;
+            if (!isActualSubmission) return acc;
+            if (!acc[sub.assignment_id]) acc[sub.assignment_id] = [];
+            acc[sub.assignment_id].push(sub);
             return acc;
           }, {});
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
             const courseObj = Array.isArray(assign.courses) ? assign.courses[0] : assign.courses;
-            const sub = submissionMap[assign.id];
-            const dueDateTime = assign.due_date
-              ? (String(assign.due_date).includes('T') ? String(assign.due_date) : `${assign.due_date}T${assign.due_time || '23:59:00'}`)
-              : new Date().toISOString();
-            const isSubmitted = sub?.status === 'submitted';
-            const isPastDue = new Date(dueDateTime) < new Date();
-            const submittedOn = isSubmitted ? sub?.submitted_at || null : null;
+            const submissionHistoryRows = submissionMap[assign.id] || [];
+            const sub = submissionHistoryRows[0];
+            const grade = sub?.grade ?? null;
             
             return {
               id: assign.id,
               title: assign.title || 'Untitled',
               course: courseObj?.name || 'Uncategorized',
               courseCode: courseObj?.course_code || '---',
-              deadline: dueDateTime,
-              status: isSubmitted ? 'submitted' : (!assign.portal_open || isPastDue ? 'closed' : 'pending'),
-              marks: isSubmitted && sub?.grade !== null && sub?.grade !== undefined ? `${sub.grade} marks` : 'Pending',
-              grade: isSubmitted && sub?.grade !== undefined ? String(sub.grade) : null,
-              submittedOn,
-              isLate: Boolean(submittedOn && new Date(submittedOn) > new Date(dueDateTime)),
-              isPending: !isSubmitted,
+              deadline: assign.due_date || new Date().toISOString(),
+              status: sub ? 'submitted' : 'pending',
+              grade,
+              gradeStatus: toGradeStatus(grade),
+              feedback: sub?.feedback || null,
+              gradedAt: sub?.graded_at || null,
+              submittedOn: sub?.submitted_at || null,
+              isPending: !sub,
               description: assign.description,
-              fileUrl: isSubmitted ? sub?.file_url : undefined,
+              fileUrl: sub?.file_url,
               portalOpen: assign.portal_open ?? true,
-              isPastDue,
+              isPastDue: assign.due_date ? new Date(assign.due_date) < new Date() : false,
+              submissionHistory: submissionHistoryRows.map((row: any) => ({
+                id: row.id,
+                fileUrl: row.file_url || null,
+                status: row.status || 'submitted',
+                grade: row.grade ?? null,
+                gradeStatus: toGradeStatus(row.grade),
+                feedback: row.feedback || null,
+                gradedAt: row.graded_at || null,
+                submittedAt: row.submitted_at || null,
+              })),
             };
           });
         }

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AIChatBot from './components/shared/AIChatBot';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
@@ -30,19 +30,22 @@ import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
 import TeacherSettingsPage from './pages/TeacherSettingsPage.tsx';
+import TeacherUpdatePasswordPage from './pages/TeacherUpdatePasswordPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
 import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
-import StudentQuizzesPage from './pages/StudentQuizzesPage.tsx';
+import StudentAssignmentSubmissionPage from './pages/StudentAssignmentSubmissionPage.tsx';
 import StudentClassDetailPage from './pages/StudentClassDetailPage.tsx';
+import StudentQuizzesPage from './pages/StudentQuizzesPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentAttendanceDetailPage from './pages/StudentAttendanceDetailPage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
 import StudentSchedulePage from './pages/StudentSchedulePage.tsx';
-import NotificationsPage from './pages/NotificationsPage.tsx';
-import SendNotificationPage from './pages/SendNotificationPage.tsx';
+import UpdatePasswordPage from './pages/UpdatePasswordPage.tsx';
 import StudentFoldersPage from './pages/StudentFoldersPage.tsx';
 import FolderContentsPage from './pages/FolderContentsPage.tsx';
+import NotificationsPage from './pages/NotificationsPage.tsx';
+import SendNotificationPage from './pages/SendNotificationPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -130,6 +133,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/update-password"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherUpdatePasswordPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── Student dashboard routes ───────────────────────────── */}
       <Route
@@ -139,15 +150,18 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/student/courses" element={<StudentCoursesPage />} />
         <Route path="/student/classes/:classId" element={<StudentClassDetailPage />} />
-        <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
         <Route path="/student/quizzes" element={<StudentQuizzesPage />} />
+        <Route path="/student/assignments" element={<StudentAssignmentsPage />} />
+        <Route path="/student/assignments/:assignmentId/submissions" element={<StudentAssignmentSubmissionPage />} />
         <Route path="/student/schedule" element={<StudentSchedulePage />} />
         <Route path="/student/attendance" element={<StudentAttendancePage />} />
         <Route path="/student/attendance/:classId" element={<StudentAttendanceDetailPage />} />
         <Route path="/student/profile" element={<StudentProfilePage />} />
+        <Route path="/student/update-password" element={<UpdatePasswordPage />} />
         <Route path="/student/notifications" element={<NotificationsPage />} />
         <Route path="/student/courses/:courseId/folders" element={<StudentFoldersPage />} />
         <Route path="/student/courses/:courseId/folders/:folderId" element={<FolderContentsPage />} />
