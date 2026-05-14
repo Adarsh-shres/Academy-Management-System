@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useStudentData } from "../hooks/useStudentData";
+import { getStudentClassIdsForCourse } from "../lib/studentClassEnrollment";
 
 interface FolderSummary {
   id: string;
@@ -11,10 +12,12 @@ interface FolderSummary {
   lastUpdated: string | null;
 }
 
+const uniqueById = (rows: any[]) => Array.from(new Map(rows.map((row) => [row.id, row])).values());
+
 export default function StudentFoldersPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const { user } = useAuth();
-  const { courses } = useStudentData();
+  const { courses, isLoading: isStudentDataLoading } = useStudentData();
   const [folders, setFolders] = useState<FolderSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,42 +31,17 @@ export default function StudentFoldersPage() {
         return;
       }
 
+      if (isStudentDataLoading) {
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
 
       try {
-        const { data: directClasses, error: classesError } = await supabase
-          .from("classes")
-          .select("id, batch_id")
-          .eq("course_id", courseId)
-          .contains("student_ids", [user.id]);
-
-        if (classesError) throw classesError;
-
-        const { data: batchRows, error: batchError } = await supabase
-          .from("batches")
-          .select("id, student_ids")
-          .contains("student_ids", [user.id]);
-
-        if (batchError && batchError.code !== "42P01") throw batchError;
-
-        const batchIds = (batchRows || []).map((batch: any) => batch.id).filter(Boolean);
-        let batchClasses: any[] = [];
-
-        if (batchIds.length > 0) {
-          const { data, error } = await supabase
-            .from("classes")
-            .select("id, batch_id")
-            .eq("course_id", courseId)
-            .in("batch_id", batchIds);
-
-          if (error) throw error;
-          batchClasses = data || [];
-        }
-
         const classIds = Array.from(new Set([
-          ...(directClasses || []).map((classRow: any) => classRow.id),
-          ...batchClasses.map((classRow: any) => classRow.id),
+          ...(course?.classIds || []),
+          ...(await getStudentClassIdsForCourse(courseId, user.id)),
         ]));
         if (classIds.length === 0) {
           setFolders([]);
@@ -80,7 +58,7 @@ export default function StudentFoldersPage() {
         if (contentError) throw contentError;
 
         const grouped = new Map<number, FolderSummary>();
-        (contentRows || []).forEach((item: any) => {
+        uniqueById(contentRows || []).forEach((item: any) => {
           const weekNumber = item.week_number || 0;
           const existing = grouped.get(weekNumber);
           if (existing) {
@@ -109,7 +87,7 @@ export default function StudentFoldersPage() {
     };
 
     void loadFolders();
-  }, [courseId, user]);
+  }, [course?.classIds, courseId, isStudentDataLoading, user]);
 
   if (isLoading) {
     return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Folders...</div>;

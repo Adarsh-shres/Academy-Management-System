@@ -135,7 +135,10 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
   const handleAddContent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contentTitle.trim() || !activeWeekId || !classId) return;
+    if (!contentTitle.trim() || !activeWeekId || !classId || !courseId) {
+      alert('Class and course could not be resolved. Please reopen the class and try again.');
+      return;
+    }
     
     setIsLoading(true);
     try {
