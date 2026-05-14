@@ -22,6 +22,12 @@ export default function StudentDashboardPage() {
   const totalCourses = courses.length;
   const pendingAssignments = assignments.filter((a) => a.status === "pending").length;
   const submittedAssignments = assignments.filter((a) => a.status === "submitted").length;
+  const completedGradeCount = assignments.filter((a) => a.gradeStatus === "completed").length;
+  const partialGradeCount = assignments.filter((a) => a.gradeStatus === "partial").length;
+  const gradedAssignmentCount = completedGradeCount + partialGradeCount;
+  const statisticalGrade = gradedAssignmentCount > 0
+    ? Math.round((completedGradeCount * 100 + partialGradeCount * 50) / gradedAssignmentCount)
+    : 0;
   const avgAttendance = courses.length > 0 ? Math.round(
     courses.reduce((sum, c) => sum + c.attendance, 0) / courses.length
   ) : 100;
@@ -43,19 +49,13 @@ export default function StudentDashboardPage() {
 
         <div className="mt-7 flex gap-3 flex-wrap">
           <div className="bg-white/10 backdrop-blur-sm rounded-[6px] px-4 py-[7px] text-[11px] font-semibold uppercase tracking-wider border border-white/15">
-            Group: Morning - B
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-[6px] px-4 py-[7px] text-[11px] font-semibold uppercase tracking-wider border border-white/15">
-            ID: {studentProfile.rollNo}
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-[6px] px-4 py-[7px] text-[11px] font-semibold uppercase tracking-wider border border-white/15">
             {studentProfile.batch}
           </div>
         </div>
       </div>
 
       {/* STAT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
         <StatCard 
           icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
           label="My Courses"
@@ -74,6 +74,12 @@ export default function StudentDashboardPage() {
           label="Completed"
           value={submittedAssignments.toString()}
           subContent="Successfully turned in"
+        />
+        <StatCard
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-6"/></svg>}
+          label="Grade Score"
+          value={`${statisticalGrade}%`}
+          subContent={gradedAssignmentCount > 0 ? `${completedGradeCount} completed / ${partialGradeCount} partial` : 'No graded work yet'}
         />
         <StatCard 
           icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>}
@@ -109,20 +115,9 @@ export default function StudentDashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Actions & Recent Activity */}
+        {/* Right Column: Enrolled courses */}
         <div className="flex flex-col gap-6">
           <EnrolledCoursesList courses={courses} />
-          
-          <div className="space-y-4">
-            <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#4b3f68] tracking-tight">
-              Recent Activity
-            </h2>
-            <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_4px_12px_rgba(57,31,86,0.03)] p-2">
-              <div className="px-4 py-8 text-center text-[13px] font-semibold text-[#7c8697]">
-                No recent activity yet.
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

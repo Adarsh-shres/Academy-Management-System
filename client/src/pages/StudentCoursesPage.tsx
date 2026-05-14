@@ -18,8 +18,19 @@ export default function StudentCoursesPage() {
     return <div className="flex h-[300px] items-center justify-center text-[#4b3f68] font-semibold">{error}</div>;
   }
 
-  const totalCredits = courses.reduce((sum, c) => sum + c.credits, 0);
   const avgAttendance = courses.length > 0 ? Math.round(courses.reduce((s, c) => s + c.attendance, 0) / courses.length) : 100;
+  const recordedSessions = courses.reduce((sum, course) => sum + course.totalClasses, 0);
+  const courseDetailRows = selectedCourse ? [
+    { label: "Course Code", value: selectedCourse.code.trim() },
+    { label: "Instructor", value: selectedCourse.instructor.trim() },
+    { label: "Classes", value: selectedCourse.classNames?.join(", ") || "" },
+    {
+      label: "Attendance",
+      value: selectedCourse.totalClasses > 0
+        ? `${selectedCourse.attendance}% (${selectedCourse.attendedClasses}/${selectedCourse.totalClasses})`
+        : "",
+    },
+  ].filter((row) => row.value) : [];
 
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full">
@@ -31,12 +42,6 @@ export default function StudentCoursesPage() {
           </h1>
           <p className="text-[14px] text-[#7c8697] mt-1">{courses.length} courses this semester</p>
         </div>
-        <div className="flex gap-2.5 flex-wrap">
-          <div className="flex items-center gap-2 rounded-[8px] border border-[#e2d9ed] bg-white px-4 py-2 text-[13px] font-medium text-primary shadow-sm">
-             <span className="w-2 h-2 rounded-full bg-primary"></span>
-             Semester 5 Active
-          </div>
-        </div>
       </div>
 
       {/* Stats row */}
@@ -47,9 +52,9 @@ export default function StudentCoursesPage() {
         </div>
         <div className="relative overflow-hidden rounded-[10px] border border-[#e7dff0] bg-white p-5 shadow-[0_2px_12px_rgba(57,31,86,0.04)] flex flex-col items-center justify-center text-center">
           <p className="font-sans text-[30px] font-bold text-[#4b3f68] leading-none tracking-tight mb-2">
-            {totalCredits}
+            {recordedSessions}
           </p>
-          <p className="text-[11px] font-semibold text-[#778196] uppercase tracking-[0.06em]">Credit Hours</p>
+          <p className="text-[11px] font-semibold text-[#778196] uppercase tracking-[0.06em]">Recorded Sessions</p>
         </div>
         <div className="relative overflow-hidden rounded-[10px] border border-[#e7dff0] bg-white p-5 shadow-[0_2px_12px_rgba(57,31,86,0.04)] flex flex-col items-center justify-center text-center">
           <p className="font-sans text-[30px] font-bold text-[#778196] leading-none tracking-tight mb-2">
@@ -60,16 +65,23 @@ export default function StudentCoursesPage() {
       </div>
 
       {/* Courses grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {courses.map((course) => (
-          <StudentCourseCard
-            key={course.id}
-            course={course}
-            onViewDetails={setSelectedCourse}
-            onViewFolders={(selected) => navigate(`/student/courses/${selected.id}/folders`)}
-          />
-        ))}
-      </div>
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {courses.map((course) => (
+            <StudentCourseCard
+              key={course.id}
+              course={course}
+              onViewDetails={setSelectedCourse}
+              onViewFolders={(selected) => navigate(`/student/courses/${selected.id}/folders`)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-[10px] border border-dashed border-[#d8c8e9] bg-white p-10 text-center shadow-[0_2px_12px_rgba(57,31,86,0.04)]">
+          <h3 className="text-[16px] font-bold text-[#4b3f68]">No Courses Assigned</h3>
+          <p className="mt-1 text-[13px] font-medium text-[#7c8697]">Courses will appear here after your account is added to a class roster.</p>
+        </div>
+      )}
 
       {/* Course detail modal */}
       {selectedCourse && createPortal(
@@ -78,11 +90,11 @@ export default function StudentCoursesPage() {
           onClick={() => setSelectedCourse(null)}
         >
           <div
-            className="bg-white rounded-[12px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] p-0 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 relative border border-[#e7dff0]"
+            className="bg-white rounded-[10px] shadow-[0_24px_70px_rgba(15,23,42,0.22)] p-0 w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 relative border border-[#e7dff0]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="px-8 pt-10 pb-7 border-b border-[#f3eff7] bg-gradient-to-br from-[#f5effa] to-white relative">
+            <div className="px-7 pt-7 pb-6 border-b border-[#f3eff7] bg-white relative">
                <button
                 onClick={() => setSelectedCourse(null)}
                 className="absolute top-6 right-6 w-8 h-8 rounded-[8px] bg-white border border-[#e7dff0] flex items-center justify-center text-[#7c8697] hover:text-[#4b3f68] hover:shadow-sm transition-all"
@@ -91,27 +103,35 @@ export default function StudentCoursesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                  </svg>
                </button>
-               <div className="w-[18px] h-[5px] rounded-full mb-3" style={{ backgroundColor: selectedCourse.color }} />
-               <h3 className="font-sans text-[20px] font-bold text-[#4b3f68] tracking-tight leading-tight">{selectedCourse.name}</h3>
-               <p className="text-[13px] font-semibold text-primary tracking-wide uppercase mt-1">{selectedCourse.code}</p>
+               <div className="flex items-start gap-4 pr-10">
+                 <div className="w-12 h-12 rounded-[10px] flex items-center justify-center text-white text-[16px] font-bold shadow-sm shrink-0" style={{ backgroundColor: selectedCourse.color }}>
+                   {selectedCourse.name.substring(0, 2).toUpperCase()}
+                 </div>
+                 <div className="min-w-0">
+                   <h3 className="font-sans text-[22px] font-bold text-[#4b3f68] tracking-tight leading-tight">{selectedCourse.name}</h3>
+                   <p className="text-[13px] font-medium text-[#7c8697] mt-1">Course summary from your current class enrollment.</p>
+                 </div>
+               </div>
             </div>
 
-            <div className="px-8 py-7 space-y-4">
-              {[
-                { label: "Instructor", value: selectedCourse.instructor },
-                { label: "Schedule", value: selectedCourse.schedule },
-                { label: "Credits", value: `${selectedCourse.credits} credit hours` },
-                { label: "Total Classes", value: selectedCourse.totalClasses },
-                { label: "Attended", value: selectedCourse.attendedClasses },
-                { label: "Attendance", value: `${selectedCourse.attendance}%` },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-center py-2.5 border-b border-dashed border-[#e7dff0] last:border-0 hover:bg-[#faf8fc] px-2 transition-colors rounded-[6px]">
-                  <span className="text-[12px] font-semibold text-[#778196] uppercase tracking-wide">{label}</span>
-                  <span className="text-[13px] font-medium text-[#4b3f68]">{value}</span>
+            <div className="px-7 py-6">
+              {courseDetailRows.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {courseDetailRows.map(({ label, value }) => (
+                    <div key={label} className="rounded-[8px] border border-[#e7dff0] bg-[#fdfcff] px-4 py-3">
+                      <span className="text-[10.5px] font-bold text-[#778196] uppercase tracking-[0.08em]">{label}</span>
+                      <p className="mt-1 text-[13.5px] font-semibold text-[#4b3f68] leading-snug">{value}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <div className="rounded-[8px] border border-dashed border-[#d8c8e9] bg-[#fdfcff] px-5 py-8 text-center">
+                  <p className="text-[13px] font-semibold text-[#4b3f68]">No verified course details are available yet.</p>
+                  <p className="mt-1 text-[12px] font-medium text-[#7c8697]">Once the course has class, instructor, or attendance data, it will show here.</p>
+                </div>
+              )}
 
-              <div className="pt-6">
+              <div className="pt-5">
                 <button
                   onClick={() => setSelectedCourse(null)}
                   className="w-full py-3 rounded-[8px] text-[13px] font-semibold text-white bg-primary hover:opacity-90 transition-opacity uppercase tracking-wider"
