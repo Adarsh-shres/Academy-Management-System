@@ -72,7 +72,11 @@ select
   coalesce(au.raw_user_meta_data -> 'profile' ->> 'department', ''),
   coalesce(au.raw_user_meta_data -> 'profile' ->> 'specialization', au.raw_user_meta_data -> 'profile' ->> 'subject', ''),
   coalesce(au.raw_user_meta_data -> 'profile' ->> 'phone', ''),
-  coalesce(nullif(au.raw_user_meta_data -> 'profile' ->> 'status', ''), 'Active'),
+  case
+    when au.raw_user_meta_data -> 'profile' ->> 'status' in ('Active', 'On Leave', 'Inactive')
+      then au.raw_user_meta_data -> 'profile' ->> 'status'
+    else 'Active'
+  end,
   coalesce(au.raw_user_meta_data -> 'profile' ->> 'location', ''),
   case when au.raw_user_meta_data -> 'profile' ->> 'gender' = 'Female' then 'Female' else 'Male' end
 from public.users u

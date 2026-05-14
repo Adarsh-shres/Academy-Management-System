@@ -30,6 +30,10 @@ test('admin profile schema has admin-only write policies', () => {
   assert.match(sql, /with check \(public\.is_admin\(\)\)/i);
 });
 
+test('teacher profile backfill normalizes status metadata', () => {
+  assert.match(sql, /case\s+when au\.raw_user_meta_data -> 'profile' ->> 'status' in \('Active', 'On Leave', 'Inactive'\)\s+then au\.raw_user_meta_data -> 'profile' ->> 'status'\s+else 'Active'\s+end/i);
+});
+
 test('visual companion artifacts are ignored', () => {
   assert.match(gitignore, /^\.superpowers\/$/m);
 });
