@@ -1,4 +1,4 @@
-import type { Department, Gender, StudentFormData } from '../types/student';
+import { STUDENT_SEMESTERS, type Department, type Gender, type Semester, type StudentFormData } from '../types/student';
 
 const DEPARTMENTS: Exclude<Department, ''>[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
 const GENDERS: Gender[] = ['Male', 'Female'];
@@ -35,6 +35,7 @@ export const STUDENT_CSV_TEMPLATE_HEADERS = [
   'mobileNo',
   'gender',
   'department',
+  'semester',
   'city',
   'address',
 ];
@@ -62,6 +63,7 @@ const FIELD_ALIASES: Record<string, StudentCsvField> = {
   phonenumber: 'mobileNo',
   gender: 'gender',
   department: 'department',
+  semester: 'semester',
   city: 'city',
   address: 'address',
 };
@@ -125,6 +127,19 @@ function normalizeDepartment(value: string): Exclude<Department, ''> | null {
   return match ?? null;
 }
 
+function normalizeSemester(value: string): Exclude<Semester, ''> | null {
+  const normalized = value.trim().toLowerCase();
+  const match = STUDENT_SEMESTERS.find((semester) => semester.toLowerCase() === normalized);
+  if (match) return match;
+
+  const numericMatch = normalized.match(/^(?:semester\s*)?([1-8])$/);
+  if (numericMatch) {
+    return `Semester ${numericMatch[1]}` as Exclude<Semester, ''>;
+  }
+
+  return null;
+}
+
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
@@ -158,8 +173,10 @@ export function parseStudentCsv(text: string): StudentCsvParseResult {
     const password = getFieldValue(raw, 'password');
     const genderValue = getFieldValue(raw, 'gender');
     const departmentValue = getFieldValue(raw, 'department');
+    const semesterValue = getFieldValue(raw, 'semester');
     const gender = genderValue ? normalizeGender(genderValue) : 'Male';
     const department = departmentValue ? normalizeDepartment(departmentValue) : 'CSE';
+    const semester = semesterValue ? normalizeSemester(semesterValue) : 'Semester 1';
 
     if (!firstName) errors.push('First name is required.');
     if (!lastName) errors.push('Last name is required.');
@@ -180,12 +197,15 @@ export function parseStudentCsv(text: string): StudentCsvParseResult {
     if (!department) {
       errors.push('Department must be one of CSE, IT, ECE, Civil, Mech.');
     }
+    if (!semester) {
+      errors.push('Semester must be one of Semester 1 through Semester 8.');
+    }
 
     if (email && isValidEmail(email)) {
       seenEmails.add(email);
     }
 
-    if (errors.length > 0 || !gender || !department) {
+    if (errors.length > 0 || !gender || !department || !semester) {
       invalidRows.push({ rowNumber, errors, raw });
       return;
     }
@@ -203,6 +223,7 @@ export function parseStudentCsv(text: string): StudentCsvParseResult {
         mobileNo: getFieldValue(raw, 'mobileNo'),
         gender,
         department,
+        semester,
         city: getFieldValue(raw, 'city'),
         address: getFieldValue(raw, 'address'),
         photo: null,

@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Bell, ChevronLeft, ChevronRight, ClipboardList, FileText, CalendarCheck2, MapPin, Users, PenLine } from '../components/shared/icons';
+import { Bell, ChevronLeft, ChevronRight, FileText, CalendarCheck2, MapPin, Users, PenLine } from '../components/shared/icons';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherWhatsDue from '../components/teachers/TeacherWhatsDue';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
-import AttendanceRosterModal from '../components/teachers/AttendanceRosterModal';
 import TeacherAssignmentPage from './TeacherAssignmentPage';
 import TeacherClassesPage from './TeacherClassesPage';
 import TeacherSchedulePage from './TeacherSchedulePage';
@@ -114,7 +113,7 @@ const TeacherNotificationBell = () => {
 
 const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDate: Date, setSelectedDate: (d: Date) => void }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [refresh, setRefresh] = useState(0);
+  const [, setRefresh] = useState(0);
 
   useEffect(() => {
     const handler = () => setRefresh(r => r + 1);
@@ -641,13 +640,6 @@ export default function TeacherDashboardPage() {
     setActiveTab('Assignment');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
-  const [selectedClassForAttendance, setSelectedClassForAttendance] = useState<any>(null);
-
-  const handleTakeAttendance = (course: any) => {
-    setSelectedClassForAttendance(course);
-    setIsAttendanceModalOpen(true);
-  };
 
   const getRelativeTime = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -1116,15 +1108,6 @@ export default function TeacherDashboardPage() {
 
         <div className="flex-1 flex flex-col relative">
           {renderContent()}
-
-          <AttendanceRosterModal 
-            isOpen={isAttendanceModalOpen} 
-            onClose={() => {
-              setIsAttendanceModalOpen(false);
-              setSelectedClassForAttendance(null);
-            }} 
-            courseName={selectedClassForAttendance?.course}
-          />
         </div>
       </main>
       

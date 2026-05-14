@@ -37,6 +37,13 @@ test('student data includes classes through batch roster membership', () => {
   assert.match(schedulePage, /\.in\('batch_id', batchIds\)/);
 });
 
+test('student courses combine enrollment rows with assigned classes', () => {
+  assert.match(useStudentData, /coursesById/);
+  assert.match(useStudentData, /enrollmentsData \|\| \[\]\)\.forEach/);
+  assert.match(useStudentData, /enrolledClasses\.forEach/);
+  assert.doesNotMatch(useStudentData, /if \(enrollmentsData && enrollmentsData\.length > 0\)/);
+});
+
 test('student course details avoid fake fields and use real available course data', () => {
   assert.match(coursesPage, /courseDetailRows/);
   assert.match(coursesPage, /No verified course details are available yet/);

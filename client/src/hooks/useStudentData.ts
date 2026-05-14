@@ -124,7 +124,7 @@ export function useStudentData() {
           email: currentUser.email || '',
           avatar: buildStudentAvatar(currentUser.name || 'Student'),
           course: 'Course assigned through batches',
-          semester: 'Semester not set',
+          semester: profileRow?.semester || 'Semester not set',
           rollNo: '',
           department: profileRow?.department || 'Department not set yet',
           batch: enrolledYear ? `${enrolledYear}-${enrolledYear + 4}` : 'Batch not set',
@@ -132,17 +132,44 @@ export function useStudentData() {
         });
 
         // ── Fetch classes where this student is enrolled (student_ids contains user id) ──
-        const { data: classesData, error: classesError } = await supabase
+        const classSelect = 'id, name, batch_id, course_id, teacher_id, student_ids';
+
+        const { data: directClassesData, error: classesError } = await supabase
           .from('classes')
-          .select('id, name, course_id, teacher_id, student_ids')
+          .select(classSelect)
           .contains('student_ids', [currentUser.id]);
 
         if (classesError && classesError.code !== '42P01') {
           console.error('Fetch Classes Error:', classesError);
         }
 
+        const { data: batchRows, error: batchError } = await supabase
+          .from('batches')
+          .select('id, student_ids')
+          .contains('student_ids', [currentUser.id]);
+
+        if (batchError && batchError.code !== '42P01') {
+          console.error('Fetch Student Batches Error:', batchError);
+        }
+
+        const batchIds = (batchRows || []).map((batch: any) => batch.id).filter(Boolean);
+        let batchClassesData: any[] = [];
+
+        if (batchIds.length > 0) {
+          const { data, error: batchClassesError } = await supabase
+            .from('classes')
+            .select(classSelect)
+            .in('batch_id', batchIds);
+
+          if (batchClassesError && batchClassesError.code !== '42P01') {
+            console.error('Fetch Batch Classes Error:', batchClassesError);
+          }
+
+          batchClassesData = data || [];
+        }
+
         // Deduplicate classes by ID to prevent the same class from showing twice
-        const rawClasses = classesData || [];
+        const rawClasses = [...(directClassesData || []), ...batchClassesData];
         const seenClassIds = new Set<string>();
         const enrolledClasses = rawClasses.filter((cls: any) => {
           if (seenClassIds.has(cls.id)) return false;
@@ -152,8 +179,24 @@ export function useStudentData() {
 
         const enrolledClassIds = enrolledClasses.map((cls: any) => cls.id);
 
+        const { data: enrollmentsData, error: enrollError } = await supabase
+          .from('enrollments')
+          .select('*, courses(*)')
+          .eq('student_id', currentUser.id);
+
+        if (enrollError && enrollError.code !== '42P01') {
+          console.error('Fetch Enrollments Error:', enrollError);
+        }
+
+        const enrollmentCourses = (enrollmentsData || [])
+          .map((enr: any) => Array.isArray(enr.courses) ? enr.courses[0] : enr.courses)
+          .filter(Boolean);
+
         // ── Fetch course details for enrolled classes ──
-        const enrolledCourseIds = Array.from(new Set(enrolledClasses.map((cls: any) => cls.course_id).filter(Boolean)));
+        const enrolledCourseIds = Array.from(new Set([
+          ...enrolledClasses.map((cls: any) => cls.course_id).filter(Boolean),
+          ...enrollmentCourses.map((course: any) => course.id).filter(Boolean),
+        ]));
         const courseMap = new Map<string, any>();
 
         if (enrolledCourseIds.length > 0) {
@@ -164,6 +207,8 @@ export function useStudentData() {
 
           (coursesData || []).forEach((c: any) => courseMap.set(c.id, c));
         }
+
+        enrollmentCourses.forEach((course: any) => courseMap.set(course.id, course));
 
         // ── Fetch teacher names for enrolled classes ──
         const teacherIds = Array.from(new Set(enrolledClasses.map((cls: any) => cls.teacher_id).filter(Boolean)));
@@ -243,86 +288,43 @@ export function useStudentData() {
           courseAttendanceMap.set(key, prev);
         });
 
-        // Also try enrollments table for course list (fallback)
-        const { data: enrollmentsData, error: enrollError } = await supabase
-          .from('enrollments')
-          .select('*, courses(*)')
-          .eq('student_id', currentUser.id);
+        const coursesById = new Map<string, any>();
+        (enrollmentsData || []).forEach((enr: any) => {
+          const course = Array.isArray(enr.courses) ? enr.courses[0] : enr.courses;
+          if (course?.id) coursesById.set(course.id, course);
+        });
+        enrolledClasses.forEach((cls: any) => {
+          const course = courseMap.get(cls.course_id);
+          if (course?.id) coursesById.set(course.id, course);
+        });
 
-        if (enrollError && enrollError.code !== '42P01') {
-          console.error('Fetch Enrollments Error:', enrollError);
-        }
+        const mappedCourses: CourseData[] = Array.from(coursesById.values()).map((course: any, idx: number) => {
+          const courseAtt = courseAttendanceMap.get(course?.name) || { total: 0, present: 0 };
+          const totalClasses = courseAtt.total;
+          const attendedClasses = courseAtt.present;
+          const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
+          const courseClasses = enrolledClasses.filter((cls: any) => cls.course_id === course?.id);
+          const classNames = courseClasses.map((cls: any) => cls.name).filter(Boolean);
+          const instructor = courseClasses
+            .map((cls: any) => teacherMap.get(cls.teacher_id))
+            .find(Boolean) || course?.faculty_lead || '';
 
-        let mappedCourses: CourseData[];
-
-        if (enrollmentsData && enrollmentsData.length > 0) {
-          // Use enrollments table if available
-          mappedCourses = enrollmentsData.map((enr: any, idx: number) => {
-            const course = enr.courses;
-            // Use class-based attendance instead of course_id-based attendance
-            const courseAtt = courseAttendanceMap.get(course?.name) || { total: 0, present: 0 };
-            const totalClasses = courseAtt.total;
-            const attendedClasses = courseAtt.present;
-            const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
-            const courseClasses = enrolledClasses.filter((cls: any) => cls.course_id === course?.id);
-            const classNames = courseClasses.map((cls: any) => cls.name).filter(Boolean);
-            const instructor = courseClasses
-              .map((cls: any) => teacherMap.get(cls.teacher_id))
-              .find(Boolean) || course?.faculty_lead || '';
-
-            return {
-              id: course.id,
-              name: course.name || 'Untitled Course',
-              code: course.course_code || '',
-              instructor,
-              attendance: attendancePercent,
-              totalClasses,
-              attendedClasses,
-              color: uiColors[idx % uiColors.length],
-              classNames,
-            };
-          });
-        } else {
-          // Build courses list from enrolled classes
-          const seenCourses = new Set<string>();
-          mappedCourses = [];
-          enrolledClasses.forEach((cls: any) => {
-            const course = courseMap.get(cls.course_id);
-            if (!course || seenCourses.has(course.id)) return;
-            seenCourses.add(course.id);
-            const courseAtt = courseAttendanceMap.get(course.name) || { total: 0, present: 0 };
-            const totalClasses = courseAtt.total;
-            const attendedClasses = courseAtt.present;
-            const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
-            mappedCourses.push({
-              id: course.id,
-              name: course.name || 'Untitled Course',
-              code: course.course_code || '',
-              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || '',
-              attendance: attendancePercent,
-              totalClasses,
-              attendedClasses,
-              color: uiColors[mappedCourses.length % uiColors.length],
-              classNames: enrolledClasses
-                .filter((classRow: any) => classRow.course_id === course.id)
-                .map((classRow: any) => classRow.name)
-                .filter(Boolean),
-            });
-          });
-        }
+          return {
+            id: course.id,
+            name: course.name || 'Untitled Course',
+            code: course.course_code || '',
+            instructor,
+            attendance: attendancePercent,
+            totalClasses,
+            attendedClasses,
+            color: uiColors[idx % uiColors.length],
+            classNames,
+          };
+        });
 
         setCourses(mappedCourses);
 
-        const { data: classesData2, error: classesError2 } = await supabase
-          .from('classes')
-          .select('id, courses(name, course_code)')
-          .contains('student_ids', [currentUser.id]);
-
-        if (classesError2) {
-          console.error('Fetch Classes Error:', classesError2);
-        }
-
-        const classIds = (classesData2 || []).map(c => c.id);
+        const classIds = enrolledClassIds;
 
         let mappedAssignments: AssignmentData[] = [];
         if (classIds.length > 0) {

@@ -183,6 +183,7 @@ serve(async (req) => {
           mobile_no: readProfileString(profile, 'mobile_no'),
           gender: readStudentGender(profile),
           department: readProfileString(profile, 'department'),
+          semester: readProfileString(profile, 'semester'),
           city: readProfileString(profile, 'city'),
           address: readProfileString(profile, 'address'),
         },

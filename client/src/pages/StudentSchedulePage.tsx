@@ -76,9 +76,9 @@ export default function StudentSchedulePage() {
     setIsLoading(true);
     setError('');
 
-    const { data: classRows, error: classError } = await supabase
+    const { data: directClassRows, error: classError } = await supabase
       .from('classes')
-      .select('id')
+      .select('id, batch_id')
       .contains('student_ids', [user.id]);
 
     if (classError) {
@@ -88,7 +88,41 @@ export default function StudentSchedulePage() {
       return;
     }
 
-    const classIds = ((classRows as Array<{ id: string }> | null) ?? []).map((row) => row.id);
+    const { data: batchRows, error: batchError } = await supabase
+      .from('batches')
+      .select('id, student_ids')
+      .contains('student_ids', [user.id]);
+
+    if (batchError && batchError.code !== '42P01') {
+      setError(batchError.message);
+      setScheduleEntries([]);
+      setIsLoading(false);
+      return;
+    }
+
+    const batchIds = ((batchRows as Array<{ id: string }> | null) ?? []).map((row) => row.id);
+    let batchClassRows: Array<{ id: string }> = [];
+
+    if (batchIds.length > 0) {
+      const { data, error } = await supabase
+        .from('classes')
+        .select('id, batch_id')
+        .in('batch_id', batchIds);
+
+      if (error && error.code !== '42P01') {
+        setError(error.message);
+        setScheduleEntries([]);
+        setIsLoading(false);
+        return;
+      }
+
+      batchClassRows = (data as Array<{ id: string }> | null) ?? [];
+    }
+
+    const classIds = Array.from(new Set([
+      ...(((directClassRows as Array<{ id: string }> | null) ?? []).map((row) => row.id)),
+      ...batchClassRows.map((row) => row.id),
+    ]));
     if (classIds.length === 0) {
       setScheduleEntries([]);
       setIsLoading(false);

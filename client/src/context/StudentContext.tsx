@@ -81,6 +81,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       ...data,
       id: crypto.randomUUID(),
       course: '',
+      semester: data.semester,
       isActive: true,
       dateEnrolled: new Date().toISOString().split('T')[0],
     };

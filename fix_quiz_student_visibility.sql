@@ -1,4 +1,5 @@
--- Allow students to see published quizzes for classes they belong to.
+-- Allow students to see published quizzes for classes they belong to, and
+-- allow teachers to see submitted quiz results for quizzes they teach.
 -- Run this in the Supabase SQL editor if student quiz pages show empty lists
 -- while teachers can see published quizzes.
 
@@ -20,7 +21,7 @@ create policy "Students can read their own batch rows"
   for select
   to authenticated
   using (
-    coalesce(student_ids, '{}'::text[]) @> array[auth.uid()::text]
+    coalesce(student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
     or exists (
       select 1
       from public.users
@@ -35,14 +36,14 @@ create policy "Students can read their own classes"
   for select
   to authenticated
   using (
-    coalesce(student_ids::text[], '{}'::text[]) @> array[auth.uid()::text]
+    coalesce(student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
     or teacher_id = auth.uid()
     or coalesce(teacher_ids, '{}'::uuid[]) @> array[auth.uid()]
     or exists (
       select 1
       from public.batches b
       where b.id = classes.batch_id
-        and coalesce(b.student_ids, '{}'::text[]) @> array[auth.uid()::text]
+        and coalesce(b.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
     )
     or exists (
       select 1
@@ -86,12 +87,12 @@ create policy "Students can read published quizzes for their classes"
       from public.classes c
       where c.id = quizzes.class_id
         and (
-          coalesce(c.student_ids::text[], '{}'::text[]) @> array[auth.uid()::text]
+          coalesce(c.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
           or exists (
             select 1
             from public.batches b
             where b.id = c.batch_id
-              and coalesce(b.student_ids, '{}'::text[]) @> array[auth.uid()::text]
+              and coalesce(b.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
           )
         )
     )
@@ -110,12 +111,12 @@ create policy "Students can read questions for visible published quizzes"
       where q.id = quiz_questions.quiz_id
         and coalesce(q.is_published, false) = true
         and (
-          coalesce(c.student_ids::text[], '{}'::text[]) @> array[auth.uid()::text]
+          coalesce(c.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
           or exists (
             select 1
             from public.batches b
             where b.id = c.batch_id
-              and coalesce(b.student_ids, '{}'::text[]) @> array[auth.uid()::text]
+              and coalesce(b.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
           )
         )
     )
@@ -127,6 +128,25 @@ create policy "Students can read own quiz submissions"
   for select
   to authenticated
   using (student_id = auth.uid());
+
+drop policy if exists "Teachers can read quiz submissions for their quizzes" on public.quiz_submissions;
+create policy "Teachers can read quiz submissions for their quizzes"
+  on public.quiz_submissions
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.quizzes q
+      join public.classes c on c.id = q.class_id
+      where q.id = quiz_submissions.quiz_id
+        and (
+          q.teacher_id = auth.uid()
+          or c.teacher_id = auth.uid()
+          or coalesce(c.teacher_ids, '{}'::uuid[]) @> array[auth.uid()]
+        )
+    )
+  );
 
 drop policy if exists "Students can insert own quiz submissions" on public.quiz_submissions;
 create policy "Students can insert own quiz submissions"
@@ -142,12 +162,12 @@ create policy "Students can insert own quiz submissions"
       where q.id = quiz_submissions.quiz_id
         and coalesce(q.is_published, false) = true
         and (
-          coalesce(c.student_ids::text[], '{}'::text[]) @> array[auth.uid()::text]
+          coalesce(c.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
           or exists (
             select 1
             from public.batches b
             where b.id = c.batch_id
-              and coalesce(b.student_ids, '{}'::text[]) @> array[auth.uid()::text]
+              and coalesce(b.student_ids::uuid[], '{}'::uuid[]) @> array[auth.uid()]
           )
         )
     )
