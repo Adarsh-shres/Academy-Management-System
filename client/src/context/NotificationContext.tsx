@@ -168,7 +168,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       await supabase
         .from('notifications')
         .update({ is_read: true })
-        .eq('user_id', userId)
+        .or(`user_id.eq.${userId},teacher_id.eq.${userId}`)
         .eq('is_read', false);
     } catch (err) {
       console.error('markAllAsRead error:', err);

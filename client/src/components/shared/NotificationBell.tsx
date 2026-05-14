@@ -13,7 +13,7 @@ export default function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, latestNotification, clearLatestNotification } = useNotificationContext();
   const { user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const historyPath = user?.role === 'student' ? '/student/notifications' : '/notifications';
+  const historyPath = user?.role === 'student' ? '/student/notifications' : user?.role === 'teacher' ? '/teacher/notifications' : '/notifications';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

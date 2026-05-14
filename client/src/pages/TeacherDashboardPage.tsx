@@ -9,108 +9,10 @@ import AttendanceRosterModal from '../components/teachers/AttendanceRosterModal'
 import TeacherAssignmentPage from './TeacherAssignmentPage';
 import TeacherClassesPage from './TeacherClassesPage';
 import TeacherSchedulePage from './TeacherSchedulePage';
+import NotificationBell from '../components/shared/NotificationBell';
 
 /** Components for Teacher Dashboard */
-const TeacherNotificationBell = () => {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    async function fetchNotifs() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-      if (data) setNotifications(data);
-    }
-    fetchNotifs();
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const unreadCount = notifications.filter(n => !n.read && !n.is_read).length;
-
-  const markAsRead = async (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true, read: true } : n));
-    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
-  };
-
-  const markAllAsRead = async () => {
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true, read: true })));
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id);
-    }
-  };
-
-  const formatTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    const diff = Math.floor((new Date().getTime() - d.getTime()) / 60000);
-    if (diff < 60) return `${diff}m ago`;
-    if (diff < 1440) return `${Math.floor(diff/60)}h ago`;
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  };
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative text-[#64748b] hover:text-[#6a5182] transition-colors cursor-pointer flex items-center justify-center p-2 rounded-full hover:bg-[#f6f2fb]"
-      >
-        <Bell size={18} />
-        {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-        )}
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.1)] overflow-hidden z-[100]">
-          <div className="p-4 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
-            <h3 className="font-bold text-[#4b3f68] text-[15px]">Notifications</h3>
-            {unreadCount > 0 && (
-              <button onClick={markAllAsRead} className="text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer">
-                Mark all as read
-              </button>
-            )}
-          </div>
-          <div className="max-h-[350px] overflow-y-auto flex flex-col">
-            {notifications.length === 0 ? (
-              <div className="p-6 text-center text-[#94a3b8] text-[13px] font-medium">
-                No notifications yet
-              </div>
-            ) : (
-              notifications.map(n => (
-                <div 
-                  key={n.id} 
-                  onClick={() => markAsRead(n.id)}
-                  className={`p-4 border-b border-[#e7dff0] last:border-0 cursor-pointer transition-colors ${(!n.read && !n.is_read) ? 'bg-[#f6f2fb]' : 'bg-white hover:bg-[#fbf8fe]'}`}
-                >
-                  <p className={`text-[13px] text-[#475569] mb-1.5 ${(!n.read && !n.is_read) ? 'font-semibold text-[#4b3f68]' : ''}`}>
-                    {n.message || n.title || 'New Notification'}
-                  </p>
-                  <span className="text-[11px] font-medium text-[#94a3b8]">{formatTime(n.created_at)}</span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDate: Date, setSelectedDate: (d: Date) => void }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -1106,7 +1008,7 @@ export default function TeacherDashboardPage() {
         <header className="h-[58px] bg-white border-b border-[#e7dff0] px-7 flex items-center gap-3.5 sticky top-0 z-50 shrink-0">
 
           <div className="flex items-center gap-4 ml-auto">
-            <TeacherNotificationBell />
+            <NotificationBell />
             
             <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
             

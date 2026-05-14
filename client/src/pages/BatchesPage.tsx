@@ -83,8 +83,8 @@ export default function BatchesPage() {
       resetForm();
       setIsCreateOpen(false);
       navigate(`/batches/${newBatch.id}`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to create batch.';
+    } catch (err: any) {
+      const message = err?.message || 'Failed to create batch.';
       setFormError(message);
     } finally {
       setIsSaving(false);

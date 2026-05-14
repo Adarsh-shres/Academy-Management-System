@@ -6,7 +6,6 @@ const NAV_ITEMS = [
   { name: 'Assignment', id: 'Assignment', icon: <ClipboardList size={16} /> },
   { name: 'Classes', id: 'Classes', icon: <Users size={16} /> },
   { name: 'Schedule', id: 'Schedule', icon: <Calendar size={16} /> },
-  { name: 'Settings', id: 'Settings', icon: <Settings size={16} /> },
 ];
 
 interface TeacherSidebarProps {
@@ -18,11 +17,6 @@ export default function TeacherSidebar({ activeTab, onTabChange }: TeacherSideba
   const navigate = useNavigate();
 
   const handleNavClick = (tabId: string) => {
-    if (tabId === 'Settings') {
-      navigate('/teacher/settings');
-      return;
-    }
-
     onTabChange(tabId);
   };
 

@@ -27,18 +27,8 @@ create policy "Admins can manage batches"
   on public.batches for all
   to authenticated
   using (
-    exists (
-      select 1
-      from public.users
-      where users.id = auth.uid()
-        and users.role in ('super_admin', 'admin')
-    )
+    public.current_app_role() in ('super_admin', 'admin')
   )
   with check (
-    exists (
-      select 1
-      from public.users
-      where users.id = auth.uid()
-        and users.role in ('super_admin', 'admin')
-    )
+    public.current_app_role() in ('super_admin', 'admin')
   );

@@ -60,12 +60,7 @@ create policy "Authenticated users can read teacher schedules"
   to authenticated
   using (
     teacher_id = auth.uid()
-    or exists (
-      select 1
-      from public.users
-      where users.id = auth.uid()
-        and users.role in ('super_admin', 'admin')
-    )
+    or public.current_app_role() in ('super_admin', 'admin')
   );
 
 drop policy if exists "Teachers and admins can manage teacher schedules" on public.teacher_schedules;
@@ -75,21 +70,11 @@ create policy "Teachers can manage their own schedules"
   to authenticated
   using (
     teacher_id = auth.uid()
-    or exists (
-      select 1
-      from public.users
-      where users.id = auth.uid()
-        and users.role in ('super_admin', 'admin')
-    )
+    or public.current_app_role() in ('super_admin', 'admin')
   )
   with check (
     teacher_id = auth.uid()
-    or exists (
-      select 1
-      from public.users
-      where users.id = auth.uid()
-        and users.role in ('super_admin', 'admin')
-    )
+    or public.current_app_role() in ('super_admin', 'admin')
   );
 
 insert into public.teacher_schedules (
