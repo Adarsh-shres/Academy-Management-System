@@ -13,6 +13,7 @@ export interface CourseData {
   attendedClasses: number;
   color: string;
   classNames: string[];
+  classIds: string[];
 }
 
 export interface AssignmentData {
@@ -319,6 +320,7 @@ export function useStudentData() {
             attendedClasses,
             color: uiColors[idx % uiColors.length],
             classNames,
+            classIds: courseClasses.map((cls: any) => cls.id).filter(Boolean),
           };
         });
 

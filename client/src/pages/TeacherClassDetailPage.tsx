@@ -83,6 +83,7 @@ export default function TeacherClassDetailPage() {
         setClassName(classData.name || '');
         setCourse({
           ...classData.courses,
+          id: classData.courses?.id || classData.course_id,
           room: classData.courses?.department || 'Virtual',
           course_code: classData.courses?.course_code || 'N/A'
         });

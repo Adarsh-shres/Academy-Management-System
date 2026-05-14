@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
+import { useStudentData } from "../hooks/useStudentData";
+import { getStudentClassIdsForCourse } from "../lib/studentClassEnrollment";
 
 interface MaterialItem {
   id: string;
@@ -12,6 +14,8 @@ interface MaterialItem {
   fileName?: string;
   uploadDate: string;
 }
+
+const uniqueById = (rows: any[]) => Array.from(new Map(rows.map((row) => [row.id, row])).values());
 
 const getFileIcon = (fileName?: string) => {
   const ext = fileName?.split(".").pop()?.toLowerCase();
@@ -24,9 +28,21 @@ const getFileIcon = (fileName?: string) => {
   );
 };
 
+const getBrowserPreviewUrl = (fileUrl: string, fileName?: string) => {
+  const ext = fileName?.split(".").pop()?.toLowerCase();
+  const directPreviewExts = new Set(["pdf", "jpg", "jpeg", "png", "gif", "webp", "svg", "txt"]);
+
+  if (!ext || directPreviewExts.has(ext)) {
+    return fileUrl;
+  }
+
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+};
+
 export default function FolderContentsPage() {
   const { courseId, folderId } = useParams<{ courseId: string; folderId: string }>();
   const { user } = useAuth();
+  const { courses } = useStudentData();
   const [materials, setMaterials] = useState<MaterialItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,45 +60,17 @@ export default function FolderContentsPage() {
       setError(null);
 
       try {
-        const { data: directClasses, error: classesError } = await supabase
-          .from("classes")
-          .select("id, batch_id")
-          .eq("course_id", courseId)
-          .contains("student_ids", [user.id]);
-
-        if (classesError) throw classesError;
-
-        const { data: batchRows, error: batchError } = await supabase
-          .from("batches")
-          .select("id, student_ids")
-          .contains("student_ids", [user.id]);
-
-        if (batchError && batchError.code !== "42P01") throw batchError;
-
-        const batchIds = (batchRows || []).map((batch: any) => batch.id).filter(Boolean);
-        let batchClasses: any[] = [];
-
-        if (batchIds.length > 0) {
-          const { data, error } = await supabase
-            .from("classes")
-            .select("id, batch_id")
-            .eq("course_id", courseId)
-            .in("batch_id", batchIds);
-
-          if (error) throw error;
-          batchClasses = data || [];
-        }
-
+        const course = courses.find((item) => item.id === courseId);
         const classIds = Array.from(new Set([
-          ...(directClasses || []).map((classRow: any) => classRow.id),
-          ...batchClasses.map((classRow: any) => classRow.id),
+          ...(course?.classIds || []),
+          ...(await getStudentClassIdsForCourse(courseId, user.id)),
         ]));
+        const weekNumber = Number(folderId) || 0;
         if (classIds.length === 0) {
           setMaterials([]);
           return;
         }
 
-        const weekNumber = Number(folderId) || 0;
         const { data: contentRows, error: contentError } = await supabase
           .from("course_content")
           .select("id, title, description, file_url, material_type, created_at")
@@ -92,7 +80,7 @@ export default function FolderContentsPage() {
 
         if (contentError) throw contentError;
 
-        setMaterials((contentRows || []).map((item: any) => ({
+        setMaterials(uniqueById(contentRows || []).map((item: any) => ({
           id: item.id,
           title: item.title || "Untitled material",
           type: item.material_type || "Other",
@@ -110,17 +98,11 @@ export default function FolderContentsPage() {
     };
 
     void loadMaterials();
-  }, [courseId, folderId, user]);
+  }, [courseId, courses, folderId, user]);
 
-  const handleDownload = (fileUrl?: string, fileName?: string) => {
+  const handleOpenMaterial = (fileUrl?: string, fileName?: string) => {
     if (!fileUrl) return;
-    const a = document.createElement("a");
-    a.href = fileUrl;
-    a.download = fileName || "study-material";
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(getBrowserPreviewUrl(fileUrl, fileName), "_blank", "noopener,noreferrer");
   };
 
   if (isLoading) {
@@ -186,11 +168,11 @@ export default function FolderContentsPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleDownload(material.fileUrl, material.fileName)}
+                    onClick={() => handleOpenMaterial(material.fileUrl, material.fileName)}
                     disabled={!material.fileUrl}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[8px] bg-primary text-white text-[12px] font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Download
+                    Open
                   </button>
                 </div>
               </div>

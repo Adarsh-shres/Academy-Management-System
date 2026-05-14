@@ -8,6 +8,7 @@ export interface Course {
   attendedClasses: number;
   color: string;
   classNames?: string[];
+  classIds?: string[];
 }
 
 interface StudentCourseCardProps {
