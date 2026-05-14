@@ -134,15 +134,40 @@ export function useStudentData() {
         // ── Fetch classes where this student is enrolled (student_ids contains user id) ──
         const { data: classesData, error: classesError } = await supabase
           .from('classes')
-          .select('id, name, course_id, teacher_id, student_ids')
+          .select('id, name, course_id, teacher_id, student_ids, batch_id')
           .contains('student_ids', [currentUser.id]);
 
         if (classesError && classesError.code !== '42P01') {
           console.error('Fetch Classes Error:', classesError);
         }
 
+        const { data: batchesData, error: batchesError } = await supabase
+          .from('batches')
+          .select('id, student_ids')
+          .contains('student_ids', [currentUser.id]);
+
+        if (batchesError && batchesError.code !== '42P01') {
+          console.error('Fetch Batches Error:', batchesError);
+        }
+
+        const batchIds = ((batchesData as Array<{ id: string }> | null) ?? []).map((batch) => batch.id);
+        let batchClassesData: any[] = [];
+
+        if (batchIds.length > 0) {
+          const { data: batchClasses, error: batchClassesError } = await supabase
+            .from('classes')
+            .select('id, name, course_id, teacher_id, student_ids, batch_id')
+            .in('batch_id', batchIds);
+
+          if (batchClassesError && batchClassesError.code !== '42P01') {
+            console.error('Fetch Batch Classes Error:', batchClassesError);
+          }
+
+          batchClassesData = batchClasses || [];
+        }
+
         // Deduplicate classes by ID to prevent the same class from showing twice
-        const rawClasses = classesData || [];
+        const rawClasses = [...(classesData || []), ...batchClassesData];
         const seenClassIds = new Set<string>();
         const enrolledClasses = rawClasses.filter((cls: any) => {
           if (seenClassIds.has(cls.id)) return false;
@@ -313,16 +338,7 @@ export function useStudentData() {
 
         setCourses(mappedCourses);
 
-        const { data: classesData2, error: classesError2 } = await supabase
-          .from('classes')
-          .select('id, courses(name, course_code)')
-          .contains('student_ids', [currentUser.id]);
-
-        if (classesError2) {
-          console.error('Fetch Classes Error:', classesError2);
-        }
-
-        const classIds = (classesData2 || []).map(c => c.id);
+        const classIds = enrolledClassIds;
 
         let mappedAssignments: AssignmentData[] = [];
         if (classIds.length > 0) {

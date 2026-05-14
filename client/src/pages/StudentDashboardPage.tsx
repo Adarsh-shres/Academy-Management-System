@@ -105,9 +105,16 @@ export default function StudentDashboardPage() {
             </button>
           </div>
           <div className="space-y-4">
-            {upcomingAssignments.map((a) => (
-              <StudentAssignmentCard key={a.id} assignment={a} compact={false} onSubmitted={refetch} />
-            ))}
+            {upcomingAssignments.length > 0 ? (
+              upcomingAssignments.map((a) => (
+                <StudentAssignmentCard key={a.id} assignment={a} compact={false} onSubmitted={refetch} />
+              ))
+            ) : (
+              <div className="rounded-[10px] border border-dashed border-[#e7dff0] bg-white p-7 text-center">
+                <p className="text-[13px] font-bold uppercase tracking-wide text-[#4b3f68]">No pending assignments</p>
+                <p className="mt-1 text-[12.5px] text-[#64748b]">New assignments will appear here when they are assigned.</p>
+              </div>
+            )}
           </div>
           
           <div className="pt-2">

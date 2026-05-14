@@ -103,8 +103,9 @@ export default function TeacherAssignmentPage() {
       if (assignIds.length > 0) {
         const { data: subData } = await supabase
           .from('submissions')
-          .select('assignment_id, id')
-          .in('assignment_id', assignIds);
+          .select('assignment_id, id, status')
+          .in('assignment_id', assignIds)
+          .eq('status', 'submitted');
 
         const countMap: Record<string, number> = {};
         if (subData) {

@@ -191,7 +191,8 @@ export default function TeacherClassDetailPage() {
       const { data: subData, error: subErr } = await supabase
         .from('submissions')
         .select('*')
-        .eq('assignment_id', assignment.id);
+        .eq('assignment_id', assignment.id)
+        .eq('status', 'submitted');
         
       if (subErr) throw subErr;
       

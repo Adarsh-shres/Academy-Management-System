@@ -42,7 +42,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
   const { title, course, courseCode, deadline, status, submittedOn, grade } = assignment;
 
   const isPending = status === "pending";
-  const isClosed = status === "closed";
+  const isClosed = status === "closed" || assignment.portalOpen === false || assignment.isPastDue === true;
   const gradeStatusLabel =
     assignment.gradeStatus === 'completed' ? 'Completed' :
     assignment.gradeStatus === 'partial' ? 'Partial' :
@@ -90,7 +90,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
                 "text-primary bg-[#f3eff7] border-[#e7dff0]"
               }`}
             >
-              {isClosed ? "Closed" : isPending ? "Pending" : "Submitted"}
+              {isClosed ? (assignment.isPastDue === true ? "Overdue" : "Closed") : isPending ? "Pending" : "Submitted"}
             </span>
           </div>
 
@@ -127,7 +127,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
               disabled
               className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-[#94a3b8] bg-[#f1f5f9] cursor-not-allowed"
             >
-              Portal Closed
+              {assignment.isPastDue === true ? 'Overdue' : 'Portal Closed'}
             </button>
           ) : isPending ? (
             <button 

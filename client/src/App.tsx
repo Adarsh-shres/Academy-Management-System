@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AIChatBot from './components/shared/AIChatBot';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
@@ -150,6 +150,7 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/student/courses" element={<StudentCoursesPage />} />
         <Route path="/student/classes/:classId" element={<StudentClassDetailPage />} />

@@ -55,7 +55,8 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
         const { data: subData, error: subErr } = await supabase
           .from('submissions')
           .select('id, student_id, file_url, submitted_at, status')
-          .eq('assignment_id', assignment.id);
+          .eq('assignment_id', assignment.id)
+          .eq('status', 'submitted');
 
         if (subErr) throw subErr;
 
