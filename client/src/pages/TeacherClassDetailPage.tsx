@@ -48,6 +48,7 @@ export default function TeacherClassDetailPage() {
 
   const [quizSubmissions, setQuizSubmissions] = useState<any[]>([]);
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
+  const [quizSubmissionsError, setQuizSubmissionsError] = useState<string | null>(null);
 
   const [isEditingQuiz, setIsEditingQuiz] = useState(false);
   const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
@@ -296,17 +297,40 @@ export default function TeacherClassDetailPage() {
 
   const loadQuizSubmissions = async (quizId: string) => {
     setIsLoadingSubmissions(true);
+    setQuizSubmissionsError(null);
     try {
       const { data, error } = await supabase
         .from('quiz_submissions')
-        .select('*, users(name, email)')
+        .select('*')
         .eq('quiz_id', quizId)
         .order('submitted_at', { ascending: false });
 
       if (error) throw error;
-      setQuizSubmissions(data || []);
-    } catch (err) {
+
+      const submissions = data || [];
+      const studentIds = Array.from(new Set(submissions.map((submission: any) => submission.student_id).filter(Boolean)));
+      let usersById = new Map<string, any>();
+
+      if (studentIds.length > 0) {
+        const { data: usersData, error: usersError } = await supabase
+          .from('users')
+          .select('id, name, email')
+          .in('id', studentIds);
+
+        if (usersError) {
+          console.warn('Failed to load quiz submission student profiles', usersError);
+        } else {
+          usersById = new Map((usersData || []).map((student: any) => [student.id, student]));
+        }
+      }
+
+      setQuizSubmissions(submissions.map((submission: any) => ({
+        ...submission,
+        users: usersById.get(submission.student_id) || null,
+      })));
+    } catch (err: any) {
       console.error('Failed to load quiz submissions', err);
+      setQuizSubmissionsError(err.message || 'Failed to load quiz submissions.');
       setQuizSubmissions([]);
     } finally {
       setIsLoadingSubmissions(false);
@@ -526,6 +550,7 @@ export default function TeacherClassDetailPage() {
       loadQuizSubmissions(selectedQuiz.id);
     } else {
       setQuizSubmissions([]);
+      setQuizSubmissionsError(null);
     }
   }, [selectedQuiz]);
 
@@ -1162,19 +1187,111 @@ export default function TeacherClassDetailPage() {
                       <h4 className="text-[15px] font-extrabold text-[#4b3f68] uppercase tracking-wide">
                         Student Results
                       </h4>
-                      {quizSubmissions.length > 0 && (
-                        <div className="flex items-center gap-4 text-[12px] font-bold text-[#64748b]">
-                          <span>
-                            {quizSubmissions.length} Submission{quizSubmissions.length !== 1 ? 's' : ''}
-                          </span>
-                          <span className="bg-[#f3eff7] text-[#6a5182] px-3 py-1 rounded-sm border border-[#d8c8e9]">
-                            Avg: {(quizSubmissions.reduce((sum, s) => sum + (s.percentage || 0), 0) / quizSubmissions.length).toFixed(1)}%
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3">
+                        {quizSubmissions.length > 0 && (
+                          <div className="flex items-center gap-4 text-[12px] font-bold text-[#64748b]">
+                            <span>
+                              {quizSubmissions.length} Submission{quizSubmissions.length !== 1 ? 's' : ''}
+                            </span>
+                            <span className="bg-[#f3eff7] text-[#6a5182] px-3 py-1 rounded-sm border border-[#d8c8e9]">
+                              Avg: {(quizSubmissions.reduce((sum, s) => sum + (s.percentage || 0), 0) / quizSubmissions.length).toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => loadQuizSubmissions(selectedQuiz.id)}
+                          disabled={isLoadingSubmissions}
+                          className="px-3 py-1.5 rounded-sm border border-[#d8c8e9] bg-white text-[#6a5182] text-[11px] font-bold uppercase tracking-wide hover:bg-[#f6f2fb] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Refresh
+                        </button>
+                      </div>
                     </div>
 
-                    {isLoadingSubmissions ? (
+                    {quizSubmissionsError ? (
+                      <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#fff7f7] border border-dashed border-red-200 rounded-md text-center">
+                        <Users size={32} className="text-red-200 mb-3" />
+                        <p className="text-[14px] font-bold text-red-600">Could not load submissions</p>
+                        <p className="text-[13px] text-[#64748b] mt-1 max-w-[680px]">{quizSubmissionsError}</p>
+                      </div>
+                    ) : isLoadingSubmissions ? (
+                      <div className="flex flex-col gap-3">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="animate-pulse bg-[#fbf8fe] h-[60px] rounded-md border border-[#e7dff0]" />
+                        ))}
+                      </div>
+                    ) : quizSubmissions.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#fbf8fe] border border-dashed border-[#e7dff0] rounded-md text-center">
+                        <Users size={32} className="text-[#cbd5e1] mb-3" />
+                        <p className="text-[14px] font-bold text-[#4b3f68]">No Submissions Yet</p>
+                        <p className="text-[13px] text-[#64748b] mt-1">
+                          {selectedQuiz.is_published
+                            ? 'Students have not attempted this quiz yet.'
+                            : 'Publish this quiz so students can attempt it.'}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[50px]">#</th>
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student</th>
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Score</th>
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Percentage</th>
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Time Taken</th>
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Submitted</th>
+                              <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Result</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#e7dff0]">
+                            {quizSubmissions.map((sub, idx) => {
+                              const passed = sub.percentage >= 50;
+                              const mins = sub.time_taken_seconds ? Math.floor(sub.time_taken_seconds / 60) : null;
+                              const secs = sub.time_taken_seconds ? sub.time_taken_seconds % 60 : null;
+                              return (
+                                <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                                  <td className="py-3 px-5 text-[13px] font-semibold text-[#64748b]">
+                                    {(idx + 1).toString().padStart(2, '0')}
+                                  </td>
+                                  <td className="py-3 px-5">
+                                    <p className="text-[14px] font-bold text-[#4b3f68]">
+                                      {sub.users?.name || 'Unknown Student'}
+                                    </p>
+                                    <p className="text-[12px] text-[#94a3b8]">{sub.users?.email || ''}</p>
+                                  </td>
+                                  <td className="py-3 px-5 text-center">
+                                    <span className="text-[14px] font-extrabold text-[#4b3f68]">
+                                      {sub.score}
+                                    </span>
+                                    <span className="text-[12px] text-[#94a3b8] font-medium">
+                                      /{sub.total_marks}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-5 text-center">
+                                    <span className={`text-[13px] font-extrabold ${sub.percentage >= 75 ? 'text-[#16a34a]' : sub.percentage >= 50 ? 'text-[#ca8a04]' : 'text-red-500'}`}>
+                                      {Number(sub.percentage).toFixed(1)}%
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-5 text-center text-[13px] text-[#64748b] font-medium">
+                                    {mins !== null ? `${mins}m ${secs}s` : '-'}
+                                  </td>
+                                  <td className="py-3 px-5 text-center text-[12px] text-[#94a3b8] font-medium">
+                                    {new Date(sub.submitted_at).toLocaleDateString()}
+                                  </td>
+                                  <td className="py-3 px-5 text-center">
+                                    <span className={`px-2.5 py-1 rounded-sm text-[11px] font-bold tracking-wide ${passed ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#fee2e2] text-red-500'}`}>
+                                      {passed ? 'PASSED' : 'FAILED'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    {false && (isLoadingSubmissions ? (
                       <div className="flex flex-col gap-3">
                         {[1, 2, 3].map(i => (
                           <div key={i} className="animate-pulse bg-[#fbf8fe] h-[60px] rounded-md border border-[#e7dff0]" />
@@ -1250,7 +1367,7 @@ export default function TeacherClassDetailPage() {
                           </tbody>
                         </table>
                       </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               )}

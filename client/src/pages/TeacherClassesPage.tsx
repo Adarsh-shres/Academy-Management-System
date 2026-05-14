@@ -9,7 +9,6 @@ export default function TeacherClassesPage() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [attendanceMap, setAttendanceMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function loadCourses() {
@@ -29,32 +28,12 @@ export default function TeacherClassesPage() {
               course_code
             )
           `)
-          .eq('teacher_id', authUser.id);
+          .or(`teacher_id.eq.${authUser.id},teacher_ids.cs.{${authUser.id}}`);
 
         if (error) throw error;
 
         if (data && data.length > 0) {
           setCourses(data);
-          
-          const classIds = data.map((c: any) => c.id);
-          const { data: attendanceData } = await supabase
-            .from('attendance')
-            .select('class_id, status')
-            .in('class_id', classIds);
-
-          if (attendanceData) {
-            const map: Record<string, number> = {};
-            classIds.forEach((classId: string) => {
-              const classRecords = attendanceData.filter((a: any) => a.class_id === classId);
-              if (classRecords.length === 0) {
-                map[classId] = 0;
-              } else {
-                const present = classRecords.filter((a: any) => a.status === 'present').length;
-                map[classId] = Math.round((present / classRecords.length) * 100);
-              }
-            });
-            setAttendanceMap(map);
-          }
         } else {
           setCourses([]);
         }
@@ -86,7 +65,7 @@ export default function TeacherClassesPage() {
       ) : courses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course, idx) => {
-            const courseRoom = course.room || 'Virtual';
+            const courseRoom = typeof course.room === 'string' ? course.room.trim() : '';
             const courseTotalStudents = course.student_ids ? course.student_ids.length : 0;
 
             return (
@@ -100,22 +79,17 @@ export default function TeacherClassesPage() {
                     <span className="bg-[#f1f5f9] text-[#4b3f68] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#e2e8f0]">
                       {course.courses?.course_code || `CRS-${idx + 1}`}
                     </span>
-                    <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold ${
-                      (attendanceMap[course.id] ?? 0) >= 75
-                        ? 'bg-[#dcfce7] text-[#16a34a]'
-                        : (attendanceMap[course.id] ?? 0) >= 50
-                        ? 'bg-[#fef9c3] text-[#ca8a04]'
-                        : 'bg-[#fee2e2] text-red-500'
-                    }`}>
-                      {attendanceMap[course.id] ?? 0}% Attend.
-                    </span>
                   </div>
 
                   <h3 className="text-[18px] font-bold text-[#4b3f68] mb-2 leading-tight">{course.courses?.name || course.name}</h3>
                   <p className="text-[13px] font-medium text-[#64748b] flex items-center gap-3">
                     <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {courseTotalStudents} Students</span>
-                    <span className="w-1 h-1 rounded-full bg-[#cbd5e1]"></span>
-                    <span className="flex items-center gap-1.5 text-[#6a5182] font-semibold">{courseRoom}</span>
+                    {courseRoom && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-[#cbd5e1]"></span>
+                        <span className="flex items-center gap-1.5 text-[#6a5182] font-semibold">{courseRoom}</span>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>

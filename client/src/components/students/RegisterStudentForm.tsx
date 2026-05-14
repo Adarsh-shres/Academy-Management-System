@@ -5,7 +5,7 @@ import { useStudents } from '../../context/StudentContext';
 import { parseStudentCsv, STUDENT_CSV_TEMPLATE_HEADERS } from '../../lib/studentCsvImport';
 import { provisionUser } from '../../lib/userProvisioning';
 import type { StudentCsvParseResult } from '../../lib/studentCsvImport';
-import type { Department, Gender, StudentFormData } from '../../types/student';
+import { STUDENT_SEMESTERS, type Department, type Gender, type StudentFormData } from '../../types/student';
 
 const departments: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
 
@@ -19,6 +19,7 @@ const initial: StudentFormData = {
   password: '',
   gender: 'Male',
   department: 'CSE',
+  semester: 'Semester 1',
   city: '',
   address: '',
   photo: null,
@@ -60,6 +61,7 @@ export default function RegisterStudentForm() {
         mobile_no: student.mobileNo,
         gender: student.gender,
         department: student.department,
+        semester: student.semester,
         city: student.city,
         address: student.address,
       },
@@ -314,6 +316,15 @@ export default function RegisterStudentForm() {
                   {departments.map((department) => (
                     <option key={department} value={department}>
                       {department}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Semester">
+                <select name="semester" value={form.semester} onChange={handleChange} className={inputClass}>
+                  {STUDENT_SEMESTERS.map((semester) => (
+                    <option key={semester} value={semester}>
+                      {semester}
                     </option>
                   ))}
                 </select>

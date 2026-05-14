@@ -5,7 +5,6 @@ import { Bell, ChevronLeft, ChevronRight, FileText, CalendarCheck2, MapPin, User
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherWhatsDue from '../components/teachers/TeacherWhatsDue';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
-import AttendanceRosterModal from '../components/teachers/AttendanceRosterModal';
 import TeacherAssignmentPage from './TeacherAssignmentPage';
 import TeacherClassesPage from './TeacherClassesPage';
 import TeacherSchedulePage from './TeacherSchedulePage';
@@ -641,8 +640,6 @@ export default function TeacherDashboardPage() {
     setActiveTab('Assignment');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
-  const [selectedClassForAttendance, setSelectedClassForAttendance] = useState<any>(null);
 
   const getRelativeTime = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -1111,15 +1108,6 @@ export default function TeacherDashboardPage() {
 
         <div className="flex-1 flex flex-col relative">
           {renderContent()}
-
-          <AttendanceRosterModal 
-            isOpen={isAttendanceModalOpen} 
-            onClose={() => {
-              setIsAttendanceModalOpen(false);
-              setSelectedClassForAttendance(null);
-            }} 
-            courseName={selectedClassForAttendance?.course}
-          />
         </div>
       </main>
       

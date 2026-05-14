@@ -1,4 +1,4 @@
-import type { Department, Gender, StudentRecord } from '../types/student';
+import { STUDENT_SEMESTERS, type Department, type Gender, type Semester, type StudentRecord } from '../types/student';
 
 export interface SupabaseStudentUserRow {
   id: string;
@@ -14,6 +14,7 @@ export interface StudentProfileRow {
   mobile_no: string | null;
   gender: string | null;
   department: string | null;
+  semester: string | null;
   city: string | null;
   address: string | null;
   is_active: boolean | null;
@@ -21,7 +22,7 @@ export interface StudentProfileRow {
 }
 
 export const STUDENT_PROFILE_SELECT =
-  'student_id, father_name, date_of_birth, mobile_no, gender, department, city, address, is_active, date_enrolled';
+  'student_id, father_name, date_of_birth, mobile_no, gender, department, semester, city, address, is_active, date_enrolled';
 
 const DEPARTMENTS: Department[] = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'];
 
@@ -54,6 +55,10 @@ export function normalizeStudentDepartment(value: string | null | undefined): De
   return DEPARTMENTS.includes(value as Department) ? (value as Department) : '';
 }
 
+export function normalizeStudentSemester(value: string | null | undefined): Semester {
+  return (STUDENT_SEMESTERS as readonly string[]).includes(value ?? '') ? (value as Semester) : '';
+}
+
 export function mapStudentRecord(row: SupabaseStudentUserRow, profile?: StudentProfileRow | null): StudentRecord | null {
   if (row.role !== 'student') {
     return null;
@@ -72,6 +77,7 @@ export function mapStudentRecord(row: SupabaseStudentUserRow, profile?: StudentP
     password: '',
     gender: normalizeStudentGender(profile?.gender),
     department: normalizeStudentDepartment(profile?.department),
+    semester: normalizeStudentSemester(profile?.semester),
     course: '',
     city: profile?.city ?? '',
     address: profile?.address ?? '',
@@ -88,6 +94,7 @@ export function buildStudentProfileUpsert(student: StudentRecord) {
     mobile_no: student.mobileNo.trim(),
     gender: student.gender,
     department: student.department,
+    semester: student.semester,
     city: student.city.trim(),
     address: student.address.trim(),
     is_active: student.isActive,

@@ -76,7 +76,7 @@ export default function StudentSchedulePage() {
     setIsLoading(true);
     setError('');
 
-    const { data: classRows, error: classError } = await supabase
+    const { data: directClassRows, error: classError } = await supabase
       .from('classes')
       .select('id, batch_id')
       .contains('student_ids', [user.id]);
@@ -88,29 +88,29 @@ export default function StudentSchedulePage() {
       return;
     }
 
-    const { data: batchesData, error: batchesError } = await supabase
+    const { data: batchRows, error: batchError } = await supabase
       .from('batches')
       .select('id, student_ids')
       .contains('student_ids', [user.id]);
 
-    if (batchesError && batchesError.code !== '42P01') {
-      setError(batchesError.message);
+    if (batchError && batchError.code !== '42P01') {
+      setError(batchError.message);
       setScheduleEntries([]);
       setIsLoading(false);
       return;
     }
 
-    const batchIds = ((batchesData as Array<{ id: string }> | null) ?? []).map((batch) => batch.id);
+    const batchIds = ((batchRows as Array<{ id: string }> | null) ?? []).map((row) => row.id);
     let batchClassRows: Array<{ id: string }> = [];
 
     if (batchIds.length > 0) {
-      const { data, error: batchClassError } = await supabase
+      const { data, error } = await supabase
         .from('classes')
         .select('id, batch_id')
         .in('batch_id', batchIds);
 
-      if (batchClassError && batchClassError.code !== '42P01') {
-        setError(batchClassError.message);
+      if (error && error.code !== '42P01') {
+        setError(error.message);
         setScheduleEntries([]);
         setIsLoading(false);
         return;
@@ -120,7 +120,7 @@ export default function StudentSchedulePage() {
     }
 
     const classIds = Array.from(new Set([
-      ...(((classRows as Array<{ id: string }> | null) ?? []).map((row) => row.id)),
+      ...(((directClassRows as Array<{ id: string }> | null) ?? []).map((row) => row.id)),
       ...batchClassRows.map((row) => row.id),
     ]));
     if (classIds.length === 0) {

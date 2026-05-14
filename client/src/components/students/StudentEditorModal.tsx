@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AppModal from '../shared/AppModal';
+import { STUDENT_SEMESTERS } from '../../types/student';
 import type { StudentRecord } from '../../types/student';
 
 interface StudentEditorModalProps {
@@ -129,6 +130,16 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
                 <div className="grid gap-2">
                   <FieldLabel>Department</FieldLabel>
                   <input className={inputClassName()} value={draft.department} onChange={(e) => setField('department', e.target.value as StudentRecord['department'])} placeholder="e.g. CSE" />
+                </div>
+                <div className="grid gap-2">
+                  <FieldLabel>Semester</FieldLabel>
+                  <select className={inputClassName()} value={draft.semester} onChange={(e) => setField('semester', e.target.value as StudentRecord['semester'])}>
+                    {STUDENT_SEMESTERS.map((semester) => (
+                      <option key={semester} value={semester}>
+                        {semester}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </section>

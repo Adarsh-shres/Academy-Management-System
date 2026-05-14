@@ -44,15 +44,39 @@ export default function FolderContentsPage() {
       setError(null);
 
       try {
-        const { data: enrolledClasses, error: classesError } = await supabase
+        const { data: directClasses, error: classesError } = await supabase
           .from("classes")
-          .select("id")
+          .select("id, batch_id")
           .eq("course_id", courseId)
           .contains("student_ids", [user.id]);
 
         if (classesError) throw classesError;
 
-        const classIds = (enrolledClasses || []).map((classRow: any) => classRow.id);
+        const { data: batchRows, error: batchError } = await supabase
+          .from("batches")
+          .select("id, student_ids")
+          .contains("student_ids", [user.id]);
+
+        if (batchError && batchError.code !== "42P01") throw batchError;
+
+        const batchIds = (batchRows || []).map((batch: any) => batch.id).filter(Boolean);
+        let batchClasses: any[] = [];
+
+        if (batchIds.length > 0) {
+          const { data, error } = await supabase
+            .from("classes")
+            .select("id, batch_id")
+            .eq("course_id", courseId)
+            .in("batch_id", batchIds);
+
+          if (error) throw error;
+          batchClasses = data || [];
+        }
+
+        const classIds = Array.from(new Set([
+          ...(directClasses || []).map((classRow: any) => classRow.id),
+          ...batchClasses.map((classRow: any) => classRow.id),
+        ]));
         if (classIds.length === 0) {
           setMaterials([]);
           return;
@@ -62,7 +86,6 @@ export default function FolderContentsPage() {
         const { data: contentRows, error: contentError } = await supabase
           .from("course_content")
           .select("id, title, description, file_url, material_type, created_at")
-          .eq("course_id", courseId)
           .eq("week_number", weekNumber)
           .in("class_id", classIds)
           .order("created_at", { ascending: false });
