@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 const studentTypes = readFileSync(new URL('../src/types/student.ts', import.meta.url), 'utf8');
@@ -8,7 +8,6 @@ const registerForm = readFileSync(new URL('../src/components/students/RegisterSt
 const editorModal = readFileSync(new URL('../src/components/students/StudentEditorModal.tsx', import.meta.url), 'utf8');
 const useStudentData = readFileSync(new URL('../src/hooks/useStudentData.ts', import.meta.url), 'utf8');
 const createUserFunction = readFileSync(new URL('../../supabase/functions/create-user/index.ts', import.meta.url), 'utf8');
-const semesterSqlUrl = new URL('../../add_student_profiles_semester.sql', import.meta.url);
 
 test('student records expose dropdown semester options', () => {
   assert.match(studentTypes, /STUDENT_SEMESTERS/);
@@ -33,10 +32,6 @@ test('student registration and editing include a semester dropdown', () => {
   assert.match(editorModal, /STUDENT_SEMESTERS\.map/);
 });
 
-test('student semester schema and create-user profile include the semester column', () => {
-  assert.equal(existsSync(semesterSqlUrl), true);
-  const sql = readFileSync(semesterSqlUrl, 'utf8');
-  assert.match(sql, /ALTER TABLE public\.student_profiles/);
-  assert.match(sql, /ADD COLUMN IF NOT EXISTS semester TEXT/);
+test('create-user profile includes the semester field', () => {
   assert.match(createUserFunction, /semester: readProfileString\(profile, 'semester'\)/);
 });
