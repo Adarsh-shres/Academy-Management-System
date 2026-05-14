@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { useStudentData } from "../hooks/useStudentData";
 import type { StudentProfileData } from "../hooks/useStudentData";
 
 export default function StudentProfilePage() {
+  const navigate = useNavigate();
   const { profile: studentProfile, isLoading, error } = useStudentData();
 
   if (isLoading) {
@@ -80,9 +82,12 @@ export default function StudentProfilePage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[14px] font-semibold text-[#4b3f68]">Account Password</p>
-            <p className="text-[12px] font-medium text-[#7c8697] mt-0.5">Last changed 2 months ago</p>
+            <p className="text-[12px] font-medium text-[#7c8697] mt-0.5">Change your password regularly to keep your account secure</p>
           </div>
-          <button className="text-[11.5px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] px-4 py-2 rounded-[6px] uppercase tracking-wider transition-colors border border-transparent">
+          <button 
+            onClick={() => navigate('/student/update-password')}
+            className="text-[11.5px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] px-4 py-2 rounded-[6px] uppercase tracking-wider transition-colors border border-transparent cursor-pointer"
+          >
             Update
           </button>
         </div>

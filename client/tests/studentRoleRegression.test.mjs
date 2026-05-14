@@ -8,6 +8,7 @@ const coursesPage = readFileSync(new URL('../src/pages/StudentCoursesPage.tsx', 
 const app = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
 const useStudentData = readFileSync(new URL('../src/hooks/useStudentData.ts', import.meta.url), 'utf8');
 const schedulePage = readFileSync(new URL('../src/pages/StudentSchedulePage.tsx', import.meta.url), 'utf8');
+const topbar = readFileSync(new URL('../src/layouts/Topbar.tsx', import.meta.url), 'utf8');
 
 test('student assignment cards close submission when portal is closed or past due', () => {
   assert.match(assignmentCard, /portalOpen === false/);
@@ -22,6 +23,11 @@ test('student pages render useful empty states instead of blank sections', () =>
 test('student root route redirects to the dashboard', () => {
   assert.match(app, /path="\/student"/);
   assert.match(app, /to="\/student\/dashboard"/);
+});
+
+test('student role does not show the global topbar search', () => {
+  assert.match(topbar, /useAuth/);
+  assert.match(topbar, /user\?\.role !== 'student'/);
 });
 
 test('student data includes classes through batch roster membership', () => {

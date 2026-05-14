@@ -85,20 +85,31 @@ export default function StudentQuizzesPage() {
 
         setCurrentUserId(user.id);
 
-        const { data: classesData, error: classesError } = await supabase
-          .from('classes')
-          .select('id, name, course_id')
-          .contains('student_ids', [user.id]);
+        const { data: quizData, error: quizError } = await supabase
+          .from('quizzes')
+          .select('*, quiz_questions(*)')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
 
-        if (classesError) throw classesError;
+        if (quizError) throw quizError;
 
-        const enrolledClasses = classesData || [];
-        const classIds = enrolledClasses.map((cls: any) => cls.id);
-        if (classIds.length === 0) {
-          setQuizzes([]);
-          setClassMeta({});
-          setSubmissions({});
-          return;
+        const visibleQuizzes = quizData || [];
+        const visibleQuizClassIds = Array.from(new Set(
+          visibleQuizzes.map((quiz: Quiz) => quiz.class_id).filter(Boolean),
+        ));
+
+        let enrolledClasses: any[] = [];
+        if (visibleQuizClassIds.length > 0) {
+          const { data: classesData, error: classesError } = await supabase
+            .from('classes')
+            .select('id, name, course_id')
+            .in('id', visibleQuizClassIds);
+
+          if (classesError) {
+            console.warn('Failed to load quiz class metadata', classesError);
+          } else {
+            enrolledClasses = classesData || [];
+          }
         }
 
         const courseIds = Array.from(new Set(enrolledClasses.map((cls: any) => cls.course_id).filter(Boolean)));
@@ -110,8 +121,11 @@ export default function StudentQuizzesPage() {
             .select('id, name, course_code')
             .in('id', courseIds);
 
-          if (coursesError) throw coursesError;
-          (coursesData || []).forEach((course: any) => courseMap.set(course.id, course));
+          if (coursesError) {
+            console.warn('Failed to load quiz course metadata', coursesError);
+          } else {
+            (coursesData || []).forEach((course: any) => courseMap.set(course.id, course));
+          }
         }
 
         const nextClassMeta = enrolledClasses.reduce((acc: Record<string, ClassMeta>, cls: any) => {
@@ -124,15 +138,6 @@ export default function StudentQuizzesPage() {
           return acc;
         }, {});
 
-        const { data: quizData, error: quizError } = await supabase
-          .from('quizzes')
-          .select('*, quiz_questions(*)')
-          .in('class_id', classIds)
-          .eq('is_published', true)
-          .order('created_at', { ascending: false });
-
-        if (quizError) throw quizError;
-
         const { data: submissionData, error: submissionError } = await supabase
           .from('quiz_submissions')
           .select('*')
@@ -141,7 +146,7 @@ export default function StudentQuizzesPage() {
         if (submissionError) throw submissionError;
 
         setClassMeta(nextClassMeta);
-        setQuizzes(quizData || []);
+        setQuizzes(visibleQuizzes);
         setSubmissions((submissionData || []).reduce((acc: Record<string, QuizSubmission>, sub: QuizSubmission) => {
           acc[sub.quiz_id] = sub;
           return acc;

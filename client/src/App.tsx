@@ -30,6 +30,7 @@ import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
 import TeacherSettingsPage from './pages/TeacherSettingsPage.tsx';
+import TeacherUpdatePasswordPage from './pages/TeacherUpdatePasswordPage.tsx';
 import StudentDashboardPage from './pages/StudentDashboardPage.tsx';
 import StudentCoursesPage from './pages/StudentCoursesPage.tsx';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage.tsx';
@@ -40,6 +41,7 @@ import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentAttendanceDetailPage from './pages/StudentAttendanceDetailPage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
 import StudentSchedulePage from './pages/StudentSchedulePage.tsx';
+import UpdatePasswordPage from './pages/UpdatePasswordPage.tsx';
 import NotificationsPage from './pages/NotificationsPage.tsx';
 import SendNotificationPage from './pages/SendNotificationPage.tsx';
 
@@ -129,6 +131,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/update-password"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherUpdatePasswordPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── Student dashboard routes ───────────────────────────── */}
       <Route
@@ -148,6 +158,7 @@ function App() {
         <Route path="/student/attendance" element={<StudentAttendancePage />} />
         <Route path="/student/attendance/:classId" element={<StudentAttendanceDetailPage />} />
         <Route path="/student/profile" element={<StudentProfilePage />} />
+        <Route path="/student/update-password" element={<UpdatePasswordPage />} />
         <Route path="/student/notifications" element={<NotificationsPage />} />
       </Route>
     </Routes>
