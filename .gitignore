@@ -32,3 +32,5 @@ client/tmp-update-theme.js
 .idea/
 .DS_Store
 Thumbs.db
+
+.superpowers/
