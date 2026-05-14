@@ -8,12 +8,11 @@ export interface CourseData {
   name: string;
   code: string;
   instructor: string;
-  credits: number;
   attendance: number;
   totalClasses: number;
   attendedClasses: number;
   color: string;
-  schedule: string;
+  classNames: string[];
 }
 
 export interface AssignmentData {
@@ -23,14 +22,28 @@ export interface AssignmentData {
   courseCode: string;
   deadline: string;
   status: 'pending' | 'submitted';
-  marks: string;
-  grade: string | null;
+  grade: number | null;
+  gradeStatus: 'pending' | 'partial' | 'completed';
+  feedback: string | null;
+  gradedAt: string | null;
   submittedOn: string | null;
   isPending: boolean;
   description?: string;
   fileUrl?: string;
   portalOpen: boolean;
   isPastDue: boolean;
+  submissionHistory: SubmissionHistoryItem[];
+}
+
+export interface SubmissionHistoryItem {
+  id: string;
+  fileUrl: string | null;
+  status: string;
+  grade: number | null;
+  gradeStatus: 'pending' | 'partial' | 'completed';
+  feedback: string | null;
+  gradedAt: string | null;
+  submittedAt: string | null;
 }
 
 export interface StudentProfileData {
@@ -112,7 +125,7 @@ export function useStudentData() {
           avatar: buildStudentAvatar(currentUser.name || 'Student'),
           course: 'Course assigned through batches',
           semester: 'Semester not set',
-          rollNo: `STD-${currentUser.id.substring(0, 4).toUpperCase()}`,
+          rollNo: '',
           department: profileRow?.department || 'Department not set yet',
           batch: enrolledYear ? `${enrolledYear}-${enrolledYear + 4}` : 'Batch not set',
           phone: profileRow?.mobile_no || 'N/A',
@@ -251,17 +264,22 @@ export function useStudentData() {
             const totalClasses = courseAtt.total;
             const attendedClasses = courseAtt.present;
             const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
+            const courseClasses = enrolledClasses.filter((cls: any) => cls.course_id === course?.id);
+            const classNames = courseClasses.map((cls: any) => cls.name).filter(Boolean);
+            const instructor = courseClasses
+              .map((cls: any) => teacherMap.get(cls.teacher_id))
+              .find(Boolean) || course?.faculty_lead || '';
+
             return {
               id: course.id,
-              name: course.name || 'Unknown Course',
-              code: course.course_code || '---',
-              instructor: course.faculty_lead || 'Unknown',
-              credits: 3,
+              name: course.name || 'Untitled Course',
+              code: course.course_code || '',
+              instructor,
               attendance: attendancePercent,
               totalClasses,
               attendedClasses,
               color: uiColors[idx % uiColors.length],
-              schedule: 'See assigned class schedule',
+              classNames,
             };
           });
         } else {
@@ -278,15 +296,17 @@ export function useStudentData() {
             const attendancePercent = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
             mappedCourses.push({
               id: course.id,
-              name: course.name || 'Unknown Course',
-              code: course.course_code || '---',
-              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || 'Unknown',
-              credits: 3,
+              name: course.name || 'Untitled Course',
+              code: course.course_code || '',
+              instructor: teacherMap.get(cls.teacher_id) || course.faculty_lead || '',
               attendance: attendancePercent,
               totalClasses,
               attendedClasses,
               color: uiColors[mappedCourses.length % uiColors.length],
-              schedule: 'See assigned class schedule',
+              classNames: enrolledClasses
+                .filter((classRow: any) => classRow.course_id === course.id)
+                .map((classRow: any) => classRow.name)
+                .filter(Boolean),
             });
           });
         }
@@ -318,20 +338,31 @@ export function useStudentData() {
           const { data: submissionsData, error: subError } = await supabase
             .from('submissions')
             .select('*')
-            .eq('student_id', currentUser.id);
+            .eq('student_id', currentUser.id)
+            .order('submitted_at', { ascending: false });
 
           if (subError) {
             console.error('Fetch Submissions Error:', subError);
           }
 
-          const submissionMap = (submissionsData || []).reduce((acc: any, sub: any) => {
-            acc[sub.assignment_id] = sub;
+          const toGradeStatus = (grade: number | null | undefined): 'pending' | 'partial' | 'completed' => {
+            if (grade === null || grade === undefined) return 'pending';
+            return grade >= 80 ? 'completed' : 'partial';
+          };
+
+          const submissionMap = (submissionsData || []).reduce((acc: Record<string, any[]>, sub: any) => {
+            const isActualSubmission = !!sub.file_url || sub.status !== 'pending' || sub.grade !== null;
+            if (!isActualSubmission) return acc;
+            if (!acc[sub.assignment_id]) acc[sub.assignment_id] = [];
+            acc[sub.assignment_id].push(sub);
             return acc;
           }, {});
 
           mappedAssignments = (assignmentsData || []).map((assign: any) => {
             const courseObj = Array.isArray(assign.courses) ? assign.courses[0] : assign.courses;
-            const sub = submissionMap[assign.id];
+            const submissionHistoryRows = submissionMap[assign.id] || [];
+            const sub = submissionHistoryRows[0];
+            const grade = sub?.grade ?? null;
             
             return {
               id: assign.id,
@@ -340,14 +371,26 @@ export function useStudentData() {
               courseCode: courseObj?.course_code || '---',
               deadline: assign.due_date || new Date().toISOString(),
               status: sub ? 'submitted' : 'pending',
-              marks: sub?.grade !== null && sub?.grade !== undefined ? `${sub.grade} marks` : 'Pending',
-              grade: sub?.grade !== undefined ? String(sub.grade) : null,
+              grade,
+              gradeStatus: toGradeStatus(grade),
+              feedback: sub?.feedback || null,
+              gradedAt: sub?.graded_at || null,
               submittedOn: sub?.submitted_at || null,
               isPending: !sub,
               description: assign.description,
               fileUrl: sub?.file_url,
               portalOpen: assign.portal_open ?? true,
               isPastDue: assign.due_date ? new Date(assign.due_date) < new Date() : false,
+              submissionHistory: submissionHistoryRows.map((row: any) => ({
+                id: row.id,
+                fileUrl: row.file_url || null,
+                status: row.status || 'submitted',
+                grade: row.grade ?? null,
+                gradeStatus: toGradeStatus(row.grade),
+                feedback: row.feedback || null,
+                gradedAt: row.graded_at || null,
+                submittedAt: row.submitted_at || null,
+              })),
             };
           });
         }

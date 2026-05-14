@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SubmitAssignmentModal from "./SubmitAssignmentModal";
-import ViewStudentSubmissionModal from "./ViewStudentSubmissionModal";
 
 export interface Assignment {
   id: string;
@@ -10,12 +10,24 @@ export interface Assignment {
   deadline: string;
   status: 'pending' | 'submitted' | 'closed';
   description?: string;
-  marks: string;
   submittedOn?: string | null;
-  grade?: string | null;
+  grade?: number | null;
+  gradeStatus?: 'pending' | 'partial' | 'completed';
+  feedback?: string | null;
+  gradedAt?: string | null;
   fileUrl?: string;
   portalOpen?: boolean;
   isPastDue?: boolean;
+  submissionHistory?: {
+    id: string;
+    fileUrl: string | null;
+    status: string;
+    grade: number | null;
+    gradeStatus: 'pending' | 'partial' | 'completed';
+    feedback: string | null;
+    gradedAt: string | null;
+    submittedAt: string | null;
+  }[];
 }
 
 interface StudentAssignmentCardProps {
@@ -25,12 +37,16 @@ interface StudentAssignmentCardProps {
 }
 
 export default function StudentAssignmentCard({ assignment, compact = false, onSubmitted }: StudentAssignmentCardProps) {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isReportOpen, setIsReportOpen] = useState(false);
-  const { title, course, courseCode, deadline, status, marks, submittedOn, grade } = assignment;
+  const { title, course, courseCode, deadline, status, submittedOn, grade } = assignment;
 
   const isPending = status === "pending";
   const isClosed = status === "closed";
+  const gradeStatusLabel =
+    assignment.gradeStatus === 'completed' ? 'Completed' :
+    assignment.gradeStatus === 'partial' ? 'Partial' :
+    'Pending';
 
   const today = new Date();
   const due = new Date(deadline);
@@ -89,8 +105,11 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
               <span className="text-[12px] text-[#7c8697]">
                 {status !== "submitted" ? `Due: ${new Date(deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${new Date(deadline).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}` : (submittedOn ? `Submitted: ${new Date(submittedOn).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${new Date(submittedOn).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}` : '')}
               </span>
-              <span className="text-[12px] text-[#7c8697]">{marks}</span>
-              {grade && <span className="text-[11px] font-semibold text-primary bg-[#f3eff7] px-2 py-[2px] rounded-[6px]">Grade: {grade}</span>}
+              {status === "submitted" && (
+                <span className="text-[11px] font-semibold text-primary bg-[#f3eff7] px-2 py-[2px] rounded-[6px]">
+                  Result: {gradeStatusLabel}{grade !== null && grade !== undefined ? ` (${grade})` : ''}
+                </span>
+              )}
               {dueBadge && (
                 <span className={`text-[11px] font-semibold px-2 py-[2px] rounded-[6px] border ${dueBadge.cls}`}>
                   {dueBadge.text}
@@ -119,10 +138,10 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
             </button>
           ) : (
             <button 
-              onClick={() => setIsReportOpen(true)}
+              onClick={() => navigate(`/student/assignments/${assignment.id}/submissions`)}
               className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors cursor-pointer"
             >
-              View Report
+              View Submissions
             </button>
           )}
         </div>
@@ -141,14 +160,6 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
         />
       )}
 
-      {/* Report Modal */}
-      {isReportOpen && (
-        <ViewStudentSubmissionModal
-          isOpen={isReportOpen}
-          onClose={() => setIsReportOpen(false)}
-          assignment={assignment}
-        />
-      )}
     </div>
   );
 }

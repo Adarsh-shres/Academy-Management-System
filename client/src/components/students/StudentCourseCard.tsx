@@ -3,12 +3,11 @@ export interface Course {
   name: string;
   code: string;
   instructor: string;
-  credits: number;
   attendance: number;
   totalClasses: number;
   attendedClasses: number;
   color: string;
-  schedule: string;
+  classNames?: string[];
 }
 
 interface StudentCourseCardProps {
@@ -19,6 +18,8 @@ interface StudentCourseCardProps {
 
 export default function StudentCourseCard({ course, onViewDetails, onViewFolders }: StudentCourseCardProps) {
   const { name, code, instructor, attendance, totalClasses, attendedClasses, color } = course;
+  const displayCode = code.trim();
+  const displayInstructor = instructor.trim();
 
   const getAttendanceColor = (pct: number) => {
     if (pct >= 90) return "text-primary bg-[#f3eff7] border-[#e7dff0]";
@@ -41,9 +42,11 @@ export default function StudentCourseCard({ course, onViewDetails, onViewFolders
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div>
-            <span className="inline-block text-[10.5px] font-semibold px-2 py-0.5 rounded-[6px] text-primary bg-[#f3eff7] uppercase tracking-wide mb-2">
-              {code}
-            </span>
+            {displayCode && (
+              <span className="inline-block text-[10.5px] font-semibold px-2 py-0.5 rounded-[6px] text-primary bg-[#f3eff7] uppercase tracking-wide mb-2">
+                {displayCode}
+              </span>
+            )}
             <h3 className="font-sans text-[16px] font-semibold text-[#4b3f68] leading-tight tracking-tight">{name}</h3>
           </div>
           <div
@@ -56,9 +59,9 @@ export default function StudentCourseCard({ course, onViewDetails, onViewFolders
         {/* Instructor */}
         <div className="flex items-center gap-2.5 mb-5">
           <div className="w-7 h-7 rounded-[8px] flex items-center justify-center text-white text-[11px] font-semibold shadow-sm" style={{ backgroundColor: color }}>
-            {instructor.split(" ").slice(-1)[0][0]}
+            {(displayInstructor || name).charAt(0).toUpperCase()}
           </div>
-          <span className="text-[13px] font-medium text-[#7c8697]">{instructor}</span>
+          <span className="text-[13px] font-medium text-[#7c8697]">{displayInstructor || 'Instructor not assigned'}</span>
         </div>
 
         {/* Spacer to push attendance down if flex container grows */}
