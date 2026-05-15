@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AccessibilityProvider } from './AccessibilityContext';
 import { AuthProvider } from './AuthContext';
 import { StudentProvider } from './StudentContext';
 import { CourseProvider } from './CourseContext';
@@ -16,21 +17,23 @@ import { NotificationProvider } from './NotificationContext';
 export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      <NotificationProvider>
-        <StudentProvider>
-          <CourseProvider>
-            <BatchProvider>
-              <TeacherProvider>
-                <ScheduleProvider>
-                  <TodoProvider>
-                    {children}
-                  </TodoProvider>
-                </ScheduleProvider>
-              </TeacherProvider>
-            </BatchProvider>
-          </CourseProvider>
-        </StudentProvider>
-      </NotificationProvider>
+      <AccessibilityProvider>
+        <NotificationProvider>
+          <StudentProvider>
+            <CourseProvider>
+              <BatchProvider>
+                <TeacherProvider>
+                  <ScheduleProvider>
+                    <TodoProvider>
+                      {children}
+                    </TodoProvider>
+                  </ScheduleProvider>
+                </TeacherProvider>
+              </BatchProvider>
+            </CourseProvider>
+          </StudentProvider>
+        </NotificationProvider>
+      </AccessibilityProvider>
     </AuthProvider>
   );
 }
