@@ -10,13 +10,16 @@ import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
 import TeacherAttendanceTab from '../components/teachers/TeacherAttendanceTab';
+import ClassChatTab from '../components/shared/ClassChatTab';
+import ClassDirectMessagesTab from '../components/teachers/ClassDirectMessagesTab';
 
 export default function TeacherClassDetailPage() {
   useAuth();
   const { classId } = useParams();
   const navigate = useNavigate();
 
-  const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades' | 'attendance' | 'quizzes'>('content');
+  const [activeSubTab, setActiveSubTab] = useState<'content' | 'students' | 'notifications' | 'grades' | 'attendance' | 'quizzes' | 'chat'>('content');
+  const [chatView, setChatView] = useState<'class' | 'dm'>('class');
   const [course, setCourse] = useState<any>(null);
   const [teacherName, setTeacherName] = useState<string>('');
   const [className, setClassName] = useState<string>('');
@@ -90,10 +93,10 @@ export default function TeacherClassDetailPage() {
         if (classData.teacher_id) {
           const { data: teacherData } = await supabase
             .from('users')
-            .select('name')
+            .select('full_name')
             .eq('id', classData.teacher_id)
             .single();
-          setTeacherName(teacherData?.name || '');
+          setTeacherName(teacherData?.full_name || '');
         }
       } catch {
         navigate('/teacher/dashboard', { state: { targetTab: 'Classes' } });
@@ -101,6 +104,19 @@ export default function TeacherClassDetailPage() {
     }
     loadClassAndCourse();
   }, [classId, navigate]);
+
+  useEffect(() => {
+    const handleSwitchToDM = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setActiveSubTab('chat');
+      setChatView('dm');
+      
+      // We can also pass the userId to pre-select it in ClassDirectMessagesTab if we want,
+      // but the event alone at least switches the tab to Direct Messages.
+    };
+    window.addEventListener('switch-to-dm', handleSwitchToDM);
+    return () => window.removeEventListener('switch-to-dm', handleSwitchToDM);
+  }, []);
 
   useEffect(() => {
     if (!classId) return;
@@ -611,7 +627,7 @@ export default function TeacherClassDetailPage() {
           </div>
 
           <div className="flex space-x-6 border-b border-[#e7dff0] mb-6 px-2 overflow-x-auto">
-            {(['content', 'students', 'grades', 'notifications', 'attendance', 'quizzes'] as const).map((tab) => (
+            {(['content', 'students', 'grades', 'notifications', 'attendance', 'chat', 'quizzes'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveSubTab(tab)}
@@ -625,6 +641,7 @@ export default function TeacherClassDetailPage() {
                 {tab === 'grades' && 'Assignments & Grades'}
                 {tab === 'notifications' && 'Broadcast Notification'}
                 {tab === 'attendance' && 'Attendance'}
+                {tab === 'chat' && 'Chat Room'}
                 {tab === 'quizzes' && 'Quiz'}
               </button>
             ))}
@@ -1438,6 +1455,30 @@ export default function TeacherClassDetailPage() {
               )}
             </div>
 
+          )}
+
+          {activeSubTab === 'chat' && classId && (
+            <div className="flex flex-col gap-4 animate-fade-in w-full h-full">
+              <div className="flex bg-white p-1 rounded-lg border border-[#e7dff0] self-start mb-2">
+                <button
+                  onClick={() => setChatView('class')}
+                  className={`px-4 py-1.5 text-sm font-bold rounded-md transition-colors ${chatView === 'class' ? 'bg-[#6a5182] text-white shadow-sm' : 'text-[#64748b] hover:bg-[#f6f2fb]'}`}
+                >
+                  Class Chat
+                </button>
+                <button
+                  onClick={() => setChatView('dm')}
+                  className={`px-4 py-1.5 text-sm font-bold rounded-md transition-colors ${chatView === 'dm' ? 'bg-[#6a5182] text-white shadow-sm' : 'text-[#64748b] hover:bg-[#f6f2fb]'}`}
+                >
+                  Direct Messages
+                </button>
+              </div>
+              {chatView === 'class' ? (
+                <ClassChatTab classId={classId} />
+              ) : (
+                <ClassDirectMessagesTab classId={classId} />
+              )}
+            </div>
           )}
 
         </div>
