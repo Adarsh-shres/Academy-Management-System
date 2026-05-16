@@ -46,6 +46,8 @@ import StudentFoldersPage from './pages/StudentFoldersPage.tsx';
 import FolderContentsPage from './pages/FolderContentsPage.tsx';
 import NotificationsPage from './pages/NotificationsPage.tsx';
 import SendNotificationPage from './pages/SendNotificationPage.tsx';
+import StudentChatPage from './pages/StudentChatPage.tsx';
+import TeacherChatPage from './pages/TeacherChatPage.tsx';
 
 function UnderDevelopment() {
   return (
@@ -141,8 +143,17 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/chat"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherChatPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── Student dashboard routes ───────────────────────────── */}
+      <Route path="/student/chat" element={<ProtectedRoute allowedRoles={['student']}><StudentChatPage /></ProtectedRoute>} />
       <Route
         element={
           <ProtectedRoute allowedRoles={['student']}>
