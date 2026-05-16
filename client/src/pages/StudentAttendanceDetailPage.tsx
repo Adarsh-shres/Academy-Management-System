@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useStudentData } from "../hooks/useStudentData";
+import { DetailPageSkeleton } from "../components/skeletons/PageSkeletons";
 
 export default function StudentAttendanceDetailPage() {
   const { classId } = useParams();
@@ -9,11 +10,7 @@ export default function StudentAttendanceDetailPage() {
   const classData = classAttendance.find((ca) => ca.classId === classId);
 
   if (isLoading) {
-    return (
-      <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">
-        Loading Attendance Details...
-      </div>
-    );
+    return <DetailPageSkeleton />;
   }
 
   if (error) {

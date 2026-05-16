@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Bell, ChevronLeft, ChevronRight, FileText, CalendarCheck2, MapPin, Users, PenLine } from '../components/shared/icons';
+import { Bell, FileText, CalendarCheck2, MapPin, Users, PenLine } from '../components/shared/icons';
+import NoticeBoard from '../components/dashboard/NoticeBoard';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherWhatsDue from '../components/teachers/TeacherWhatsDue';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
 import TeacherAssignmentPage from './TeacherAssignmentPage';
 import TeacherClassesPage from './TeacherClassesPage';
 import TeacherSchedulePage from './TeacherSchedulePage';
+import TeacherDashboardSkeleton from '../components/skeletons/TeacherDashboardSkeleton';
 
 /** Components for Teacher Dashboard */
 const TeacherNotificationBell = () => {
@@ -107,99 +109,6 @@ const TeacherNotificationBell = () => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
-
-const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDate: Date, setSelectedDate: (d: Date) => void }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [, setRefresh] = useState(0);
-
-  useEffect(() => {
-    const handler = () => setRefresh(r => r + 1);
-    window.addEventListener('notesUpdated', handler);
-    return () => window.removeEventListener('notesUpdated', handler);
-  }, []);
-
-  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-
-  const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
-  const getFirstDayOfMonth = (year: number, month: number) => {
-    let day = new Date(year, month, 1).getDay();
-    return day; // Sunday is 0
-  };
-
-  const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
-  const firstDay = getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth());
-  
-  const monthName = currentDate.toLocaleString('default', { month: 'long' });
-  const yearStr = currentDate.getFullYear();
-
-  const days = [];
-  for (let i = 0; i < firstDay; i++) days.push(null);
-  for (let i = 1; i <= daysInMonth; i++) days.push(i);
-
-  const today = new Date();
-  const isToday = (day: number) => today.getDate() === day && today.getMonth() === currentDate.getMonth() && today.getFullYear() === currentDate.getFullYear();
-  const isSelected = (day: number) => selectedDate.getDate() === day && selectedDate.getMonth() === currentDate.getMonth() && selectedDate.getFullYear() === currentDate.getFullYear();
-
-  const hasNotes = (day: number) => {
-    const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const saved = localStorage.getItem(`teacher_notes_${dateStr}`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) && parsed.length > 0;
-      } catch(e) { return false; }
-    }
-    return false;
-  };
-
-  return (
-    <div className="bg-white rounded-2xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col w-full overflow-hidden">
-      <div className="bg-[#6a5182] text-white p-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          <span className="font-bold text-[15px]">Academy Calendar</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={prevMonth} className="hover:text-[#d1c4e9] transition-colors cursor-pointer"><ChevronLeft size={16} /></button>
-          <span className="font-semibold text-[13px] uppercase tracking-wider">{monthName} {yearStr}</span>
-          <button onClick={nextMonth} className="hover:text-[#d1c4e9] transition-colors cursor-pointer"><ChevronRight size={16} /></button>
-        </div>
-      </div>
-      
-      <div className="p-5">
-        <div className="grid grid-cols-7 gap-1 mb-3 text-center">
-          {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => (
-            <div key={d} className="text-[10px] font-bold text-[#6a5182]/60">{d}</div>
-          ))}
-        </div>
-        
-        <div className="grid grid-cols-7 gap-1 justify-items-center">
-          {days.map((day, idx) => {
-            if (!day) return <div key={idx} className="w-[34px] h-[34px]" />;
-            
-            const todayStyle = isToday(day) ? 'bg-[#6a5182] text-white shadow-sm' : '';
-            const selectedStyle = isSelected(day) && !isToday(day) ? 'border border-[#6a5182] bg-white text-[#4b3f68] shadow-sm' : '';
-            const normalStyle = !isToday(day) && !isSelected(day) ? 'text-[#475569] hover:bg-[#f6f2fb]' : '';
-            const hasEvent = hasNotes(day);
-
-            return (
-              <div 
-                key={idx} 
-                onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
-                className={`relative w-[34px] h-[34px] flex flex-col items-center justify-center rounded-full font-semibold text-[13px] cursor-pointer transition-all ${todayStyle} ${selectedStyle} ${normalStyle}`}
-              >
-                {day}
-                {hasEvent && !isToday(day) && <div className="absolute bottom-1 w-1 h-1 rounded-full bg-[#a78bfa]"></div>}
-                {hasEvent && isToday(day) && <div className="absolute bottom-1 w-1 h-1 rounded-full bg-white opacity-80"></div>}
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 };
@@ -404,12 +313,12 @@ const TeacherNotesWidget = ({ selectedDate }: { selectedDate: Date }) => {
 };
 
 const TeacherCalendarAndNotesSection = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate] = useState(new Date());
 
   return (
     <div className="flex flex-col md:flex-row gap-6 items-start w-full">
       <div className="w-full md:w-[55%] shrink-0">
-        <TeacherAcademyCalendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+        <NoticeBoard />
       </div>
       <div className="w-full md:flex-1">
         <TeacherNotesWidget selectedDate={selectedDate} />
@@ -838,6 +747,9 @@ export default function TeacherDashboardPage() {
   }, [activeTab]);
 
   const renderDashboardContent = () => (
+    isLoadingCounters ? (
+      <TeacherDashboardSkeleton />
+    ) : (
     <div className="flex-1 p-6 md:p-8 flex flex-col lg:flex-row gap-8 w-full">
       <div className="flex-1 flex flex-col min-w-0">
         <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full shadow-[0_10px_28px_rgba(57,31,86,0.06)] mb-8">
@@ -1076,6 +988,7 @@ export default function TeacherDashboardPage() {
         </div>
       </div>
     </div>
+    )
   );
 
 

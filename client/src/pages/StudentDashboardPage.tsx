@@ -4,15 +4,15 @@ import StudentAssignmentCard from '../components/students/StudentAssignmentCard'
 import StatCard from '../components/dashboard/StatCard';
 
 import EnrolledCoursesList from '../components/courses/EnrolledCoursesList';
-
-import AcademyCalendar from '../components/schedule/AcademyCalendar';
+import NoticeBoard from '../components/dashboard/NoticeBoard';
+import StudentDashboardSkeleton from '../components/skeletons/StudentDashboardSkeleton';
 
 export default function StudentDashboardPage() {
   const navigate = useNavigate();
   const { courses, assignments, profile: studentProfile, isLoading, error, refetch } = useStudentData();
 
   if (isLoading) {
-    return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Dashboard...</div>;
+    return <StudentDashboardSkeleton />;
   }
 
   if (error || !studentProfile) {
@@ -34,7 +34,7 @@ export default function StudentDashboardPage() {
 
   const upcomingAssignments = assignments
     .filter((a) => a.status === "pending")
-    .slice(0, 3);
+    .slice(0, 2);
 
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full">
@@ -118,7 +118,7 @@ export default function StudentDashboardPage() {
           </div>
           
           <div className="pt-2">
-            <AcademyCalendar assignmentsList={assignments as any[]} />
+            <NoticeBoard />
           </div>
         </div>
 

@@ -10,6 +10,7 @@ import TeacherSidebar from '../components/teachers/TeacherSidebar';
 import TeacherGradeModal from '../components/teachers/TeacherGradeModal';
 import TeacherContentTab from '../components/teachers/TeacherContentTab';
 import TeacherAttendanceTab from '../components/teachers/TeacherAttendanceTab';
+import { SkeletonBlock } from '../components/shared/Skeleton';
 
 export default function TeacherClassDetailPage() {
   useAuth();
@@ -637,8 +638,10 @@ export default function TeacherClassDetailPage() {
           {activeSubTab === 'students' && (
             <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)] animate-fade-in">
               {isLoadingStudents ? (
-                <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
-                  <p className="text-[14px] font-medium animate-pulse">Loading enrollments...</p>
+                <div className="p-5 space-y-3">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <SkeletonBlock key={index} className="h-12 w-full" />
+                  ))}
                 </div>
               ) : (
                 <table className="w-full text-left border-collapse">
@@ -691,8 +694,10 @@ export default function TeacherClassDetailPage() {
               {!selectedAssignment && (
                 <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
                   {isLoadingAssignments ? (
-                    <div className="flex justify-center py-20">
-                      <p className="text-[14px] font-medium animate-pulse text-[#94a3b8]">Loading assignments...</p>
+                    <div className="p-5 space-y-3">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <SkeletonBlock key={index} className="h-12 w-full" />
+                      ))}
                     </div>
                   ) : assignments.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -775,8 +780,10 @@ export default function TeacherClassDetailPage() {
 
                   <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
                     {isLoadingSubmissions ? (
-                      <div className="flex justify-center py-20">
-                        <p className="text-[14px] font-medium animate-pulse text-[#94a3b8]">Loading submissions...</p>
+                      <div className="p-5 space-y-3">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <SkeletonBlock key={index} className="h-12 w-full" />
+                        ))}
                       </div>
                     ) : assignmentSubmissions.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-16 text-center">

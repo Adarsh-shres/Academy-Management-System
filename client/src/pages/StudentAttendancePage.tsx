@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStudentData } from "../hooks/useStudentData";
 import type { ClassAttendanceData } from "../hooks/useStudentData";
+import { CardGridPageSkeleton } from "../components/skeletons/PageSkeletons";
 
 export default function StudentAttendancePage() {
   const { classAttendance, isLoading, error } = useStudentData();
@@ -19,11 +20,7 @@ export default function StudentAttendancePage() {
   }, [classAttendance]);
 
   if (isLoading) {
-    return (
-      <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">
-        Loading Attendance...
-      </div>
-    );
+    return <CardGridPageSkeleton cards={4} />;
   }
 
   if (error) {

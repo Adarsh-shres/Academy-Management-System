@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useStudentData } from "../hooks/useStudentData";
 import { getStudentClassIdsForCourse } from "../lib/studentClassEnrollment";
+import { MaterialsPageSkeleton } from "../components/skeletons/PageSkeletons";
 
 interface FolderSummary {
   id: string;
@@ -90,7 +91,7 @@ export default function StudentFoldersPage() {
   }, [course?.classIds, courseId, isStudentDataLoading, user]);
 
   if (isLoading) {
-    return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Folders...</div>;
+    return <MaterialsPageSkeleton />;
   }
 
   if (error) {

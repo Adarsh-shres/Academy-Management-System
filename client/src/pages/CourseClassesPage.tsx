@@ -5,6 +5,8 @@ import { useCourses } from '../context/CourseContext';
 import { supabase } from '../lib/supabase';
 import type { Course, CourseRow } from '../types/course';
 import { rowToCourse } from '../types/course';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
+import { SkeletonBlock } from '../components/shared/Skeleton';
 
 const MAX_STUDENTS_PER_CLASS = 35;
 const DAY_OPTIONS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
@@ -273,12 +275,7 @@ export default function CourseClassesPage() {
   };
 
   if (coursesLoading || pageLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading course classes...</p>
-      </div>
-    );
+    return <CardGridPageSkeleton cards={6} />;
   }
 
   if (error || !course) {
@@ -540,7 +537,11 @@ export default function CourseClassesPage() {
 
                 <div className="max-h-[310px] overflow-y-auto divide-y divide-[#edf2f7]">
                   {usersLoading ? (
-                    <div className="py-12 text-center text-[13px] text-[#64748b] font-semibold animate-pulse">Loading students...</div>
+                    <div className="py-4 space-y-3">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <SkeletonBlock key={index} className="h-10 w-full" />
+                      ))}
+                    </div>
                   ) : filteredStudents.length > 0 ? (
                     filteredStudents.map((student) => {
                       const isSelected = selectedStudentIds.includes(student.id);

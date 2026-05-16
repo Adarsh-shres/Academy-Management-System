@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import AccessCodeModal from '../components/students/AccessCodeModal';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 interface QuizQuestion {
   id: string;
@@ -412,9 +413,7 @@ export default function StudentQuizzesPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex h-[240px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">
-          Loading quizzes...
-        </div>
+        <CardGridPageSkeleton cards={4} />
       ) : error ? (
         <div className="flex h-[240px] items-center justify-center text-[#4b3f68] font-semibold">{error}</div>
       ) : quizzes.length === 0 ? (

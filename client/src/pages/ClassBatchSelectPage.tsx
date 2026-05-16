@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBatches } from '../context/BatchContext';
 import { useCourses } from '../context/CourseContext';
 import { useStudents } from '../context/StudentContext';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 export default function ClassBatchSelectPage() {
   const navigate = useNavigate();
@@ -32,12 +33,7 @@ export default function ClassBatchSelectPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading batches...</p>
-      </div>
-    );
+    return <CardGridPageSkeleton cards={4} />;
   }
 
   return (

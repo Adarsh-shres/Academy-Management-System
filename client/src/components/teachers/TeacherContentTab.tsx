@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Plus, Trash2, ChevronDown, ChevronRight, FileText, Video, Users, File } from '../shared/icons';
+import { SkeletonBlock } from '../shared/Skeleton';
 
 
 
@@ -320,8 +321,10 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
       <div className="space-y-4">
         {isLoading && weeks.length === 0 ? (
-          <div className="py-16 flex justify-center items-center rounded-md bg-[#fbf8fe]">
-            <p className="text-[13px] font-bold text-[#94a3b8] animate-pulse">Loading content packages...</p>
+          <div className="space-y-3">
+            <SkeletonBlock className="h-16 w-full" />
+            <SkeletonBlock className="h-16 w-full" />
+            <SkeletonBlock className="h-16 w-full" />
           </div>
         ) : weeks.length === 0 ? (
           <div className="py-16 text-center border-2 border-dashed border-[#e7dff0] rounded-md bg-[#fbf8fe]">

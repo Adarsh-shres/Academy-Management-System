@@ -5,6 +5,7 @@ import { useBatches } from '../context/BatchContext';
 import { useCourses } from '../context/CourseContext';
 import { useStudents } from '../context/StudentContext';
 import { supabase } from '../lib/supabase';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 type BatchClass = {
   id: string;
@@ -104,12 +105,7 @@ export default function BatchClassesPage() {
   };
 
   if (loading || isLoadingClasses) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading batch classes...</p>
-      </div>
-    );
+    return <CardGridPageSkeleton cards={6} />;
   }
 
   if (!batch) {

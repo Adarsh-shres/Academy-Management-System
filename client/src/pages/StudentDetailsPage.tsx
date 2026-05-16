@@ -5,6 +5,7 @@ import ConfirmActionModal from '../components/shared/ConfirmActionModal';
 import { useStudents } from '../context/StudentContext';
 import { supabase } from '../lib/supabase';
 import type { StudentRecord } from '../types/student';
+import { SkeletonBlock } from '../components/shared/Skeleton';
 
 type StudentDetailTab = 'profile' | 'assignments' | 'attendance';
 
@@ -364,7 +365,11 @@ export default function StudentDetailsPage() {
           </div>
 
           {activityLoading ? (
-            <div className="py-16 text-center text-[13px] font-semibold text-[#64748b] animate-pulse">Loading assignments...</div>
+            <div className="p-5 space-y-3">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <SkeletonBlock key={index} className="h-12 w-full" />
+              ))}
+            </div>
           ) : assignments.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -438,7 +443,11 @@ export default function StudentDetailsPage() {
             </div>
 
             {activityLoading ? (
-              <div className="py-16 text-center text-[13px] font-semibold text-[#64748b] animate-pulse">Loading attendance...</div>
+              <div className="p-5 space-y-3">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <SkeletonBlock key={index} className="h-12 w-full" />
+                ))}
+              </div>
             ) : filteredAttendance.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">

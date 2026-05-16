@@ -4,6 +4,7 @@ import { PlusCircle, Search, FileText } from '../components/shared/icons';
 import AssignmentCard from '../components/teachers/AssignmentCard';
 import CreateAssignmentModal from '../components/teachers/CreateAssignmentModal';
 import ViewSubmissionsModal from '../components/teachers/ViewSubmissionsModal';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 
 
@@ -234,11 +235,7 @@ export default function TeacherAssignmentPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="animate-pulse bg-white p-5 h-[180px] rounded-sm border border-[#e7dff0]"></div>
-          ))}
-        </div>
+        <CardGridPageSkeleton cards={6} />
       ) : (
         <div className="flex flex-col gap-10">
           <section>

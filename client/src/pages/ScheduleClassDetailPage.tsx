@@ -8,6 +8,7 @@ import { getScheduleCourseId } from '../lib/scheduleCourseSelection';
 import { getScheduleTeacherId } from '../lib/scheduleTeacherSelection';
 import { sendNotificationToUsers } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
+import { SchedulePageSkeleton } from '../components/skeletons/PageSkeletons';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -495,12 +496,7 @@ export default function ScheduleClassDetailPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading schedule...</p>
-      </div>
-    );
+    return <SchedulePageSkeleton />;
   }
 
   if (error || !courseClass) {

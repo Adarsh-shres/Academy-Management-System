@@ -7,6 +7,7 @@ import { useStudents } from '../context/StudentContext';
 import { supabase } from '../lib/supabase';
 import type { BatchStatus } from '../types/batch';
 import type { StudentRecord } from '../types/student';
+import { DetailPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 type CsvImportResult = {
   matchedIds: string[];
@@ -343,12 +344,7 @@ export default function BatchDetailsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading batch...</p>
-      </div>
-    );
+    return <DetailPageSkeleton />;
   }
 
   if (!batch) {

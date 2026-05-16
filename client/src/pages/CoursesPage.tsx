@@ -5,6 +5,7 @@ import { useCourses } from '../context/CourseContext';
 import { useTeachers } from '../context/TeacherContext';
 import type { Course } from '../types/course';
 import type { Teacher } from '../types/teacher';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 const DEPARTMENT_OPTIONS = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'] as const;
 
@@ -154,12 +155,7 @@ export default function CoursesPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading courses...</p>
-      </div>
-    );
+    return <CardGridPageSkeleton cards={6} />;
   }
 
   if (contextError && courses.length === 0) {

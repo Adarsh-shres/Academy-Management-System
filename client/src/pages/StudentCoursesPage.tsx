@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useStudentData } from "../hooks/useStudentData";
 import StudentCourseCard from "../components/students/StudentCourseCard";
 import type { Course } from "../components/students/StudentCourseCard";
+import { CardGridPageSkeleton } from "../components/skeletons/PageSkeletons";
 
 export default function StudentCoursesPage() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function StudentCoursesPage() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   if (isLoading) {
-    return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Courses...</div>;
+    return <CardGridPageSkeleton cards={6} />;
   }
 
   if (error) {
