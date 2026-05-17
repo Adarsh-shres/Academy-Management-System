@@ -146,9 +146,17 @@ export default function AdminTeacherSchedulePage() {
           <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider bg-[#e0f2fe] text-[#0284c7]">
             {trimTime(entry.start_time)} - {trimTime(entry.end_time)}
           </span>
-          <span className="bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[11px] font-bold px-2 py-0.5 rounded-sm">
-            {batchLabel}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[11px] font-bold px-2 py-0.5 rounded-sm">
+              {batchLabel}
+            </span>
+            <button
+              onClick={() => navigate(`/schedule/${entry.class_id}`)}
+              className="text-[11px] font-bold text-[#6a5182] hover:text-[#4b3f68] hover:underline underline-offset-2 transition-all cursor-pointer"
+            >
+              Edit
+            </button>
+          </div>
         </div>
         <h4 className="mt-3 text-[15px] font-bold text-[#4b3f68]">{courseLabel}</h4>
         <p className="mt-1 text-[12.5px] font-semibold text-[#64748b]">{classLabel}</p>

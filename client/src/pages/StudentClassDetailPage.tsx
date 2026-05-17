@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import AccessCodeModal from '../components/students/AccessCodeModal';
+import ClassChatTab from '../components/shared/ClassChatTab';
+import StudentDirectMessageTab from '../components/students/StudentDirectMessageTab';
 
 interface QuizQuestion {
   id: string;
@@ -39,6 +41,7 @@ interface QuizSubmission {
 export default function StudentClassDetailPage() {
   const { classId } = useParams<{ classId: string }>();
   
+  const [activeTab, setActiveTab] = useState<'chat' | 'quizzes' | 'dm'>('quizzes');
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [submissions, setSubmissions] = useState<Record<string, QuizSubmission>>({});
   const [currentUserId, setCurrentUserId] = useState<string>('');
@@ -58,6 +61,14 @@ export default function StudentClassDetailPage() {
   useEffect(() => {
     answersRef.current = answers;
   }, [answers]);
+
+  useEffect(() => {
+    const handleSwitchToDM = () => {
+      setActiveTab('dm');
+    };
+    window.addEventListener('switch-to-dm', handleSwitchToDM);
+    return () => window.removeEventListener('switch-to-dm', handleSwitchToDM);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -353,61 +364,95 @@ export default function StudentClassDetailPage() {
   // View: Main Listing
   return (
     <div className="p-8 max-w-4xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-extrabold text-[#4b3f68] tracking-tight">Class Quizzes</h1>
-      
-      {quizLoadError ? (
-        <div className="bg-white rounded-md border border-[#fecaca] p-8 text-center">
-          <p className="text-[#dc2626] font-semibold">Failed to load quizzes.</p>
-          <p className="text-[13px] text-[#64748b] mt-2">{quizLoadError}</p>
-        </div>
-      ) : quizzes.length === 0 ? (
-        <div className="bg-white rounded-md border border-dashed border-[#e7dff0] p-12 text-center">
-          <p className="text-[#94a3b8] font-semibold">No quizzes available for this class.</p>
-        </div>
-      ) : (
-        <div className="grid gap-5">
-          {quizzes.map(quiz => {
-            const hasSubmitted = !!submissions[quiz.id];
-            
-            return (
-              <div key={quiz.id} className="bg-white rounded-[10px] border border-[#e7dff0] p-6 shadow-[0_2px_12px_rgba(57,31,86,0.04)] hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
-                <div>
-                  <h3 className="font-bold text-[#4b3f68] text-lg">{quiz.title}</h3>
-                  {quiz.description && <p className="text-[13px] text-[#64748b] mt-1 line-clamp-2">{quiz.description}</p>}
-                  <div className="flex gap-4 mt-3">
-                    {quiz.time_limit_minutes > 0 && <span className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider bg-[#f8fafc] px-2 py-1 rounded-sm">⏱ {quiz.time_limit_minutes} min</span>}
-                    {hasSubmitted && <span className="text-[11px] font-bold text-[#16a34a] uppercase tracking-wider bg-[#dcfce7] px-2 py-1 rounded-sm">✓ Submitted</span>}
+      {/* Tabs */}
+      <div className="flex space-x-6 border-b border-[#e7dff0] mb-4 overflow-x-auto">
+        {(['quizzes', 'chat', 'dm'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${
+              activeTab === tab
+                ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
+                : 'text-[#64748b] hover:text-[#4b3f68]'
+            }`}
+          >
+            {tab === 'quizzes' && 'Quizzes'}
+            {tab === 'chat' && '💬 Class Chat'}
+            {tab === 'dm' && '👨‍🏫 Direct Message'}
+          </button>
+        ))}
+      </div>
+
+      {/* Quizzes Tab */}
+      {activeTab === 'quizzes' && (
+        <>
+          <h1 className="text-2xl font-extrabold text-[#4b3f68] tracking-tight">Class Quizzes</h1>
+          
+          {quizLoadError ? (
+            <div className="bg-white rounded-md border border-[#fecaca] p-8 text-center">
+              <p className="text-[#dc2626] font-semibold">Failed to load quizzes.</p>
+              <p className="text-[13px] text-[#64748b] mt-2">{quizLoadError}</p>
+            </div>
+          ) : quizzes.length === 0 ? (
+            <div className="bg-white rounded-md border border-dashed border-[#e7dff0] p-12 text-center">
+              <p className="text-[#94a3b8] font-semibold">No quizzes available for this class.</p>
+            </div>
+          ) : (
+            <div className="grid gap-5">
+              {quizzes.map(quiz => {
+                const hasSubmitted = !!submissions[quiz.id];
+                
+                return (
+                  <div key={quiz.id} className="bg-white rounded-[10px] border border-[#e7dff0] p-6 shadow-[0_2px_12px_rgba(57,31,86,0.04)] hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+                    <div>
+                      <h3 className="font-bold text-[#4b3f68] text-lg">{quiz.title}</h3>
+                      {quiz.description && <p className="text-[13px] text-[#64748b] mt-1 line-clamp-2">{quiz.description}</p>}
+                      <div className="flex gap-4 mt-3">
+                        {quiz.time_limit_minutes > 0 && <span className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider bg-[#f8fafc] px-2 py-1 rounded-sm">⏱ {quiz.time_limit_minutes} min</span>}
+                        {hasSubmitted && <span className="text-[11px] font-bold text-[#16a34a] uppercase tracking-wider bg-[#dcfce7] px-2 py-1 rounded-sm">✓ Submitted</span>}
+                      </div>
+                    </div>
+                    {hasSubmitted ? (
+                      <button 
+                        onClick={() => handleViewResults(quiz)}
+                        className="px-6 py-2.5 bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold text-sm tracking-wide rounded-md hover:bg-[#e7dff0] transition-colors shrink-0 uppercase"
+                      >
+                        View Results
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleStartClick(quiz)}
+                        className="px-6 py-2.5 bg-[#6a5182] text-white font-bold text-sm tracking-wide rounded-md hover:bg-[#5b4471] transition-colors shrink-0 uppercase shadow-sm"
+                      >
+                        Start Quiz
+                      </button>
+                    )}
                   </div>
-                </div>
-                {hasSubmitted ? (
-                  <button 
-                    onClick={() => handleViewResults(quiz)}
-                    className="px-6 py-2.5 bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold text-sm tracking-wide rounded-md hover:bg-[#e7dff0] transition-colors shrink-0 uppercase"
-                  >
-                    View Results
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => handleStartClick(quiz)}
-                    className="px-6 py-2.5 bg-[#6a5182] text-white font-bold text-sm tracking-wide rounded-md hover:bg-[#5b4471] transition-colors shrink-0 uppercase shadow-sm"
-                  >
-                    Start Quiz
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeQuizToUnlock && (
+            <AccessCodeModal 
+              isOpen={!!activeQuizToUnlock}
+              onClose={() => setActiveQuizToUnlock(null)}
+              expectedCode={activeQuizToUnlock.access_code || ''}
+              quizTitle={activeQuizToUnlock.title}
+              onSuccess={handleUnlockSuccess}
+            />
+          )}
+        </>
       )}
 
-      {activeQuizToUnlock && (
-        <AccessCodeModal 
-          isOpen={!!activeQuizToUnlock}
-          onClose={() => setActiveQuizToUnlock(null)}
-          expectedCode={activeQuizToUnlock.access_code || ''}
-          quizTitle={activeQuizToUnlock.title}
-          onSuccess={handleUnlockSuccess}
-        />
+      {/* Chat Tab */}
+      {activeTab === 'chat' && classId && (
+        <ClassChatTab classId={classId} />
+      )}
+
+      {/* Teacher DM Tab */}
+      {activeTab === 'dm' && classId && (
+        <StudentDirectMessageTab classId={classId} />
       )}
     </div>
   );

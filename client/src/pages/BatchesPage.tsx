@@ -63,11 +63,6 @@ export default function BatchesPage() {
       return;
     }
 
-    if (selectedCourseIds.length === 0) {
-      setFormError('Assign at least one course to this batch.');
-      return;
-    }
-
     setIsSaving(true);
     setFormError('');
 
