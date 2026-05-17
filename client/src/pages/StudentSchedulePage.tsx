@@ -200,7 +200,7 @@ export default function StudentSchedulePage() {
     const teacherLabel = teacher?.name || 'Teacher not selected';
 
     return (
-      <div key={entry.id} className={`${compact ? 'border-l-[3px] border-[#6a5182] bg-[#fbf8fe]' : 'border border-[#e2d9ed] bg-white'} rounded-sm p-4`}>
+      <div key={entry.id} className={`${compact ? 'border-l-[3px] border-[#CCD4E0] bg-[#F6F8FB]' : 'border border-[#E1E6EE] bg-white'} rounded-sm p-4`}>
         <div className="flex items-start justify-between gap-3 mb-3">
           <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider bg-[#e0f2fe] text-[#0284c7]">
             {trimTime(entry.start_time)} - {trimTime(entry.end_time)}
@@ -209,7 +209,7 @@ export default function StudentSchedulePage() {
             {entry.schedule_type === 'weekly' ? entry.day_of_week : formatDate(entry.schedule_date)}
           </span>
         </div>
-        <h4 className="text-[15px] font-bold text-[#4b3f68] mb-1 leading-tight">{courseLabel}</h4>
+        <h4 className="text-[15px] font-bold text-[#232529] mb-1 leading-tight">{courseLabel}</h4>
         <p className="text-[12px] font-semibold text-[#64748b] mb-3">{classLabel} | {batchLabel}</p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-[#475569]">
           <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || classRow?.room || 'Room not set'}</span>
@@ -235,21 +235,21 @@ export default function StudentSchedulePage() {
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6">
-          <div className="h-[220px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
-          <div className="h-[780px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
+          <div className="h-[220px] animate-pulse rounded-sm bg-white border border-[#E1E6EE]" />
+          <div className="h-[780px] animate-pulse rounded-sm bg-white border border-[#E1E6EE]" />
         </div>
       ) : (
         <>
-          <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-            <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-start justify-between gap-3">
+          <section className="bg-white rounded-sm border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-[#E1E6EE] bg-[#F6F8FB] flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <CalendarCheck2 size={18} className="text-[#6a5182]" />
-                  <h2 className="text-[16px] font-extrabold text-[#4b3f68]">Today Schedule</h2>
+                  <CalendarCheck2 size={18} className="text-[#4B5563]" />
+                  <h2 className="text-[16px] font-extrabold text-[#232529]">Today Schedule</h2>
                 </div>
                 <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{todayDay}</p>
               </div>
-              <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[12px] font-bold text-[#64748b]">
+              <span className="rounded-sm bg-white border border-[#E1E6EE] px-2.5 py-1 text-[12px] font-bold text-[#64748b]">
                 {todaysEntries.length}
               </span>
             </div>
@@ -259,16 +259,16 @@ export default function StudentSchedulePage() {
                 todaysEntries.map((entry) => renderEntry(entry, true))
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 bg-[#f8fafc] rounded-sm text-center border border-dashed border-[#cbd5e1] min-h-[180px]">
-                  <p className="text-[13.5px] font-bold text-[#4b3f68]">No classes today</p>
+                  <p className="text-[13.5px] font-bold text-[#232529]">No classes today</p>
                   <p className="text-[12.5px] text-[#64748b] mt-1">Your scheduled classes for today will appear here.</p>
                 </div>
               )}
             </div>
           </section>
 
-          <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-            <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe]">
-              <h2 className="text-[16px] font-extrabold text-[#4b3f68]">One-Time Schedule</h2>
+          <section className="bg-white rounded-sm border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-[#E1E6EE] bg-[#F6F8FB]">
+              <h2 className="text-[16px] font-extrabold text-[#232529]">One-Time Schedule</h2>
               <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{oneTimeEntries.length} upcoming date-specific classes.</p>
             </div>
             <div className="p-5 flex flex-col gap-3">
@@ -282,13 +282,13 @@ export default function StudentSchedulePage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-            <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
+          <section className="bg-white rounded-sm border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-[#E1E6EE] bg-[#F6F8FB] flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h2 className="text-[16px] font-extrabold text-[#4b3f68]">Weekly Schedule</h2>
+                <h2 className="text-[16px] font-extrabold text-[#232529]">Weekly Schedule</h2>
                 <p className="text-[12.5px] text-[#64748b] font-medium mt-1">Recurring classes from Sunday through Friday.</p>
               </div>
-              <span className="rounded-sm bg-white border border-[#e2d9ed] px-3 py-2 text-[12px] font-bold text-[#64748b]">
+              <span className="rounded-sm bg-white border border-[#E1E6EE] px-3 py-2 text-[12px] font-bold text-[#64748b]">
                 {weeklyEntries.length} {weeklyEntries.length === 1 ? 'entry' : 'entries'}
               </span>
             </div>
@@ -299,13 +299,13 @@ export default function StudentSchedulePage() {
                 const isToday = day === todayDay;
 
                 return (
-                  <div key={day} className={`grid grid-cols-1 lg:grid-cols-[170px_1fr] ${isToday ? 'bg-[#fbf8fe]' : 'bg-white'}`}>
+                  <div key={day} className={`grid grid-cols-1 lg:grid-cols-[170px_1fr] ${isToday ? 'bg-[#F6F8FB]' : 'bg-white'}`}>
                     <div className="p-5 border-b lg:border-b-0 lg:border-r border-[#edf2f7] flex lg:flex-col items-center lg:items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-[15px] font-extrabold text-[#4b3f68]">{day}</h3>
-                        {isToday && <p className="text-[11px] font-bold text-[#6a5182] mt-1 uppercase tracking-wide">Today</p>}
+                        <h3 className="text-[15px] font-extrabold text-[#232529]">{day}</h3>
+                        {isToday && <p className="text-[11px] font-bold text-[#4B5563] mt-1 uppercase tracking-wide">Today</p>}
                       </div>
-                      <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
+                      <span className="rounded-sm bg-white border border-[#E1E6EE] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
                         {dayEntries.length}
                       </span>
                     </div>

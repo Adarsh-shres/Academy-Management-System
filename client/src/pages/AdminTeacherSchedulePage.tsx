@@ -140,7 +140,7 @@ export default function AdminTeacherSchedulePage() {
     const classLabel = entry.classes?.name || 'Class';
 
     return (
-      <div key={entry.id} className="rounded-sm border border-[#e2d9ed] bg-white p-4">
+      <div key={entry.id} className="rounded-sm border border-[#E1E6EE] bg-white p-4">
         <div className="flex items-start justify-between gap-3">
           <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider bg-[#e0f2fe] text-[#0284c7]">
             {trimTime(entry.start_time)} - {trimTime(entry.end_time)}
@@ -149,7 +149,7 @@ export default function AdminTeacherSchedulePage() {
             {batchLabel}
           </span>
         </div>
-        <h4 className="mt-3 text-[15px] font-bold text-[#4b3f68]">{courseLabel}</h4>
+        <h4 className="mt-3 text-[15px] font-bold text-[#232529]">{courseLabel}</h4>
         <p className="mt-1 text-[12.5px] font-semibold text-[#64748b]">{classLabel}</p>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-[#475569]">
           <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || entry.classes?.room || 'Room not set'}</span>
@@ -163,7 +163,7 @@ export default function AdminTeacherSchedulePage() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading teacher schedule...</p>
       </div>
     );
@@ -174,7 +174,7 @@ export default function AdminTeacherSchedulePage() {
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <p className="text-[14px] text-[#ef4444] font-semibold">Unable to load teacher schedule</p>
         <p className="max-w-md text-center text-[13px] text-[#64748b]">{error}</p>
-        <button onClick={() => navigate('/schedule')} className="mt-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer">
+        <button onClick={() => navigate('/schedule')} className="mt-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer">
           Back to Schedule
         </button>
       </div>
@@ -186,7 +186,7 @@ export default function AdminTeacherSchedulePage() {
       <div>
         <button
           onClick={() => navigate('/schedule')}
-          className="mb-3 inline-flex items-center gap-2 text-[13px] font-semibold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer"
+          className="mb-3 inline-flex items-center gap-2 text-[13px] font-semibold text-[#4B5563] hover:text-[#232529] cursor-pointer"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
           Back to Schedule
@@ -196,8 +196,8 @@ export default function AdminTeacherSchedulePage() {
       </div>
 
       <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-          <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Weekly Schedule</h2>
+        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
+          <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Weekly Schedule</h2>
         </div>
         <div className="divide-y divide-[#edf2f7]">
           {DAYS_OF_WEEK.map((day) => {
@@ -205,8 +205,8 @@ export default function AdminTeacherSchedulePage() {
             return (
               <div key={day} className="grid grid-cols-1 lg:grid-cols-[170px_1fr]">
                 <div className="p-5 border-b lg:border-b-0 lg:border-r border-[#edf2f7] flex lg:flex-col items-center lg:items-start justify-between gap-3">
-                  <h3 className="text-[15px] font-extrabold text-[#4b3f68]">{day}</h3>
-                  <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
+                  <h3 className="text-[15px] font-extrabold text-[#232529]">{day}</h3>
+                  <span className="rounded-sm bg-white border border-[#E1E6EE] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
                     {dayEntries.length}
                   </span>
                 </div>
@@ -228,8 +228,8 @@ export default function AdminTeacherSchedulePage() {
       </section>
 
       <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-          <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Upcoming One-Day Schedule</h2>
+        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
+          <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Upcoming One-Day Schedule</h2>
         </div>
         <div className="p-5">
           {oneTimeEntries.length > 0 ? (
@@ -239,7 +239,7 @@ export default function AdminTeacherSchedulePage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-14 px-4 bg-[#f8fafc] border border-dashed border-[#cbd5e1] rounded-sm text-center">
               <Calendar size={42} className="text-[#cbd5e1] mb-4" />
-              <h3 className="text-[17px] font-bold text-[#4b3f68] mb-1">No Upcoming One-Day Entries</h3>
+              <h3 className="text-[17px] font-bold text-[#232529] mb-1">No Upcoming One-Day Entries</h3>
               <p className="text-[13px] text-[#64748b] max-w-md">Upcoming one-day schedule changes assigned to this teacher will appear here.</p>
             </div>
           )}

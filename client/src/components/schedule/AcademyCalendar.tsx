@@ -153,9 +153,9 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
 
     if (!deadlineInfo) return null;
 
-    if (deadlineInfo.status === "submitted") return "bg-[#6a5182] text-white shadow-sm ring-1 ring-[#4b3f68]";
-    if (new Date(deadlineInfo.deadline) < today && deadlineInfo.status !== "submitted") return "bg-[#4b3f68] text-white shadow-sm ring-1 ring-[#391f56]";
-    return "bg-[#8b6ca8] text-white shadow-sm ring-1 ring-[#6a5182]";
+    if (deadlineInfo.status === "submitted") return "bg-[#3E4FFF] text-white shadow-sm ring-1 ring-[#232529]";
+    if (new Date(deadlineInfo.deadline) < today && deadlineInfo.status !== "submitted") return "bg-[#232529] text-white shadow-sm ring-1 ring-[#391f56]";
+    return "bg-[#5F73F5] text-white shadow-sm ring-1 ring-[#CCD4E0]";
   };
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -166,9 +166,9 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
   return (
-    <div className="bg-[#6a5182]/5 backdrop-blur-md rounded-[10px] shadow-[0_2px_12px_rgba(57,31,86,0.03)] w-full overflow-hidden border border-[#e7dff0]/60">
+    <div className="bg-[#F6F8FB] backdrop-blur-md rounded-[10px] shadow-[0_2px_12px_rgba(36,37,41,0.03)] w-full overflow-hidden border border-[#E1E6EE]/60">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] px-6 py-5 text-white relative flex justify-between items-center">
+      <div className="bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] px-6 py-5 text-white relative flex justify-between items-center">
         <div className="flex items-center gap-3">
           <span className="w-8 h-8 rounded-[6px] bg-white/20 flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -182,7 +182,7 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
       <div className="p-6">
         <div className="grid grid-cols-7 gap-2 mb-5">
           {dayNames.map((d) => (
-            <div key={d} className="text-center text-[10px] font-semibold text-[#778196] uppercase tracking-[0.06em] pb-2 border-b border-[#f3eff7]">
+            <div key={d} className="text-center text-[10px] font-semibold text-[#778196] uppercase tracking-[0.06em] pb-2 border-b border-[#F6F8FB]">
               {d}
             </div>
           ))}
@@ -203,12 +203,12 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
                 }}
                 className={`
                   min-h-[46px] flex flex-col items-center justify-center text-[13px] font-semibold transition-all cursor-pointer rounded-[6px] hover:border-primary hover:text-primary hover:shadow-md relative
-                  ${statusCls ? statusCls : isToday ? "bg-[#f3eff7] text-primary border border-[#e7dff0]" : "text-[#4b3f68] hover:bg-[#faf8fc]"}
+                  ${statusCls ? statusCls : isToday ? "bg-[#F6F8FB] text-primary border border-[#E1E6EE]" : "text-[#232529] hover:bg-[#faf8fc]"}
                 `}
               >
                 {day}
                 {hasNote && (
-                  <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[#8b6ca8]" />
+                  <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[#5F73F5]" />
                 )}
               </div>
             );
@@ -221,10 +221,10 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
         <div className="fixed inset-0 bg-[#0d3349]/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4" onClick={() => setSelectedDate(null)}>
           <div className="bg-white rounded-[12px] w-full max-w-[420px] shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-[17px] font-bold text-[#4b3f68]">
+              <h3 className="text-[17px] font-bold text-[#232529]">
                 Notes for {monthName} {selectedDate}, {year}
               </h3>
-              <button type="button" onClick={() => setSelectedDate(null)} className="text-[#64748b] hover:text-[#4b3f68] transition-colors cursor-pointer">
+              <button type="button" onClick={() => setSelectedDate(null)} className="text-[#64748b] hover:text-[#232529] transition-colors cursor-pointer">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -239,7 +239,7 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
                   value={currentNote}
                   onChange={(e) => setCurrentNote(e.target.value)}
                   placeholder="Type your notes or reminders here..."
-                  className="w-full min-h-[120px] bg-[#f8fafc] border border-[#cbd5e1] rounded-[8px] p-3 text-[14px] text-[#1e293b] outline-none focus:border-[#6a5182] focus:ring-1 focus:ring-[#6a5182] resize-y transition-all"
+                  className="w-full min-h-[120px] bg-[#f8fafc] border border-[#cbd5e1] rounded-[8px] p-3 text-[14px] text-[#1e293b] outline-none focus:border-[#CCD4E0] focus:ring-1 focus:ring-[#CCD4E0] resize-y transition-all"
                 />
               )}
 
@@ -252,7 +252,7 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
                   type="button"
                   onClick={() => setSelectedDate(null)}
                   disabled={isSaving}
-                  className="flex-1 bg-[#f3eff7] hover:bg-[#e2d9ed] text-[#4b3f68] text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors cursor-pointer disabled:opacity-50"
+                  className="flex-1 bg-[#F6F8FB] hover:bg-[#E1E6EE] text-[#232529] text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -260,7 +260,7 @@ export default function AcademyCalendar({ assignmentsList = [] }: { assignmentsL
                   type="button"
                   onClick={handleSaveNote}
                   disabled={isSaving || isLoadingNote}
-                  className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors shadow-sm cursor-pointer disabled:opacity-70"
+                  className="flex-[2] bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-semibold py-2.5 rounded-[8px] transition-colors shadow-sm cursor-pointer disabled:opacity-70"
                 >
                   {isSaving ? 'Saving...' : 'Save Note'}
                 </button>

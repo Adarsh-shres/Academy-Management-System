@@ -57,7 +57,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
         className="relative z-10 w-full max-w-[640px] bg-white rounded-sm shadow-[0_20px_60px_rgba(13,51,73,0.15)] flex flex-col max-h-[90vh] overflow-hidden animate-fade-up transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] px-6 py-5 text-white flex items-center justify-between shrink-0 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] px-6 py-5 text-white flex items-center justify-between shrink-0 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
           
           <div>
@@ -76,25 +76,25 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
           </button>
         </div>
 
-        <div className="flex border-b border-[#e7dff0] bg-[#fbf8fe] px-6 py-3 shrink-0 gap-6">
+        <div className="flex border-b border-[#E1E6EE] bg-[#F6F8FB] px-6 py-3 shrink-0 gap-6">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-sm bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
-            <span className="text-[12px] font-bold text-[#4b3f68]">Present: {presentCount}</span>
+            <span className="text-[12px] font-bold text-[#232529]">Present: {presentCount}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-sm bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)]"></span>
-            <span className="text-[12px] font-bold text-[#4b3f68]">Late: {lateCount}</span>
+            <span className="text-[12px] font-bold text-[#232529]">Late: {lateCount}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-sm bg-[#ef4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]"></span>
-            <span className="text-[12px] font-bold text-[#4b3f68]">Absent: {absentCount}</span>
+            <span className="text-[12px] font-bold text-[#232529]">Absent: {absentCount}</span>
           </div>
           <div className="ml-auto text-[12px] font-bold text-[#64748b]">Total: {students.length}</div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 hide-scrollbar">
           {students.length === 0 && (
-            <div className="rounded-sm border border-dashed border-[#d8c8e9] bg-[#fbf8fe] p-8 text-center text-[13px] font-semibold text-[#7c8697]">
+            <div className="rounded-sm border border-dashed border-[#E1E6EE] bg-[#F6F8FB] p-8 text-center text-[13px] font-semibold text-[#7c8697]">
               No students are loaded for this roster yet.
             </div>
           )}
@@ -103,7 +103,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
               key={student.id} 
               className={`
                 group flex flex-col md:flex-row md:items-center justify-between p-3.5 rounded-sm border transition-all duration-300
-                ${student.status === 'present' ? 'bg-white border-[#e7dff0] shadow-[0_2px_8px_rgba(0,0,0,0.02)]' : ''}
+                ${student.status === 'present' ? 'bg-white border-[#E1E6EE] shadow-[0_2px_8px_rgba(0,0,0,0.02)]' : ''}
                 ${student.status === 'late' ? 'bg-[#fffbeb] border-[#fde68a] shadow-[0_4px_12px_rgba(245,158,11,0.08)]' : ''}
                 ${student.status === 'absent' ? 'bg-[#fef2f2] border-[#fecaca] shadow-[0_4px_12px_rgba(239,68,68,0.08)]' : ''}
               `}
@@ -112,7 +112,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
               <div className="flex items-center gap-3 mb-3 md:mb-0">
                 <div className={`
                     w-11 h-11 rounded-sm text-white text-[13px] font-extrabold flex items-center justify-center shrink-0 shadow-sm
-                    ${student.status === 'present' ? 'bg-gradient-to-br from-[#6a5182] to-[#8b6ca8]' : ''}
+                    ${student.status === 'present' ? 'bg-gradient-to-br from-[#3E4FFF] to-[#5F73F5]' : ''}
                     ${student.status === 'late' ? 'bg-gradient-to-br from-[#f59e0b] to-[#d97706]' : ''}
                     ${student.status === 'absent' ? 'bg-gradient-to-br from-[#ef4444] to-[#dc2626]' : ''}
                     transition-all duration-300
@@ -127,7 +127,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
               </div>
 
               <div className="flex flex-col md:items-end gap-2">
-                <div className="flex bg-[#f3eff7] rounded-sm p-1 gap-1 border border-[#e7dff0] w-full md:w-auto relative overflow-hidden">
+                <div className="flex bg-[#F6F8FB] rounded-sm p-1 gap-1 border border-[#E1E6EE] w-full md:w-auto relative overflow-hidden">
                   {(['present', 'late', 'absent'] as AttendanceStatus[]).map((st) => (
                     <button
                       key={st}
@@ -138,7 +138,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
                           ? st === 'present' ? 'bg-white text-[#10b981] shadow-sm border border-[#e2e8f0]'
                           : st === 'late' ? 'bg-white text-[#f59e0b] shadow-sm border border-[#e2e8f0]'
                           : 'bg-white text-[#ef4444] shadow-sm border border-[#e2e8f0]'
-                          : 'text-[#64748b] hover:text-[#4b3f68] hover:bg-[#e2d9ed]/50'
+                          : 'text-[#64748b] hover:text-[#232529] hover:bg-[#E1E6EE]/50'
                         }
                       `}
                     >
@@ -155,7 +155,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
                           value={student.note || ''}
                           onChange={(e) => handleNoteChange(student.id, e.target.value)}
                           placeholder="Add reason/note..."
-                          className="w-full text-[12px] bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 outline-none focus:border-[#6a5182] focus:ring-1 focus:ring-[#6a5182] resize-none h-14"
+                          className="w-full text-[12px] bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 outline-none focus:border-[#CCD4E0] focus:ring-1 focus:ring-[#CCD4E0] resize-none h-14"
                           autoFocus
                           onBlur={() => { if(!student.note?.trim()) setActiveNoteId(null) }}
                         />
@@ -163,7 +163,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
                     ) : (
                       <button 
                         onClick={() => setActiveNoteId(student.id)}
-                        className={`text-[11px] font-bold flex items-center justify-end w-full gap-1 cursor-pointer hover:underline transition-colors ${student.note ? 'text-[#6a5182]' : 'text-[#94a3b8]'}`}
+                        className={`text-[11px] font-bold flex items-center justify-end w-full gap-1 cursor-pointer hover:underline transition-colors ${student.note ? 'text-[#4B5563]' : 'text-[#94a3b8]'}`}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         {student.note ? 'Edit Note' : 'Add Note'}
@@ -176,7 +176,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
           ))}
         </div>
 
-        <div className="p-4 md:p-5 border-t border-[#e2e8f0] bg-[#fbf8fe] flex gap-3 shrink-0">
+        <div className="p-4 md:p-5 border-t border-[#e2e8f0] bg-[#F6F8FB] flex gap-3 shrink-0">
           <button 
             type="button" 
             onClick={onClose} 
@@ -189,7 +189,7 @@ export default function AttendanceRosterModal({ isOpen, onClose, date = new Date
             onClick={handleSave}
             disabled={isSubmitting}
             className={`flex-[2] text-white text-[14px] font-bold px-6 py-3 rounded-sm transition-all shadow-md flex items-center justify-center gap-2
-              ${isSubmitting ? 'bg-[#5b4471] opacity-70 cursor-not-allowed' : 'bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] hover:from-[#5b4471] hover:to-[#7a5c96] active:scale-[0.98] cursor-pointer'}
+              ${isSubmitting ? 'bg-[#5F73F5] opacity-70 cursor-not-allowed' : 'bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] hover:from-[#5F73F5] hover:to-[#7a5c96] active:scale-[0.98] cursor-pointer'}
             `}
           >
             {isSubmitting ? (

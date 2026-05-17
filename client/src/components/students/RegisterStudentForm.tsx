@@ -170,11 +170,11 @@ export default function RegisterStudentForm() {
   };
 
   const inputClass =
-    'w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10';
+    'w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#CCD4E0] focus:ring-4 focus:ring-[#CCD4E0]/10';
 
   return (
-    <form onSubmit={handleSubmit} className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_28px_70px_rgba(57,31,86,0.12)]">
-      <div className="border-b border-[#ece4f4] bg-[linear-gradient(135deg,#eef7fb_0%,#f8f4fd_100%)] px-6 py-6 md:px-8">
+    <form onSubmit={handleSubmit} className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_28px_70px_rgba(36,37,41,0.12)]">
+      <div className="border-b border-[#E1E6EE] bg-[linear-gradient(135deg,#eef7fb_0%,#f8f4fd_100%)] px-6 py-6 md:px-8">
         <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Student Enrollment</p>
         <h2 className="mt-2 text-[24px] font-extrabold tracking-tight text-[#0d3349]">Create Student Account</h2>
         <p className="mt-1 max-w-2xl text-[13px] text-[#64748b]">
@@ -195,7 +195,7 @@ export default function RegisterStudentForm() {
             </div>
           )}
 
-          <section className="grid gap-4 rounded-2xl border border-[#e2d9ed] bg-[#fbf8fe] p-4 md:p-5">
+          <section className="grid gap-4 rounded-2xl border border-[#E1E6EE] bg-[#F6F8FB] p-4 md:p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <SectionHeading
                 eyebrow="Bulk Import"
@@ -205,20 +205,20 @@ export default function RegisterStudentForm() {
               <button
                 type="button"
                 onClick={downloadCsvTemplate}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#d8c8e9] bg-white px-4 py-2.5 text-[13px] font-bold text-[#6a5182] transition-all hover:bg-[#f3eff7]"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#E1E6EE] bg-white px-4 py-2.5 text-[13px] font-bold text-[#4B5563] transition-all hover:bg-[#F6F8FB]"
               >
                 <Download size={16} />
                 Template
               </button>
             </div>
 
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#d8c8e9] bg-white px-6 py-8 text-center transition-colors hover:bg-[#f8f4fd]">
+            <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#E1E6EE] bg-white px-6 py-8 text-center transition-colors hover:bg-[#f8f4fd]">
               <input type="file" accept=".csv,text/csv" onChange={(event) => void handleCsvFile(event.target.files?.[0])} className="sr-only" />
-              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#e2d9ed] bg-[#f7f2fb] text-[#6a5182]">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#E1E6EE] bg-[#F6F8FB] text-[#4B5563]">
                 <Upload size={22} />
               </span>
               <span>
-                <span className="block text-[14px] font-extrabold text-[#4b3f68]">{csvFileName || 'Choose CSV file'}</span>
+                <span className="block text-[14px] font-extrabold text-[#232529]">{csvFileName || 'Choose CSV file'}</span>
                 <span className="mt-1 block text-[12.5px] text-[#64748b]">
                   Required headers: firstName, lastName, email, password.
                 </span>
@@ -269,7 +269,7 @@ export default function RegisterStudentForm() {
                 type="button"
                 onClick={() => void handleImportStudents()}
                 disabled={isImporting || !csvResult || csvResult.validRows.length === 0}
-                className="rounded-2xl bg-[#6a5182] px-5 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.18)] transition-all hover:bg-[#5b4471] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-2xl bg-[#3E4FFF] px-5 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(62,79,255,0.18)] transition-all hover:bg-[#5F73F5] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isImporting ? 'Importing Students...' : 'Import Valid Students'}
               </button>
@@ -339,7 +339,7 @@ export default function RegisterStudentForm() {
                       key={gender}
                       className={`flex cursor-pointer items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-[14px] font-semibold transition-all ${
                         form.gender === gender
-                          ? 'border-[#6a5182] bg-[#f6f0fb] text-[#6a5182]'
+                          ? 'border-[#CCD4E0] bg-[#F6F8FB] text-[#4B5563]'
                           : 'border-[#dbe4f0] bg-[#fbfdff] text-[#475569]'
                       }`}
                     >
@@ -367,7 +367,7 @@ export default function RegisterStudentForm() {
                   type="file"
                   accept="image/*"
                   onChange={handleFile}
-                  className="w-full rounded-2xl border border-dashed border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#64748b] file:mr-4 file:rounded-xl file:border-0 file:bg-[#f3eff7] file:px-4 file:py-2 file:text-[13px] file:font-semibold file:text-[#6a5182] hover:file:bg-[#e7dff0]"
+                  className="w-full rounded-2xl border border-dashed border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#64748b] file:mr-4 file:rounded-xl file:border-0 file:bg-[#F6F8FB] file:px-4 file:py-2 file:text-[13px] file:font-semibold file:text-[#4B5563] hover:file:bg-[#E1E6EE]"
                 />
               </Field>
               <div className="md:col-span-2">
@@ -386,18 +386,18 @@ export default function RegisterStudentForm() {
           </section>
         </div>
 
-        <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#ece4f4] pt-5 sm:flex-row sm:justify-end">
+        <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#E1E6EE] pt-5 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={resetForm}
-            className="rounded-2xl border border-[#e2d9ed] bg-[#f7f2fb] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#eadff4]"
+            className="rounded-2xl border border-[#E1E6EE] bg-[#F6F8FB] px-5 py-3 text-[14px] font-bold text-[#4B5563] transition-all hover:bg-[#F6F8FB]"
           >
             Reset Form
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-2xl bg-[#6a5182] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.22)] transition-all hover:bg-[#5b4471] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-2xl bg-[#3E4FFF] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(62,79,255,0.22)] transition-all hover:bg-[#5F73F5] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? 'Creating Student...' : 'Create Student Account'}
           </button>

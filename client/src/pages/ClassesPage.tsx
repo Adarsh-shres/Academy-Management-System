@@ -48,7 +48,7 @@ export default function ClassesPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading class batches...</p>
       </div>
     );
@@ -64,14 +64,14 @@ export default function ClassesPage() {
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => navigate('/schedule')}
-              className="flex items-center gap-2 bg-white border border-[#d8c8e9] hover:bg-[#f3eff7] text-[#6a5182] text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-2 bg-white border border-[#E1E6EE] hover:bg-[#F6F8FB] text-[#4B5563] text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></svg>
               Schedules
             </button>
             <button
               onClick={() => navigate('/classes/new')}
-              className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
               Create Class
@@ -86,8 +86,8 @@ export default function ClassesPage() {
         )}
 
         <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden animate-fade-up">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#fbf8fe]">
-            <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Batch Class Directory</h3>
+          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#F6F8FB]">
+            <h3 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Batch Class Directory</h3>
             <span className="inline-flex items-center rounded-sm bg-white px-3 py-2 text-[12px] font-semibold text-[#64748b] border border-[#e2e8f0]">
               {batches.length} {batches.length === 1 ? 'batch' : 'batches'}
             </span>
@@ -122,16 +122,16 @@ export default function ClassesPage() {
                             navigate(`/classes/${batch.id}`);
                           }
                         }}
-                        className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#6a5182]/25 transition-colors cursor-pointer group"
+                        className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#CCD4E0]/25 transition-colors cursor-pointer group"
                       >
                         <td className="py-4 px-6">
-                          <p className="text-[14px] font-bold text-[#1e293b] group-hover:text-[#6a5182] group-hover:underline underline-offset-4">{batch.name}</p>
+                          <p className="text-[14px] font-bold text-[#1e293b] group-hover:text-[#4B5563] group-hover:underline underline-offset-4">{batch.name}</p>
                           <p className="text-[12px] text-[#64748b] mt-1">{batch.code}</p>
                         </td>
                         <td className="py-4 px-6 text-[13px] text-[#64748b]">{batchCourses.length}</td>
                         <td className="py-4 px-6 text-[13px] text-[#64748b]">{batchStudents.length}</td>
                         <td className="py-4 px-6">
-                          <span className="inline-flex rounded-sm bg-[#f3eff7] px-2.5 py-1 text-[12px] font-bold text-[#6a5182]">
+                          <span className="inline-flex rounded-sm bg-[#F6F8FB] px-2.5 py-1 text-[12px] font-bold text-[#4B5563]">
                             {classCountByBatch.get(batch.id) ?? 0}
                           </span>
                         </td>

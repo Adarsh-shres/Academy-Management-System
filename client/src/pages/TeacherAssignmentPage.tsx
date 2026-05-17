@@ -184,19 +184,19 @@ export default function TeacherAssignmentPage() {
     <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1400px] mx-auto w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-[26px] font-extrabold text-[#4b3f68] tracking-tight">Assignments</h1>
+          <h1 className="text-[26px] font-extrabold text-[#232529] tracking-tight">Assignments</h1>
           <p className="text-[#64748b] font-medium mt-1">Manage and track all your class assignments</p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer whitespace-nowrap"
+          className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[14px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm active:scale-[0.98] cursor-pointer whitespace-nowrap"
         >
           <PlusCircle size={16} />
           Create Assignment
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-sm border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] gap-4 mb-8">
         <div className="relative w-full md:w-[320px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8]" size={16} />
           <input
@@ -204,7 +204,7 @@ export default function TeacherAssignmentPage() {
             placeholder="Search assignments..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-[#f6f2fb] border-transparent rounded-sm text-[13px] outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+            className="w-full pl-10 pr-4 py-2 bg-[#F6F8FB] border-transparent rounded-sm text-[13px] outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
           />
         </div>
 
@@ -219,8 +219,8 @@ export default function TeacherAssignmentPage() {
               key={filter.id}
               onClick={() => setActiveFilter(filter.id as any)}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold transition-all whitespace-nowrap ${activeFilter === filter.id
-                ? 'bg-[#6a5182] text-white border border-[#6a5182] shadow-sm'
-                : 'bg-white border border-[#e7dff0] text-[#64748b] hover:bg-[#f3eff7] hover:border-[#d8c8e9]'
+                ? 'bg-[#3E4FFF] text-white border border-[#CCD4E0] shadow-sm'
+                : 'bg-white border border-[#E1E6EE] text-[#64748b] hover:bg-[#F6F8FB] hover:border-[#E1E6EE]'
                 }`}
             >
               {filter.label}
@@ -236,15 +236,15 @@ export default function TeacherAssignmentPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="animate-pulse bg-white p-5 h-[180px] rounded-sm border border-[#e7dff0]"></div>
+            <div key={i} className="animate-pulse bg-white p-5 h-[180px] rounded-sm border border-[#E1E6EE]"></div>
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-10">
           <section>
-            <div className="flex items-center gap-3 mb-6 border-b border-[#e7dff0] pb-2">
-              <h2 className="text-[16px] font-bold text-[#4b3f68]">Active Assignments</h2>
-              <span className="bg-[#e2d9ed] text-[#4b3f68] text-[11px] font-bold px-2 py-0.5 rounded-sm">
+            <div className="flex items-center gap-3 mb-6 border-b border-[#E1E6EE] pb-2">
+              <h2 className="text-[16px] font-bold text-[#232529]">Active Assignments</h2>
+              <span className="bg-[#E1E6EE] text-[#232529] text-[11px] font-bold px-2 py-0.5 rounded-sm">
                 {activeAssignmentsList.length}
               </span>
             </div>
@@ -262,17 +262,17 @@ export default function TeacherAssignmentPage() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 px-4 bg-white border border-dashed border-[#d8c8e9] rounded-sm text-center">
-                <div className="bg-[#f3eff7] p-4 rounded-full mb-3"><FileText size={24} className="text-[#6a5182]" /></div>
-                <h3 className="text-[15px] font-bold text-[#4b3f68] mb-1">No active assignments</h3>
+              <div className="flex flex-col items-center justify-center py-12 px-4 bg-white border border-dashed border-[#E1E6EE] rounded-sm text-center">
+                <div className="bg-[#F6F8FB] p-4 rounded-full mb-3"><FileText size={24} className="text-[#4B5563]" /></div>
+                <h3 className="text-[15px] font-bold text-[#232529] mb-1">No active assignments</h3>
                 <p className="text-[13px] text-[#64748b]">You don't have any active assignments matching this filter.</p>
               </div>
             )}
           </section>
 
           <section>
-            <div className="flex items-center gap-3 mb-6 border-b border-[#e7dff0] pb-2">
-              <h2 className="text-[16px] font-bold text-[#4b3f68]">Closed Assignments</h2>
+            <div className="flex items-center gap-3 mb-6 border-b border-[#E1E6EE] pb-2">
+              <h2 className="text-[16px] font-bold text-[#232529]">Closed Assignments</h2>
               <span className="bg-[#e2e8f0] text-[#475569] text-[11px] font-bold px-2 py-0.5 rounded-sm">
                 {otherAssignmentsList.length}
               </span>

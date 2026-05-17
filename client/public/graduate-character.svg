@@ -1,0 +1,38 @@
+<svg width="360" height="430" viewBox="0 0 360 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="graduateBody" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(202 178) rotate(108) scale(202 188)">
+      <stop offset="0" stop-color="#F8FAFF"/>
+      <stop offset="0.56" stop-color="#D6DEFF"/>
+      <stop offset="1" stop-color="#778DFF"/>
+    </radialGradient>
+    <linearGradient id="graduateCap" x1="82" y1="70" x2="271" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BFE7FF"/>
+      <stop offset="1" stop-color="#63A8E9"/>
+    </linearGradient>
+    <linearGradient id="graduateArm" x1="48" y1="196" x2="311" y2="268" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8EEFF"/>
+      <stop offset="1" stop-color="#7189FF"/>
+    </linearGradient>
+    <filter id="graduateShadow" x="15" y="29" width="330" height="375" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#07113E" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#graduateShadow)">
+    <ellipse cx="178" cy="215" rx="130" ry="128" fill="url(#graduateBody)"/>
+    <ellipse cx="60" cy="247" rx="35" ry="51" transform="rotate(34 60 247)" fill="url(#graduateArm)"/>
+    <ellipse cx="304" cy="247" rx="42" ry="53" transform="rotate(-25 304 247)" fill="url(#graduateArm)"/>
+    <ellipse cx="131" cy="355" rx="39" ry="55" transform="rotate(10 131 355)" fill="#07113E"/>
+    <ellipse cx="228" cy="355" rx="39" ry="55" transform="rotate(-8 228 355)" fill="#07113E"/>
+    <circle cx="137" cy="196" r="16" fill="#08154C"/>
+    <circle cx="220" cy="196" r="16" fill="#08154C"/>
+    <ellipse cx="179" cy="230" rx="24" ry="30" fill="#0B1C62"/>
+    <circle cx="94" cy="235" r="20" fill="#C9B7FF" opacity="0.42"/>
+    <circle cx="263" cy="235" r="20" fill="#C9B7FF" opacity="0.42"/>
+    <path d="M82 83L184 42L288 83L184 124L82 83Z" fill="url(#graduateCap)"/>
+    <path d="M111 98H256V126C256 149 224 166 183 166C143 166 111 149 111 126V98Z" fill="#62AAE9"/>
+    <path d="M82 83L184 124L288 83V101L184 143L82 101V83Z" fill="#579DE0"/>
+    <path d="M239 85C260 90 274 101 286 120" stroke="#6576DF" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="289" cy="126" r="12" fill="#4D8FDB"/>
+    <path d="M289 136L276 168H302L289 136Z" fill="#6677E5"/>
+  </g>
+</svg>

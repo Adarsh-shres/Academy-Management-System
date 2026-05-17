@@ -18,11 +18,11 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
   const formattedDate = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date());
 
   return (
-    <div className="bg-white rounded-[10px] border border-[#e7dff0] flex flex-col shadow-[0_2px_12px_rgba(57,31,86,0.04)] min-h-[320px]">
-      <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe] rounded-t-[10px]">
+    <div className="bg-white rounded-[10px] border border-[#E1E6EE] flex flex-col shadow-[0_2px_12px_rgba(36,37,41,0.04)] min-h-[320px]">
+      <div className="p-5 border-b border-[#E1E6EE] flex items-center justify-between bg-[#F6F8FB] rounded-t-[10px]">
         <div className="flex items-center gap-2">
           <CalendarCheck2 className="text-primary" size={18} />
-          <h3 className="text-[15px] font-semibold text-[#4b3f68]">{title}</h3>
+          <h3 className="text-[15px] font-semibold text-[#232529]">{title}</h3>
         </div>
         <span className="text-[12px] font-medium text-[#64748b]">
           {formattedDate}
@@ -32,15 +32,15 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
       <div className="p-5 flex-1 flex flex-col gap-3.5 overflow-y-auto">
         {mySchedule.length > 0 ? (
           mySchedule.map((item, index) => (
-            <div key={item.id} className="border-l-[3px] border-primary bg-[#fbf8fe] rounded-[8px] p-3.5 flex flex-col gap-1.5 transition-all hover:bg-[#f6f0fb]">
+            <div key={item.id} className="border-l-[3px] border-primary bg-[#F6F8FB] rounded-[8px] p-3.5 flex flex-col gap-1.5 transition-all hover:bg-[#F6F8FB]">
               <div className="flex items-center justify-between">
                 <span className="text-[12px] font-semibold text-primary">Session {index + 1}</span>
-                <span className="text-[11px] font-medium text-[#64748b] bg-white px-2 py-0.5 rounded-[6px] border border-[#e7dff0]">
+                <span className="text-[11px] font-medium text-[#64748b] bg-white px-2 py-0.5 rounded-[6px] border border-[#E1E6EE]">
                   {item.time}
                 </span>
               </div>
               <div className="mt-1">
-                <h4 className="text-[14px] font-semibold text-[#4b3f68]">{item.course}</h4>
+                <h4 className="text-[14px] font-semibold text-[#232529]">{item.course}</h4>
                 <p className="text-[12px] text-[#475569] font-medium leading-tight mt-1 flex gap-4">
                   {user?.role === 'student' && (
                     <span><strong className="text-[#64748b] font-medium">Instructor:</strong> {item.instructor}</span>
@@ -48,7 +48,7 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
                   <span><strong className="text-[#64748b] font-medium">Level:</strong> {item.level}</span>
                 </p>
               </div>
-              <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-3 border-t border-[#e2d9ed]/50 text-[12px] text-[#253f58] font-medium justify-between">
+              <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-3 border-t border-[#E1E6EE]/50 text-[12px] text-[#253f58] font-medium justify-between">
                 <div className="flex items-center gap-2 text-primary">
                   <MapPin size={14} />
                   <span className="font-medium text-primary">{item.room}</span>
@@ -56,7 +56,7 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
                 {user?.role === 'teacher' && onTakeAttendance && (
                   <button
                     onClick={() => onTakeAttendance(item)}
-                    className="flex items-center gap-1.5 bg-[#6a5182]/10 hover:bg-[#6a5182]/20 text-[#6a5182] px-3 py-2 rounded-[6px] font-semibold transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 bg-[#EEF2F7] hover:bg-[#E7ECF3] text-[#4B5563] px-3 py-2 rounded-[6px] font-semibold transition-colors cursor-pointer"
                   >
                     <CalendarCheck2 size={13} />
                     Take Attendance
@@ -66,8 +66,8 @@ export default function PersonalizedSchedule({ onTakeAttendance }: PersonalizedS
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center p-8 bg-[#f3eff7] rounded-[8px] text-center border border-[#e2d9ed] h-[150px]">
-            <span className="text-[13px] font-medium text-[#6a5182]">{emptyStateText}</span>
+          <div className="flex flex-col items-center justify-center p-8 bg-[#F6F8FB] rounded-[8px] text-center border border-[#E1E6EE] h-[150px]">
+            <span className="text-[13px] font-medium text-[#4B5563]">{emptyStateText}</span>
           </div>
         )}
       </div>

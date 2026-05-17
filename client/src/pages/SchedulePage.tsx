@@ -270,14 +270,14 @@ export default function SchedulePage() {
         key={`${entry.class_id}-${entry.id}`}
         type="button"
         onClick={() => navigate(`/schedule/classes/${entry.class_id}`)}
-        className="w-full text-left rounded-sm border border-[#e2e8f0] bg-white hover:border-[#6a5182] hover:shadow-sm transition-all p-4 cursor-pointer"
+        className="w-full text-left rounded-sm border border-[#e2e8f0] bg-white hover:border-[#CCD4E0] hover:shadow-sm transition-all p-4 cursor-pointer"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[14px] font-extrabold text-[#4b3f68]">{courseClass.name || 'Class'}</p>
+            <p className="text-[14px] font-extrabold text-[#232529]">{courseClass.name || 'Class'}</p>
             <p className="text-[12.5px] text-[#64748b] mt-1">{courseClass.batches?.name || 'Batch'} | {courseNameForSchedule(entry, courseClass)}</p>
           </div>
-          <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold ${entry.usesOverride ? 'bg-[#fef3c7] text-[#92400e]' : 'bg-[#f3eff7] text-[#6a5182]'}`}>
+          <span className={`rounded-sm px-2.5 py-1 text-[11px] font-bold ${entry.usesOverride ? 'bg-[#fef3c7] text-[#92400e]' : 'bg-[#F6F8FB] text-[#4B5563]'}`}>
             {entry.usesOverride ? 'Edited Today' : 'Weekly'}
           </span>
         </div>
@@ -299,22 +299,22 @@ export default function SchedulePage() {
         </div>
         <div className="rounded-sm border border-[#e2e8f0] bg-white px-4 py-3">
           <p className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Today</p>
-          <p className="text-[14px] font-extrabold text-[#4b3f68] mt-0.5">{day} | {new Date(`${dateText}T00:00:00`).toLocaleDateString()}</p>
+          <p className="text-[14px] font-extrabold text-[#232529] mt-0.5">{day} | {new Date(`${dateText}T00:00:00`).toLocaleDateString()}</p>
         </div>
       </div>
 
       <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-          <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Create / Manage Schedule</h2>
+        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
+          <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Create / Manage Schedule</h2>
           <p className="text-[12.5px] text-[#64748b] mt-1">Open a batch class, then create its weekly schedule or edit only today.</p>
         </div>
 
         <div className="p-5 grid grid-cols-1 xl:grid-cols-[260px_1fr_auto] gap-4 items-end">
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setScheduleTarget('class')} className={`rounded-sm border px-4 py-2.5 text-[13px] font-bold transition-colors cursor-pointer ${scheduleTarget === 'class' ? 'border-[#6a5182] bg-[#f3eff7] text-[#6a5182]' : 'border-[#cbd5e1] bg-white text-[#64748b] hover:bg-[#f8fafc]'}`}>
+            <button type="button" onClick={() => setScheduleTarget('class')} className={`rounded-sm border px-4 py-2.5 text-[13px] font-bold transition-colors cursor-pointer ${scheduleTarget === 'class' ? 'border-[#CCD4E0] bg-[#F6F8FB] text-[#4B5563]' : 'border-[#cbd5e1] bg-white text-[#64748b] hover:bg-[#f8fafc]'}`}>
               Class
             </button>
-            <button type="button" onClick={() => setScheduleTarget('teacher')} className={`rounded-sm border px-4 py-2.5 text-[13px] font-bold transition-colors cursor-pointer ${scheduleTarget === 'teacher' ? 'border-[#6a5182] bg-[#f3eff7] text-[#6a5182]' : 'border-[#cbd5e1] bg-white text-[#64748b] hover:bg-[#f8fafc]'}`}>
+            <button type="button" onClick={() => setScheduleTarget('teacher')} className={`rounded-sm border px-4 py-2.5 text-[13px] font-bold transition-colors cursor-pointer ${scheduleTarget === 'teacher' ? 'border-[#CCD4E0] bg-[#F6F8FB] text-[#4B5563]' : 'border-[#cbd5e1] bg-white text-[#64748b] hover:bg-[#f8fafc]'}`}>
               Teacher
             </button>
           </div>
@@ -322,7 +322,7 @@ export default function SchedulePage() {
           {scheduleTarget === 'class' ? (
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Select Batch Class</label>
-              <select value={selectedClassId} onChange={(event) => setSelectedClassId(event.target.value)} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]">
+              <select value={selectedClassId} onChange={(event) => setSelectedClassId(event.target.value)} className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]">
                 <option value="">Choose a class</option>
                 {classes.map((courseClass) => (
                   <option key={courseClass.id} value={courseClass.id}>
@@ -340,7 +340,7 @@ export default function SchedulePage() {
                   onChange={(event) => {
                     setSelectedTeacherId(event.target.value);
                   }}
-                  className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                  className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                 >
                   <option value="">Choose a teacher</option>
                   {teacherOptions.map((teacher) => (
@@ -351,7 +351,7 @@ export default function SchedulePage() {
             </div>
           )}
 
-          <button type="button" onClick={openSelectedSchedule} disabled={scheduleTarget === 'class' ? !selectedClassId : !selectedTeacherId} className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+          <button type="button" onClick={openSelectedSchedule} disabled={scheduleTarget === 'class' ? !selectedClassId : !selectedTeacherId} className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
             Open Schedule
           </button>
         </div>
@@ -364,8 +364,8 @@ export default function SchedulePage() {
       )}
 
       <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-          <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Today&apos;s Schedule</h2>
+        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
+          <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Today&apos;s Schedule</h2>
           <p className="text-[12.5px] text-[#64748b] mt-1">Uses today&apos;s edit when present; otherwise it inherits the weekly {day} schedule.</p>
         </div>
         <div className="p-5">
@@ -378,7 +378,7 @@ export default function SchedulePage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-14 px-4 bg-[#f8fafc] border border-dashed border-[#cbd5e1] rounded-sm text-center">
               <Calendar size={42} className="text-[#cbd5e1] mb-4" />
-              <h3 className="text-[17px] font-bold text-[#4b3f68] mb-1">No Classes Today</h3>
+              <h3 className="text-[17px] font-bold text-[#232529] mb-1">No Classes Today</h3>
               <p className="text-[13px] text-[#64748b] max-w-md">Open a class schedule to add a weekly {day} row or a temporary today-only row.</p>
             </div>
           )}
@@ -386,12 +386,12 @@ export default function SchedulePage() {
       </section>
 
       <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB] flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Batch Classes</h2>
+            <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Batch Classes</h2>
             <p className="text-[12.5px] text-[#64748b] mt-1">{visibleClasses.length} classes shown</p>
           </div>
-          <input type="text" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search class, batch, course, teacher" className="bg-white border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full md:w-[340px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]" />
+          <input type="text" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search class, batch, course, teacher" className="bg-white border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full md:w-[340px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]" />
         </div>
 
         {isLoading ? (
@@ -405,16 +405,16 @@ export default function SchedulePage() {
               const next = counts.next;
 
               return (
-                <button key={courseClass.id} onClick={() => navigate(`/schedule/classes/${courseClass.id}`)} className="text-left bg-white rounded-sm border border-[#e2e8f0] p-5 hover:border-[#6a5182] hover:shadow-md transition-all cursor-pointer">
+                <button key={courseClass.id} onClick={() => navigate(`/schedule/classes/${courseClass.id}`)} className="text-left bg-white rounded-sm border border-[#e2e8f0] p-5 hover:border-[#CCD4E0] hover:shadow-md transition-all cursor-pointer">
                   <div className="flex justify-between items-start gap-3 mb-4">
                     <span className="bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[11px] font-bold px-2.5 py-1 rounded-sm">
                       {courseClass.batches?.code || 'Batch'}
                     </span>
-                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-sm ${counts.hasTodayOverride ? 'bg-[#fef3c7] text-[#92400e]' : 'bg-[#f3eff7] text-[#6a5182]'}`}>
+                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-sm ${counts.hasTodayOverride ? 'bg-[#fef3c7] text-[#92400e]' : 'bg-[#F6F8FB] text-[#4B5563]'}`}>
                       {counts.today} Today
                     </span>
                   </div>
-                  <h3 className="text-[17px] font-extrabold text-[#4b3f68] leading-tight">{courseClass.name || 'Class'}</h3>
+                  <h3 className="text-[17px] font-extrabold text-[#232529] leading-tight">{courseClass.name || 'Class'}</h3>
                   <p className="text-[13px] text-[#64748b] font-semibold mt-1">{courseClass.batches?.name || 'Batch not set'}</p>
                   <div className="mt-4 flex flex-col gap-2 text-[12.5px] text-[#475569] font-medium">
                     <span className="flex items-center gap-2"><Calendar size={14} className="text-[#94a3b8]" /> {courseNamesForClass(courseClass)}</span>
@@ -433,7 +433,7 @@ export default function SchedulePage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
             <Calendar size={44} className="text-[#cbd5e1] mb-4" />
-            <h2 className="text-[18px] font-bold text-[#4b3f68] mb-1">No Batch Classes Found</h2>
+            <h2 className="text-[18px] font-bold text-[#232529] mb-1">No Batch Classes Found</h2>
             <p className="text-[14px] text-[#64748b] max-w-md">Create classes from batches first, then schedule those classes here.</p>
           </div>
         )}

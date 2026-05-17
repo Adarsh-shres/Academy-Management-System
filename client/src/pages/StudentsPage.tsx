@@ -11,9 +11,9 @@ const STATUS_STYLES = {
 const AVATAR_TILES = [
   'bg-[#0ea5b0]',
   'bg-[#006496]',
-  'bg-[#6a5182]',
-  'bg-[#8b6ca8]',
-  'bg-[#4b3f68]',
+  'bg-[#3E4FFF]',
+  'bg-[#5F73F5]',
+  'bg-[#232529]',
   'bg-[#7b6591]',
 ];
 
@@ -60,7 +60,7 @@ export default function StudentsPage() {
         </div>
         <button
           onClick={() => navigate('/register-students')}
-          className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
+          className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -71,12 +71,12 @@ export default function StudentsPage() {
       </div>
 
       <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden animate-fade-up">
-        <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#fbf8fe]">
-          <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Student Directory</h3>
+        <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#F6F8FB]">
+          <h3 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Student Directory</h3>
 
           <div className="flex items-center gap-3 ml-auto flex-wrap">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6a5182] opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#4B5563] opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
@@ -84,7 +84,7 @@ export default function StudentsPage() {
                 value={studentSearch}
                 onChange={(event) => setStudentSearch(event.target.value)}
                 placeholder="Search students..."
-                className="pl-9 pr-4 py-2 border border-[#e2d9ed] rounded-sm text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-[#6a5182]/15 bg-[#f3eff7] w-[220px] transition-all placeholder:text-[#8b7aa0] text-[#4b3f68]"
+                className="pl-9 pr-4 py-2 border border-[#E1E6EE] rounded-sm text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-[#CCD4E0]/15 bg-[#F6F8FB] w-[220px] transition-all placeholder:text-[#667086] text-[#232529]"
               />
             </div>
 
@@ -128,7 +128,7 @@ export default function StudentsPage() {
                   </div>
 
                   <div className="ml-auto hidden md:block">
-                    <div className="px-3.5 py-1.5 rounded-sm bg-[#f3eff7] text-[#6a5182] text-[11.5px] font-bold tracking-tight border border-[#e2d9ed]">
+                    <div className="px-3.5 py-1.5 rounded-sm bg-[#F6F8FB] text-[#4B5563] text-[11.5px] font-bold tracking-tight border border-[#E1E6EE]">
                       {formatProgramSummary(student)}
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function StudentsPage() {
                     </div>
                   </div>
 
-                  <div className="ml-6 flex items-center justify-end w-12 flex-shrink-0 text-[#c4b6d4] group-hover:text-[#6a5182] transition-colors">
+                  <div className="ml-6 flex items-center justify-end w-12 flex-shrink-0 text-[#B7C0CB] group-hover:text-[#4B5563] transition-colors">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <polyline points="9 18 15 12 9 6" />
                     </svg>

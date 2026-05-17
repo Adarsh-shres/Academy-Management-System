@@ -5,7 +5,7 @@ export default function Hero() {
 
   return (
     <section className="flex flex-col items-center justify-center text-center mt-14" id="home">
-        <h1 className="font-sans text-[42px] md:text-[54px] font-extrabold text-[#4b3f68] tracking-tight leading-tight">
+        <h1 className="font-sans text-[42px] md:text-[54px] font-extrabold text-[#232529] tracking-tight leading-tight">
           The Future of <br/>Academic Precision
         </h1>
         <p className="text-[14px] md:text-[15px] text-[#7c8697] mt-6 max-w-2xl leading-relaxed mb-8">
@@ -13,7 +13,7 @@ export default function Hero() {
         </p>
 
         <button 
-           className="flex items-center justify-center gap-2 rounded-sm border border-transparent bg-[#6a5182] px-6 py-3 text-[13px] font-bold text-white shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
+           className="flex items-center justify-center gap-2 rounded-sm border border-transparent bg-[#3E4FFF] px-6 py-3 text-[13px] font-bold text-white shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
            onClick={() => navigate('/login')}>
            Login to Dashboard →
         </button>

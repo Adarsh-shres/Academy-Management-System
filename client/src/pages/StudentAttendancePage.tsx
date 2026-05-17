@@ -28,7 +28,7 @@ export default function StudentAttendancePage() {
 
   if (error) {
     return (
-      <div className="flex h-[300px] items-center justify-center text-[#4b3f68] font-semibold">
+      <div className="flex h-[300px] items-center justify-center text-[#232529] font-semibold">
         {error}
       </div>
     );
@@ -52,7 +52,7 @@ export default function StudentAttendancePage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
-          <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#4b3f68] tracking-tight">
+          <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#232529] tracking-tight">
             Attendance Report
           </h1>
           <p className="text-[14px] text-[#7c8697] mt-1">
@@ -60,7 +60,7 @@ export default function StudentAttendancePage() {
           </p>
         </div>
         {uniqueClassAttendance.length > 1 && (
-          <div className="bg-white border border-[#e7dff0] rounded-[8px] px-3 flex items-center shadow-[0_1px_4px_rgba(57,31,86,0.02)] shrink-0">
+          <div className="bg-white border border-[#E1E6EE] rounded-[8px] px-3 flex items-center shadow-[0_1px_4px_rgba(36,37,41,0.02)] shrink-0">
             <svg
               width="15"
               height="15"
@@ -68,7 +68,7 @@ export default function StudentAttendancePage() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
-              className="text-[#b096cc] mr-2 shrink-0"
+              className="text-[#B7C0CB] mr-2 shrink-0"
             >
               <path
                 strokeLinecap="round"
@@ -79,7 +79,7 @@ export default function StudentAttendancePage() {
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="py-2.5 text-[13px] text-[#4b3f68] font-bold uppercase tracking-wide outline-none bg-transparent cursor-pointer truncate flex-1 min-w-[130px]"
+              className="py-2.5 text-[13px] text-[#232529] font-bold uppercase tracking-wide outline-none bg-transparent cursor-pointer truncate flex-1 min-w-[130px]"
             >
               <option value="all">ALL CLASSES</option>
               {uniqueClassAttendance.map((ca) => (
@@ -165,20 +165,20 @@ export default function StudentAttendancePage() {
       )}
 
       {/* Per-class attendance cards — 2-column compact grid */}
-      <h3 className="font-sans text-[19px] md:text-[21px] font-bold text-[#4b3f68] tracking-tight mt-2">
+      <h3 className="font-sans text-[19px] md:text-[21px] font-bold text-[#232529] tracking-tight mt-2">
         Class Breakdown
       </h3>
 
       {filteredClasses.length === 0 ? (
-        <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.02)] p-10 text-center flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-[#f3eff7] flex items-center justify-center mb-4">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6a5182" strokeWidth="2">
+        <div className="bg-white rounded-[10px] border border-[#E1E6EE] shadow-[0_2px_12px_rgba(36,37,41,0.02)] p-10 text-center flex flex-col items-center">
+          <div className="w-14 h-14 rounded-full bg-[#F6F8FB] flex items-center justify-center mb-4">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3E4FFF" strokeWidth="2">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5c-1.1 0-2 .9-2 2v2" />
               <circle cx="8.5" cy="7" r="4" />
               <polyline points="17 11 19 13 23 9" />
             </svg>
           </div>
-          <h3 className="text-[18px] font-bold text-[#4b3f68] mb-1">No Classes Found</h3>
+          <h3 className="text-[18px] font-bold text-[#232529] mb-1">No Classes Found</h3>
           <p className="text-[14px] text-[#7c8697] max-w-md">
             You are not enrolled in any classes yet. Once a teacher adds you to a class, your attendance records will appear here.
           </p>
@@ -214,18 +214,18 @@ function OverallStatCard({
   accent?: boolean;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-[10px] border border-[#e7dff0] bg-white p-5 shadow-[0_2px_12px_rgba(57,31,86,0.04)] flex items-center gap-4">
+    <div className="relative overflow-hidden rounded-[10px] border border-[#E1E6EE] bg-white p-5 shadow-[0_2px_12px_rgba(36,37,41,0.04)] flex items-center gap-4">
       <div
         className={`w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0 ${
           accent
-            ? "bg-gradient-to-br from-[#6a5182] to-[#8b6ca8] text-white shadow-sm"
-            : "bg-[#f3eff7] text-[#6a5182]"
+            ? "bg-gradient-to-br from-[#3E4FFF] to-[#5F73F5] text-white shadow-sm"
+            : "bg-[#F6F8FB] text-[#4B5563]"
         }`}
       >
         {icon}
       </div>
       <div>
-        <p className="font-sans text-[22px] font-bold text-[#4b3f68] leading-none tracking-tight">
+        <p className="font-sans text-[22px] font-bold text-[#232529] leading-none tracking-tight">
           {value}
         </p>
         <p className="text-[11px] font-semibold text-[#778196] uppercase tracking-[0.06em] mt-1">
@@ -258,8 +258,8 @@ function CompactClassCard({
   } = data;
 
   const getBarColor = (pct: number) => {
-    if (pct >= 90) return "#6a5182";
-    if (pct >= 80) return "#8b6ca8";
+    if (pct >= 90) return "#3E4FFF";
+    if (pct >= 80) return "#5F73F5";
     return "#e11d48";
   };
 
@@ -272,7 +272,7 @@ function CompactClassCard({
   const status = getStatusLabel(attendancePercent);
 
   return (
-    <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)] transition-all duration-200 overflow-hidden group">
+    <div className="bg-white rounded-[10px] border border-[#E1E6EE] shadow-[0_2px_12px_rgba(36,37,41,0.04)] hover:shadow-[0_8px_24px_rgba(36,37,41,0.08)] transition-all duration-200 overflow-hidden group">
       {/* Colored top strip */}
       <div className="h-1 w-full" style={{ backgroundColor: color }} />
 
@@ -280,10 +280,10 @@ function CompactClassCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 pr-2 min-w-0">
-            <span className="inline-block text-[9.5px] font-semibold px-1.5 py-[1px] rounded-[4px] text-[#6a5182] bg-[#f3eff7] uppercase tracking-wide mb-1">
+            <span className="inline-block text-[9.5px] font-semibold px-1.5 py-[1px] rounded-[4px] text-[#4B5563] bg-[#F6F8FB] uppercase tracking-wide mb-1">
               {courseCode}
             </span>
-            <h3 className="font-sans text-[14px] font-semibold text-[#4b3f68] leading-tight tracking-tight truncate">
+            <h3 className="font-sans text-[14px] font-semibold text-[#232529] leading-tight tracking-tight truncate">
               {courseName}
             </h3>
             <p className="text-[11.5px] text-[#7c8697] font-medium truncate">
@@ -291,7 +291,7 @@ function CompactClassCard({
             </p>
           </div>
           <div className="text-right flex flex-col items-end shrink-0">
-            <div className="font-sans text-[20px] font-bold text-[#4b3f68] leading-none">
+            <div className="font-sans text-[20px] font-bold text-[#232529] leading-none">
               {attendancePercent}
               <span className="text-[11px] font-medium text-[#778196] ml-[1px]">%</span>
             </div>
@@ -316,13 +316,13 @@ function CompactClassCard({
 
         {/* Compact stats row */}
         <div className="grid grid-cols-3 gap-2 mb-3">
-          <div className="text-center py-2 bg-[#faf8fc] rounded-[6px] border border-[#e7dff0]">
-            <p className="font-sans text-[15px] font-bold text-[#4b3f68] leading-none mb-0.5">{totalSessions}</p>
+          <div className="text-center py-2 bg-[#faf8fc] rounded-[6px] border border-[#E1E6EE]">
+            <p className="font-sans text-[15px] font-bold text-[#232529] leading-none mb-0.5">{totalSessions}</p>
             <p className="text-[9.5px] font-semibold text-[#778196] uppercase tracking-wider">Total</p>
           </div>
-          <div className="text-center py-2 bg-[#fbf8fe] rounded-[6px] border border-[#e2d9ed]">
-            <p className="font-sans text-[15px] font-bold text-[#6a5182] leading-none mb-0.5">{presentCount}</p>
-            <p className="text-[9.5px] font-semibold text-[#6a5182] uppercase tracking-wider">Present</p>
+          <div className="text-center py-2 bg-[#F6F8FB] rounded-[6px] border border-[#E1E6EE]">
+            <p className="font-sans text-[15px] font-bold text-[#4B5563] leading-none mb-0.5">{presentCount}</p>
+            <p className="text-[9.5px] font-semibold text-[#4B5563] uppercase tracking-wider">Present</p>
           </div>
           <div className="text-center py-2 bg-[#f8fafc] rounded-[6px] border border-[#cbd5e1]">
             <p className="font-sans text-[15px] font-bold text-[#475569] leading-none mb-0.5">{absentCount}</p>
@@ -333,7 +333,7 @@ function CompactClassCard({
         {/* View Records Button — navigates to detail page */}
         <button
           onClick={onClick}
-          className="w-full py-2.5 rounded-[8px] text-[12px] font-semibold uppercase tracking-wider text-[#6a5182] bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer group-hover:bg-[#e7dff0]"
+          className="w-full py-2.5 rounded-[8px] text-[12px] font-semibold uppercase tracking-wider text-[#4B5563] bg-[#F6F8FB] hover:bg-[#E1E6EE] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer group-hover:bg-[#E1E6EE]"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />

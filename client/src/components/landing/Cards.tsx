@@ -20,7 +20,7 @@ export default function Cards() {
             label="System Architects"
             value="Secure"
             isAccent
-            subContent={<span className="text-[10.5px] font-bold text-primary bg-[#f3eff7] px-[9px] py-0.5 rounded-full tracking-wide">Audit Link Active</span>}
+            subContent={<span className="text-[10.5px] font-bold text-primary bg-[#F6F8FB] px-[9px] py-0.5 rounded-full tracking-wide">Audit Link Active</span>}
         />
     </section>
   );

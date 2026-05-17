@@ -18,13 +18,13 @@ export default function Dashboard() {
       {/* Page header */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
-          <h1 className="font-sans text-[28px] md:text-[31px] font-extrabold text-[#4b3f68] tracking-tight">
+          <h1 className="font-sans text-[28px] md:text-[31px] font-extrabold text-[#232529] tracking-tight">
             Institutional Overview
           </h1>
           <p className="text-[14px] text-[#7c8697] mt-1">Real-time performance and resource monitoring.</p>
         </div>
         <div className="flex gap-2.5 flex-wrap">
-          <button className="flex items-center gap-2 rounded-sm border border-[#e2d9ed] bg-white px-4 py-2 text-[13px] font-semibold text-[#4b3f68] shadow-sm transition-all hover:-translate-y-px hover:shadow-md hover:border-[#d8c8e9]">
+          <button className="flex items-center gap-2 rounded-sm border border-[#E1E6EE] bg-white px-4 py-2 text-[13px] font-semibold text-[#232529] shadow-sm transition-all hover:-translate-y-px hover:shadow-md hover:border-[#E1E6EE]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             Generate Report
           </button>

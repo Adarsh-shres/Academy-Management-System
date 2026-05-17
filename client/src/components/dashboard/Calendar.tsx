@@ -79,14 +79,14 @@ export default function Calendar() {
   }, [calDate]);
 
   return (
-    <div className="bg-white border border-[#e7dff0] rounded-sm p-[22px] shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+    <div className="bg-white border border-[#E1E6EE] rounded-sm p-[22px] shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
       <div className="flex items-center justify-between mb-4 gap-3">
-        <h2 className="font-sans text-[15px] font-extrabold text-[#4b3f68]">Institutional Calendar</h2>
+        <h2 className="font-sans text-[15px] font-extrabold text-[#232529]">Institutional Calendar</h2>
         <div className="flex items-center gap-2">
           <button onClick={handlePrevMonth} className="w-[26px] h-[26px] rounded-sm border-[1.5px] border-[#e2e8f0] bg-white cursor-pointer text-base leading-none text-[#64748b] flex items-center justify-center transition-all hover:bg-primary hover:text-white hover:border-primary">
             &#8249;
           </button>
-          <span className="text-[12.5px] font-semibold text-[#4b3f68] min-w-[110px] text-center">
+          <span className="text-[12.5px] font-semibold text-[#232529] min-w-[110px] text-center">
             {MONTH_NAMES[calDate.month]} {calDate.year}
           </span>
           <button onClick={handleNextMonth} className="w-[26px] h-[26px] rounded-sm border-[1.5px] border-[#e2e8f0] bg-white cursor-pointer text-base leading-none text-[#64748b] flex items-center justify-center transition-all hover:bg-primary hover:text-white hover:border-primary">
@@ -112,7 +112,7 @@ export default function Calendar() {
                 <td key={cell.key} className="p-1 text-center align-top min-w-[48px]">
                   <div className={`w-[30px] h-[30px] mx-auto rounded-sm inline-flex items-center justify-center text-[12.5px] cursor-pointer transition-all
                     ${cell.isOtherMonth ? 'text-[#c8d3df]' : ''}
-                    ${cell.isToday ? 'bg-[#6a5182] text-white font-bold shadow-sm' : (!cell.isOtherMonth ? 'hover:bg-[#f3edf8]' : '')}
+                    ${cell.isToday ? 'bg-[#3E4FFF] text-white font-bold shadow-sm' : (!cell.isOtherMonth ? 'hover:bg-[#f3edf8]' : '')}
                   `}>
                     {cell.displayDay}
                   </div>

@@ -16,7 +16,7 @@ export default function StudentDashboardPage() {
   }
 
   if (error || !studentProfile) {
-    return <div className="flex h-[300px] items-center justify-center text-[#4b3f68] font-semibold">{error || "Failed to load profile"}</div>;
+    return <div className="flex h-[300px] items-center justify-center text-[#232529] font-semibold">{error || "Failed to load profile"}</div>;
   }
 
   const totalCourses = courses.length;
@@ -39,7 +39,7 @@ export default function StudentDashboardPage() {
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full">
       {/* Welcome banner */}
-      <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] rounded-[10px] p-8 text-white shadow-md relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] rounded-[10px] p-8 text-white shadow-md relative overflow-hidden">
         <div className="absolute -top-10 -right-10 opacity-10 pointer-events-none">
           <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
         </div>
@@ -67,7 +67,7 @@ export default function StudentDashboardPage() {
           label="Due Work"
           value={pendingAssignments.toString()}
           isAccent
-          subContent={<span className="text-[11px] font-semibold text-[#4b3f68] bg-[#faf8fc] border border-[#e7dff0] px-2.5 py-0.5 rounded-full tracking-wide">Requires attention</span>}
+          subContent={<span className="text-[11px] font-semibold text-[#232529] bg-[#faf8fc] border border-[#E1E6EE] px-2.5 py-0.5 rounded-full tracking-wide">Requires attention</span>}
         />
         <StatCard 
           icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>}
@@ -94,7 +94,7 @@ export default function StudentDashboardPage() {
         {/* Left Column: Upcoming assignments */}
         <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#4b3f68] tracking-tight">
+            <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#232529] tracking-tight">
               Timeline
             </h2>
             <button 
@@ -110,8 +110,8 @@ export default function StudentDashboardPage() {
                 <StudentAssignmentCard key={a.id} assignment={a} compact={false} onSubmitted={refetch} />
               ))
             ) : (
-              <div className="rounded-[10px] border border-dashed border-[#e7dff0] bg-white p-7 text-center">
-                <p className="text-[13px] font-bold uppercase tracking-wide text-[#4b3f68]">No pending assignments</p>
+              <div className="rounded-[10px] border border-dashed border-[#E1E6EE] bg-white p-7 text-center">
+                <p className="text-[13px] font-bold uppercase tracking-wide text-[#232529]">No pending assignments</p>
                 <p className="mt-1 text-[12.5px] text-[#64748b]">New assignments will appear here when they are assigned.</p>
               </div>
             )}

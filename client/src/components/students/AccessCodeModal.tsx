@@ -37,29 +37,29 @@ export default function AccessCodeModal({ isOpen, onClose, expectedCode, onSucce
   return createPortal(
     <div className="fixed inset-0 bg-[#391f56]/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onClose}>
       <div 
-        className="bg-white rounded-[12px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] p-0 w-full max-w-md overflow-hidden relative border border-[#e7dff0]"
+        className="bg-white rounded-[12px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] p-0 w-full max-w-md overflow-hidden relative border border-[#E1E6EE]"
         onClick={e => e.stopPropagation()}
       >
-        <div className="px-8 pt-8 pb-6 border-b border-[#f3eff7] bg-gradient-to-br from-[#f5effa] to-white relative">
+        <div className="px-8 pt-8 pb-6 border-b border-[#F6F8FB] bg-gradient-to-br from-[#f5effa] to-white relative">
           <button 
             onClick={onClose}
-            className="absolute top-5 right-5 w-8 h-8 rounded-[8px] bg-white border border-[#e7dff0] flex items-center justify-center text-[#7c8697] hover:text-[#4b3f68] hover:shadow-sm transition-all"
+            className="absolute top-5 right-5 w-8 h-8 rounded-[8px] bg-white border border-[#E1E6EE] flex items-center justify-center text-[#7c8697] hover:text-[#232529] hover:shadow-sm transition-all"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           
-          <div className="w-12 h-12 rounded-full bg-[#f3eff7] flex items-center justify-center text-[#6a5182] mb-4">
+          <div className="w-12 h-12 rounded-full bg-[#F6F8FB] flex items-center justify-center text-[#4B5563] mb-4">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
           
-          <h3 className="font-sans text-[22px] font-extrabold text-[#4b3f68] tracking-tight leading-tight">Access Required</h3>
+          <h3 className="font-sans text-[22px] font-extrabold text-[#232529] tracking-tight leading-tight">Access Required</h3>
           <p className="text-[13px] text-[#7c8697] mt-1.5 leading-relaxed">
-            The quiz <strong className="text-[#4b3f68]">"{quizTitle}"</strong> requires an access code.
+            The quiz <strong className="text-[#232529]">"{quizTitle}"</strong> requires an access code.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export default function AccessCodeModal({ isOpen, onClose, expectedCode, onSucce
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Enter 6-character code"
-                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[15px] font-semibold text-center tracking-[0.2em] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] uppercase"
+                className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[15px] font-semibold text-center tracking-[0.2em] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] uppercase"
                 maxLength={10}
                 required
                 autoFocus
@@ -83,7 +83,7 @@ export default function AccessCodeModal({ isOpen, onClose, expectedCode, onSucce
             <button
               type="submit"
               disabled={isVerifying || !code.trim()}
-              className="mt-2 w-full py-3.5 rounded-[8px] text-[13.5px] font-bold tracking-wide text-white bg-[#6a5182] hover:bg-[#5b4471] hover:shadow-md transition-all shadow-sm flex items-center justify-center gap-2 uppercase disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-sm"
+              className="mt-2 w-full py-3.5 rounded-[8px] text-[13.5px] font-bold tracking-wide text-white bg-[#3E4FFF] hover:bg-[#5F73F5] hover:shadow-md transition-all shadow-sm flex items-center justify-center gap-2 uppercase disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-sm"
             >
               {isVerifying ? 'Verifying...' : 'Unlock Quiz'}
             </button>

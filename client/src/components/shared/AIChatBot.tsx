@@ -8,9 +8,9 @@ interface Message {
 const BOT_AVATAR = (
   <div style={{
     width: 28, height: 28, borderRadius: '50%',
-    background: 'linear-gradient(135deg, #6a5182 0%, #3d2a5a 100%)',
+    background: 'linear-gradient(135deg, #3E4FFF 0%, #3d2a5a 100%)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    flexShrink: 0, boxShadow: '0 0 0 2px rgba(106,81,130,0.3)',
+    flexShrink: 0, boxShadow: '0 0 0 2px rgba(62,79,255,0.3)',
   }}>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e2d9f3" strokeWidth="2.2">
       <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
@@ -30,7 +30,7 @@ function formatMessage(text: string) {
         <pre key={i} style={{
           background: 'rgba(0,0,0,0.35)', borderRadius: 6, padding: '8px 10px',
           fontSize: 11.5, overflowX: 'auto', margin: '6px 0',
-          border: '1px solid rgba(106,81,130,0.3)', color: '#c4b5fd',
+          border: '1px solid rgba(62,79,255,0.3)', color: '#c4b5fd',
           fontFamily: 'monospace', lineHeight: 1.5,
         }}><code>{code.trim()}</code></pre>
       );
@@ -62,7 +62,7 @@ export default function AIChatBot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "**YOGIFY BOT ONLINE** ⚡\n\nYour Academy AI assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
+      content: "**LEARNIFY BOT ONLINE** ⚡\n\nYour Academy AI assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
     },
   ]);
   const [input, setInput] = useState('');
@@ -126,7 +126,7 @@ export default function AIChatBot() {
   function clearChat() {
     setMessages([{
       role: 'assistant',
-      content: "**YOGIFY BOT ONLINE** ⚡\n\nYour Academy AI assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
+      content: "**LEARNIFY BOT ONLINE** ⚡\n\nYour Academy AI assistant is ready. Ask me anything about assignments, courses, students, or system navigation.",
     }]);
     setError(null);
   }
@@ -137,15 +137,15 @@ export default function AIChatBot() {
       <button
         id="ai-chatbot-toggle"
         onClick={() => setOpen(o => !o)}
-        title="Yogify Bot AI Assistant"
+        title="Learnify Bot AI Assistant"
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
           width: 54, height: 54, borderRadius: '50%', border: 'none', cursor: 'pointer',
-          background: 'linear-gradient(135deg, #6a5182 0%, #3d2a5a 100%)',
+          background: 'linear-gradient(135deg, #3E4FFF 0%, #3d2a5a 100%)',
           boxShadow: open
-            ? '0 0 0 3px rgba(106,81,130,0.5), 0 8px 32px rgba(61,42,90,0.6)'
+            ? '0 0 0 3px rgba(62,79,255,0.5), 0 8px 32px rgba(61,42,90,0.6)'
             : pulse
-              ? '0 0 0 6px rgba(106,81,130,0.3), 0 8px 24px rgba(61,42,90,0.5)'
+              ? '0 0 0 6px rgba(62,79,255,0.3), 0 8px 24px rgba(61,42,90,0.5)'
               : '0 4px 20px rgba(61,42,90,0.45)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
@@ -172,28 +172,29 @@ export default function AIChatBot() {
           width: 'min(380px, calc(100vw - 32px))',
           height: 'min(540px, calc(100vh - 120px))',
           background: 'linear-gradient(160deg, #1a1028 0%, #120d1e 60%, #0d0a17 100%)',
-          border: '1px solid rgba(106,81,130,0.35)',
+          border: '1px solid rgba(62,79,255,0.35)',
           borderRadius: 16,
-          boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(106,81,130,0.15)',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(62,79,255,0.15)',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'all' : 'none',
           transform: open ? 'translateY(0) scale(1)' : 'translateY(16px) scale(0.97)',
           transition: 'all 0.28s cubic-bezier(0.4,0,0.2,1)',
+          fontFamily: 'Inter, sans-serif',
         }}
       >
         {/* Header */}
         <div style={{
           padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10,
-          borderBottom: '1px solid rgba(106,81,130,0.25)',
-          background: 'linear-gradient(90deg, rgba(106,81,130,0.2) 0%, rgba(61,42,90,0.1) 100%)',
+          borderBottom: '1px solid rgba(62,79,255,0.25)',
+          background: 'linear-gradient(90deg, rgba(62,79,255,0.2) 0%, rgba(61,42,90,0.1) 100%)',
           flexShrink: 0,
         }}>
           {BOT_AVATAR}
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#e2d9f3', letterSpacing: '0.05em' }}>
-              YOGIFY BOT
+              LEARNIFY BOT
             </div>
             <div style={{ fontSize: 10.5, color: '#7c6b9e', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 5 }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 6px #4ade80' }}/>
@@ -224,7 +225,7 @@ export default function AIChatBot() {
           style={{
             flex: 1, overflowY: 'auto', padding: '14px 14px 8px',
             display: 'flex', flexDirection: 'column', gap: 12,
-            scrollbarWidth: 'thin', scrollbarColor: 'rgba(106,81,130,0.3) transparent',
+            scrollbarWidth: 'thin', scrollbarColor: 'rgba(62,79,255,0.3) transparent',
           }}
         >
           {messages.map((msg, i) => (
@@ -240,11 +241,11 @@ export default function AIChatBot() {
               <div style={{
                 maxWidth: '80%',
                 background: msg.role === 'user'
-                  ? 'linear-gradient(135deg, #6a5182 0%, #4e3a70 100%)'
+                  ? 'linear-gradient(135deg, #3E4FFF 0%, #4e3a70 100%)'
                   : 'rgba(255,255,255,0.05)',
                 border: msg.role === 'user'
                   ? 'none'
-                  : '1px solid rgba(106,81,130,0.2)',
+                  : '1px solid rgba(62,79,255,0.2)',
                 borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                 padding: '9px 13px',
                 fontSize: 13,
@@ -252,7 +253,7 @@ export default function AIChatBot() {
                 lineHeight: 1.55,
                 wordBreak: 'break-word',
                 boxShadow: msg.role === 'user'
-                  ? '0 2px 12px rgba(106,81,130,0.25)'
+                  ? '0 2px 12px rgba(62,79,255,0.25)'
                   : 'none',
               }}>
                 {formatMessage(msg.content)}
@@ -265,14 +266,14 @@ export default function AIChatBot() {
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               {BOT_AVATAR}
               <div style={{
-                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(106,81,130,0.2)',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(62,79,255,0.2)',
                 borderRadius: '14px 14px 14px 4px', padding: '10px 14px',
                 display: 'flex', gap: 5, alignItems: 'center',
               }}>
                 {[0, 150, 300].map(delay => (
                   <div key={delay} style={{
                     width: 7, height: 7, borderRadius: '50%',
-                    background: '#6a5182',
+                    background: '#3E4FFF',
                     animation: 'botTyping 1.2s ease-in-out infinite',
                     animationDelay: `${delay}ms`,
                   }}/>
@@ -300,7 +301,7 @@ export default function AIChatBot() {
 
         {/* Input */}
         <div style={{
-          padding: '10px 12px', borderTop: '1px solid rgba(106,81,130,0.2)',
+          padding: '10px 12px', borderTop: '1px solid rgba(62,79,255,0.2)',
           display: 'flex', gap: 8, alignItems: 'flex-end',
           background: 'rgba(0,0,0,0.2)', flexShrink: 0,
         }}>
@@ -310,19 +311,19 @@ export default function AIChatBot() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask Yogify Bot..."
+            placeholder="Ask Learnify Bot..."
             rows={1}
             style={{
-              flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(106,81,130,0.3)',
+              flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(62,79,255,0.3)',
               borderRadius: 10, padding: '9px 12px', fontSize: 13,
               color: '#e2d9f3', outline: 'none', resize: 'none',
               fontFamily: 'Inter, sans-serif', lineHeight: 1.5,
               maxHeight: 100, overflowY: 'auto',
               transition: 'border-color 0.2s',
-              scrollbarWidth: 'thin', scrollbarColor: 'rgba(106,81,130,0.3) transparent',
+              scrollbarWidth: 'thin', scrollbarColor: 'rgba(62,79,255,0.3) transparent',
             }}
-            onFocus={e => (e.target.style.borderColor = 'rgba(106,81,130,0.7)')}
-            onBlur={e => (e.target.style.borderColor = 'rgba(106,81,130,0.3)')}
+            onFocus={e => (e.target.style.borderColor = 'rgba(62,79,255,0.7)')}
+            onBlur={e => (e.target.style.borderColor = 'rgba(62,79,255,0.3)')}
             onInput={e => {
               const el = e.currentTarget;
               el.style.height = 'auto';
@@ -337,12 +338,12 @@ export default function AIChatBot() {
             style={{
               width: 38, height: 38, borderRadius: 10, border: 'none',
               background: input.trim() && !loading
-                ? 'linear-gradient(135deg, #6a5182 0%, #4e3a70 100%)'
-                : 'rgba(106,81,130,0.2)',
+                ? 'linear-gradient(135deg, #3E4FFF 0%, #4e3a70 100%)'
+                : 'rgba(62,79,255,0.2)',
               cursor: input.trim() && !loading ? 'pointer' : 'not-allowed',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, transition: 'all 0.2s',
-              boxShadow: input.trim() && !loading ? '0 2px 10px rgba(106,81,130,0.35)' : 'none',
+              boxShadow: input.trim() && !loading ? '0 2px 10px rgba(62,79,255,0.35)' : 'none',
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -362,7 +363,7 @@ export default function AIChatBot() {
         }
         #ai-chatbot-messages::-webkit-scrollbar { width: 4px; }
         #ai-chatbot-messages::-webkit-scrollbar-track { background: transparent; }
-        #ai-chatbot-messages::-webkit-scrollbar-thumb { background: rgba(106,81,130,0.3); border-radius: 10px; }
+        #ai-chatbot-messages::-webkit-scrollbar-thumb { background: rgba(62,79,255,0.3); border-radius: 10px; }
         #ai-chatbot-input::placeholder { color: rgba(140,120,170,0.6); }
       `}</style>
     </>

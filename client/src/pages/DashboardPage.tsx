@@ -12,10 +12,10 @@ export default function DashboardPage() {
     location.pathname === '/student/dashboard';
 
   return (
-    <div className="flex w-full min-h-screen text-[#1e293b] bg-main-bg font-sans antialiased">
+    <div className="app-shell flex font-sans antialiased">
       <Sidebar />
 
-      <main className="flex-1 ml-[210px] flex flex-col min-h-screen min-w-0">
+      <main className="app-main flex-1 flex flex-col">
         <Topbar />
 
         <div className="flex flex-1 w-full min-w-0 flex-col xl:flex-row xl:items-stretch">

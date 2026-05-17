@@ -94,7 +94,7 @@ export default function BatchesPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading batches...</p>
       </div>
     );
@@ -110,7 +110,7 @@ export default function BatchesPage() {
           </div>
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
+            className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -151,8 +151,8 @@ export default function BatchesPage() {
         </div>
 
         <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col animate-fade-up">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#fbf8fe]">
-            <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Batch Directory</h3>
+          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#F6F8FB]">
+            <h3 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Batch Directory</h3>
             <span className="inline-flex items-center rounded-sm bg-white px-3 py-2 text-[12px] font-semibold text-[#64748b] border border-[#e2e8f0]">
               {batches.length} {batches.length === 1 ? 'batch' : 'batches'} shown
             </span>
@@ -183,15 +183,15 @@ export default function BatchesPage() {
                           navigate(`/batches/${batch.id}`);
                         }
                       }}
-                      className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#6a5182]/25 transition-colors cursor-pointer group"
+                      className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#CCD4E0]/25 transition-colors cursor-pointer group"
                     >
                       <td className="py-4 px-6">
-                        <p className="text-[14px] font-bold text-[#1e293b] group-hover:text-[#6a5182] group-hover:underline underline-offset-4 transition-colors">{batch.name}</p>
+                        <p className="text-[14px] font-bold text-[#1e293b] group-hover:text-[#4B5563] group-hover:underline underline-offset-4 transition-colors">{batch.name}</p>
                         <p className="text-[12px] text-[#64748b] mt-1">{batch.code}</p>
                       </td>
                       <td className="py-4 px-6 text-[13px] text-[#64748b] max-w-[360px]">{courseNames(courses, batch.courseIds)}</td>
                       <td className="py-4 px-6">
-                        <span className="inline-flex items-center rounded-sm bg-[#f3eff7] px-2.5 py-1 text-[12px] font-bold text-[#6a5182]">
+                        <span className="inline-flex items-center rounded-sm bg-[#F6F8FB] px-2.5 py-1 text-[12px] font-bold text-[#4B5563]">
                           {batch.studentIds.length}
                         </span>
                       </td>
@@ -217,7 +217,7 @@ export default function BatchesPage() {
       {isCreateOpen && (
         <AppModal onClose={() => { setIsCreateOpen(false); resetForm(); }} widthClass="max-w-[720px]">
           <div className="bg-white rounded-md shadow-2xl overflow-hidden">
-            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-start justify-between gap-4">
+            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-[20px] font-extrabold text-[#0d3349] tracking-tight">Create Batch</h3>
                 <p className="text-[13px] text-[#64748b] mt-1">Create an intake group and assign the courses it belongs to.</p>
@@ -249,7 +249,7 @@ export default function BatchesPage() {
                     value={batchName}
                     onChange={(event) => setBatchName(event.target.value)}
                     placeholder="e.g. Autumn 2026 Intake"
-                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                   />
                 </div>
 
@@ -260,14 +260,14 @@ export default function BatchesPage() {
                     onChange={(event) => setBatchDescription(event.target.value)}
                     rows={5}
                     placeholder="Optional intake notes"
-                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none"
+                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] resize-none"
                   />
                 </div>
               </div>
 
               <div className="flex flex-col min-h-0 rounded-sm border border-[#e2e8f0] overflow-hidden">
-                <div className="p-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-                  <p className="text-[13px] font-extrabold text-[#4b3f68] uppercase tracking-wide">Assigned Courses</p>
+                <div className="p-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
+                  <p className="text-[13px] font-extrabold text-[#232529] uppercase tracking-wide">Assigned Courses</p>
                   <p className="text-[12px] text-[#64748b] mt-1">{selectedCourseIds.length} selected</p>
                 </div>
                 <div className="max-h-[360px] overflow-y-auto divide-y divide-[#edf2f7]">
@@ -281,7 +281,7 @@ export default function BatchesPage() {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleCourse(course.id)}
-                            className="mt-1 w-4 h-4 accent-[#6a5182]"
+                            className="mt-1 w-4 h-4 accent-[#3E4FFF]"
                           />
                           <span className="min-w-0">
                             <span className="block text-[13.5px] font-bold text-[#1e293b] truncate">{course.name}</span>
@@ -303,12 +303,12 @@ export default function BatchesPage() {
               </div>
             )}
 
-            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#fbf8fe] flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#F6F8FB] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => { setIsCreateOpen(false); resetForm(); }}
                 disabled={isSaving}
-                className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 bg-white border border-[#E1E6EE] text-[#232529] text-[13.5px] font-semibold rounded-sm hover:bg-[#F6F8FB] transition-all cursor-pointer disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -316,7 +316,7 @@ export default function BatchesPage() {
                 type="button"
                 onClick={handleCreateBatch}
                 disabled={isSaving}
-                className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSaving && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {isSaving ? 'Creating...' : 'Create Batch'}

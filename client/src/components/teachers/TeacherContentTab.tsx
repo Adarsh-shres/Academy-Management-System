@@ -298,21 +298,21 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
       case 'Tutorial': return 'bg-[#fce7f3] text-[#db2777] border-[#fbcfe8]';
       case 'Workshop': return 'bg-[#fef3c7] text-[#d97706] border-[#fde68a]';
       case 'Assignment': return 'bg-[#dcfce7] text-[#16a34a] border-[#bbf7d0]';
-      case 'Other': return 'bg-[#f3eff7] text-[#6a5182] border-[#d8c8e9]';
-      default: return 'bg-[#f3eff7] text-[#6a5182] border-[#d8c8e9]';
+      case 'Other': return 'bg-[#F6F8FB] text-[#4B5563] border-[#E1E6EE]';
+      default: return 'bg-[#F6F8FB] text-[#4B5563] border-[#E1E6EE]';
     }
   };
 
   return (
-    <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-6 md:p-8 animate-fade-in">
-      <div className="flex justify-between items-center mb-6 border-b border-[#e7dff0] pb-4">
+    <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] p-6 md:p-8 animate-fade-in">
+      <div className="flex justify-between items-center mb-6 border-b border-[#E1E6EE] pb-4">
         <div>
-          <h3 className="text-[18px] font-extrabold text-[#4b3f68]">Course Content</h3>
+          <h3 className="text-[18px] font-extrabold text-[#232529]">Course Content</h3>
           <p className="text-[13px] text-[#64748b] mt-1">Organize and manage your class materials by week</p>
         </div>
         <button 
           onClick={() => setIsAddWeekOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase"
+          className="flex items-center gap-2 px-4 py-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase"
         >
           <Plus size={16} /> Add Week
         </button>
@@ -320,27 +320,27 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
       <div className="space-y-4">
         {isLoading && weeks.length === 0 ? (
-          <div className="py-16 flex justify-center items-center rounded-md bg-[#fbf8fe]">
+          <div className="py-16 flex justify-center items-center rounded-md bg-[#F6F8FB]">
             <p className="text-[13px] font-bold text-[#94a3b8] animate-pulse">Loading content packages...</p>
           </div>
         ) : weeks.length === 0 ? (
-          <div className="py-16 text-center border-2 border-dashed border-[#e7dff0] rounded-md bg-[#fbf8fe]">
+          <div className="py-16 text-center border-2 border-dashed border-[#E1E6EE] rounded-md bg-[#F6F8FB]">
             <FileText size={32} className="text-[#cbd5e1] mx-auto mb-3" />
-            <p className="text-[14px] font-semibold text-[#4b3f68]">No Content Found</p>
+            <p className="text-[14px] font-semibold text-[#232529]">No Content Found</p>
             <p className="text-[13px] text-[#64748b] mt-1">Add your first week to start organizing course materials.</p>
           </div>
         ) : (
           weeks.map(week => (
-            <div key={week.id} className="border border-[#e7dff0] rounded-md overflow-hidden bg-white">
+            <div key={week.id} className="border border-[#E1E6EE] rounded-md overflow-hidden bg-white">
               <div 
-                className="bg-[#fbf8fe] p-4 flex items-center justify-between cursor-pointer hover:bg-[#f3eff7] transition-colors"
+                className="bg-[#F6F8FB] p-4 flex items-center justify-between cursor-pointer hover:bg-[#F6F8FB] transition-colors"
                 onClick={() => toggleWeek(week.id)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#6a5182]">
+                  <div className="text-[#4B5563]">
                     {expandedWeeks[week.id] ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                   </div>
-                  <h4 className="text-[15px] font-bold text-[#4b3f68]">{week.title}</h4>
+                  <h4 className="text-[15px] font-bold text-[#232529]">{week.title}</h4>
                   <span className="text-[12px] font-medium text-[#64748b] bg-[#e2e8f0] px-2 py-0.5 rounded-full">
                     {week.items.length} items
                   </span>
@@ -348,7 +348,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
                 <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                   <button 
                     onClick={() => openAddContentModal(week.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[11px] font-bold tracking-wider rounded-sm transition-colors uppercase shadow-sm cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] text-[11px] font-bold tracking-wider rounded-sm transition-colors uppercase shadow-sm cursor-pointer"
                   >
                     <Plus size={14} /> Add Material
                   </button>
@@ -363,7 +363,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
               </div>
 
               {expandedWeeks[week.id] && (
-                <div className="p-4 bg-white border-t border-[#e7dff0]">
+                <div className="p-4 bg-white border-t border-[#E1E6EE]">
                   {week.items.length === 0 ? (
                     <p className="text-center text-[#94a3b8] text-[13px] py-4 italic">No content added for this week yet.</p>
                   ) : (
@@ -420,10 +420,10 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
       {isAddWeekOpen && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
-          <form onSubmit={handleAddWeek} className="bg-white rounded-md max-w-md w-full shadow-2xl overflow-hidden animate-fade-in border border-[#e7dff0]">
-            <div className="px-6 py-4 border-b border-[#e7dff0] bg-[#fbf8fe] flex justify-between items-center">
-              <h3 className="text-[15px] font-extrabold text-[#4b3f68]">Add New Week</h3>
-              <button type="button" onClick={() => setIsAddWeekOpen(false)} className="text-[#94a3b8] hover:text-[#4b3f68]">✕</button>
+          <form onSubmit={handleAddWeek} className="bg-white rounded-md max-w-md w-full shadow-2xl overflow-hidden animate-fade-in border border-[#E1E6EE]">
+            <div className="px-6 py-4 border-b border-[#E1E6EE] bg-[#F6F8FB] flex justify-between items-center">
+              <h3 className="text-[15px] font-extrabold text-[#232529]">Add New Week</h3>
+              <button type="button" onClick={() => setIsAddWeekOpen(false)} className="text-[#94a3b8] hover:text-[#232529]">✕</button>
             </div>
             <div className="p-6">
               <label className="block text-[12px] font-bold text-[#64748b] uppercase tracking-wider mb-2">Week Title *</label>
@@ -434,12 +434,12 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
                 placeholder="E.g. Week 1: Introduction"
                 value={newWeekTitle}
                 onChange={e => setNewWeekTitle(e.target.value)}
-                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
+                className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium"
               />
             </div>
-            <div className="px-6 py-4 border-t border-[#e7dff0] bg-[#fbf8fe] flex justify-end gap-3">
-              <button type="button" onClick={() => setIsAddWeekOpen(false)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#4b3f68] transition-colors uppercase">Cancel</button>
-              <button type="submit" className="px-4 py-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase">Add Week</button>
+            <div className="px-6 py-4 border-t border-[#E1E6EE] bg-[#F6F8FB] flex justify-end gap-3">
+              <button type="button" onClick={() => setIsAddWeekOpen(false)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#232529] transition-colors uppercase">Cancel</button>
+              <button type="submit" className="px-4 py-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase">Add Week</button>
             </div>
           </form>
         </div>
@@ -447,10 +447,10 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
       {isAddContentOpen && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
-          <form onSubmit={handleAddContent} className="bg-white rounded-md max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in border border-[#e7dff0]">
-            <div className="px-6 py-4 border-b border-[#e7dff0] bg-[#fbf8fe] flex justify-between items-center">
-              <h3 className="text-[15px] font-extrabold text-[#4b3f68]">Add Content Material</h3>
-              <button type="button" onClick={() => setIsAddContentOpen(false)} className="text-[#94a3b8] hover:text-[#4b3f68]">✕</button>
+          <form onSubmit={handleAddContent} className="bg-white rounded-md max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in border border-[#E1E6EE]">
+            <div className="px-6 py-4 border-b border-[#E1E6EE] bg-[#F6F8FB] flex justify-between items-center">
+              <h3 className="text-[15px] font-extrabold text-[#232529]">Add Content Material</h3>
+              <button type="button" onClick={() => setIsAddContentOpen(false)} className="text-[#94a3b8] hover:text-[#232529]">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -462,7 +462,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
                   placeholder="E.g. Introduction Slides"
                   value={contentTitle}
                   onChange={e => setContentTitle(e.target.value)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
+                  className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium"
                 />
               </div>
               <div>
@@ -470,7 +470,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
                 <select 
                   value={contentType}
                   onChange={e => setContentType(e.target.value as any)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium appearance-none"
+                  className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium appearance-none"
                 >
                   <option value="Lecture">Lecture</option>
                   <option value="Tutorial">Tutorial</option>
@@ -486,17 +486,17 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
                   placeholder="Brief context about this material..."
                   value={contentDesc}
                   onChange={e => setContentDesc(e.target.value)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none"
+                  className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] resize-none"
                 />
               </div>
               <div>
                 <label className="block text-[12px] font-bold text-[#64748b] uppercase tracking-wider mb-2">Upload File (Optional)</label>
-                <div className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 w-full transition-all text-[#1e293b] font-medium focus-within:bg-white focus-within:border-[#6a5182] focus-within:ring-[3px] focus-within:ring-[#6a5182]/10">
+                <div className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 w-full transition-all text-[#1e293b] font-medium focus-within:bg-white focus-within:border-[#CCD4E0] focus-within:ring-[3px] focus-within:ring-[#CCD4E0]/10">
                   <input 
                     type="file" 
                     onChange={handleFileChange}
                     accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif,.zip"
-                    className="text-[13px] w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-sm file:border-0 file:text-[12px] file:font-semibold file:bg-[#6a5182] file:text-white hover:file:bg-[#5b4471] file:cursor-pointer file:transition-colors"
+                    className="text-[13px] w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-sm file:border-0 file:text-[12px] file:font-semibold file:bg-[#3E4FFF] file:text-white hover:file:bg-[#5F73F5] file:cursor-pointer file:transition-colors"
                   />
                 </div>
                 {contentFileError && (
@@ -507,9 +507,9 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
                 </p>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-[#e7dff0] bg-[#fbf8fe] flex justify-end gap-3">
-              <button type="button" onClick={() => setIsAddContentOpen(false)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#4b3f68] transition-colors uppercase">Cancel</button>
-              <button type="submit" className="px-4 py-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase">Save Content</button>
+            <div className="px-6 py-4 border-t border-[#E1E6EE] bg-[#F6F8FB] flex justify-end gap-3">
+              <button type="button" onClick={() => setIsAddContentOpen(false)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#232529] transition-colors uppercase">Cancel</button>
+              <button type="submit" className="px-4 py-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase">Save Content</button>
             </div>
           </form>
         </div>
@@ -517,7 +517,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
       {deleteWeekId && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
-          <div className="bg-white rounded-md max-w-sm w-full shadow-2xl p-6 border border-[#e7dff0] animate-fade-in relative overflow-hidden">
+          <div className="bg-white rounded-md max-w-sm w-full shadow-2xl p-6 border border-[#E1E6EE] animate-fade-in relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
             <h3 className="text-[16px] font-extrabold text-[#1e293b] mb-2 flex items-center gap-2">
               <Trash2 size={18} className="text-red-500" /> Delete Week?
@@ -526,7 +526,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
               Are you sure you want to delete this week and <strong className="text-[#334155]">all its contents</strong>? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeleteWeekId(null)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#4b3f68] transition-colors uppercase cursor-pointer">Cancel</button>
+              <button onClick={() => setDeleteWeekId(null)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#232529] transition-colors uppercase cursor-pointer">Cancel</button>
               <button onClick={handleDeleteWeek} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase cursor-pointer">Delete</button>
             </div>
           </div>
@@ -535,7 +535,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
 
       {deleteContentId && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
-          <div className="bg-white rounded-md max-w-sm w-full shadow-2xl p-6 border border-[#e7dff0] animate-fade-in relative overflow-hidden">
+          <div className="bg-white rounded-md max-w-sm w-full shadow-2xl p-6 border border-[#E1E6EE] animate-fade-in relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
             <h3 className="text-[16px] font-extrabold text-[#1e293b] mb-2 flex items-center gap-2">
               <Trash2 size={18} className="text-red-500" /> Remove Material?
@@ -544,7 +544,7 @@ export default function TeacherContentTab({ courseId, classId }: TeacherContentT
               Are you sure you want to remove this material from the week's content?
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeleteContentId(null)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#4b3f68] transition-colors uppercase cursor-pointer">Cancel</button>
+              <button onClick={() => setDeleteContentId(null)} className="px-4 py-2 text-[13px] font-bold text-[#64748b] hover:text-[#232529] transition-colors uppercase cursor-pointer">Cancel</button>
               <button onClick={handleDeleteContent} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-[13px] font-bold tracking-wide rounded-sm transition-all uppercase cursor-pointer">Remove</button>
             </div>
           </div>

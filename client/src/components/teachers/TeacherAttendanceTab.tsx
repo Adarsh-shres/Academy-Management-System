@@ -226,8 +226,8 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
   return (
     <div className="animate-fade-in space-y-6">
       {/* Session Selector Card */}
-      <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-        <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] px-6 py-4 text-white">
+      <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] overflow-hidden">
+        <div className="bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] px-6 py-4 text-white">
           <h3 className="text-[17px] font-extrabold tracking-tight flex items-center gap-2">
             <Calendar size={18} />
             Session Details
@@ -246,14 +246,14 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
                 setSelectedDate(e.target.value);
                 setSessionLoaded(false);
               }}
-              className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
+              className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium"
             />
           </div>
 
           {/* Day (read-only) */}
           <div className="flex flex-col gap-1.5 flex-1">
             <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Day</label>
-            <div className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] text-[#4b3f68] font-semibold">
+            <div className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] text-[#232529] font-semibold">
               {dayName}
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
               value={sessionTime}
               onChange={e => setSessionTime(e.target.value)}
               placeholder="e.g. 10:00 AM"
-              className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
+              className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium"
             />
           </div>
 
@@ -305,16 +305,16 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
       {sessionLoaded && (
         <>
           {/* Summary Bar */}
-          <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 bg-[#fbf8fe] border-b border-[#e7dff0]">
+          <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 bg-[#F6F8FB] border-b border-[#E1E6EE]">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-sm bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
-                  <span className="text-[12px] font-bold text-[#4b3f68]">Present: {presentCount}</span>
+                  <span className="text-[12px] font-bold text-[#232529]">Present: {presentCount}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-sm bg-[#ef4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]"></span>
-                  <span className="text-[12px] font-bold text-[#4b3f68]">Absent: {absentCount}</span>
+                  <span className="text-[12px] font-bold text-[#232529]">Absent: {absentCount}</span>
                 </div>
                 <div className="text-[12px] font-bold text-[#64748b]">Total: {students.length}</div>
               </div>
@@ -338,14 +338,14 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
             {/* Student Table */}
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                   <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[70px]">S.No</th>
                   <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student Name</th>
                   <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Email</th>
                   <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center w-[180px]">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e7dff0]">
+              <tbody className="divide-y divide-[#E1E6EE]">
                 {students.map((student, idx) => {
                   const status = attendance[student.id] || 'present';
                   return (
@@ -362,17 +362,17 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className={`w-9 h-9 rounded-sm text-white text-[12px] font-extrabold flex items-center justify-center shrink-0 shadow-sm transition-all duration-300 ${status === 'present'
-                            ? 'bg-gradient-to-br from-[#6a5182] to-[#8b6ca8]'
+                            ? 'bg-gradient-to-br from-[#3E4FFF] to-[#5F73F5]'
                             : 'bg-gradient-to-br from-[#ef4444] to-[#dc2626]'
                             }`}>
                             {student.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                           </div>
-                          <span className="text-[14px] font-bold text-[#4b3f68]">{student.name}</span>
+                          <span className="text-[14px] font-bold text-[#232529]">{student.name}</span>
                         </div>
                       </td>
                       <td className="py-4 px-6 text-[13.5px] text-[#64748b]">{student.email}</td>
                       <td className="py-4 px-6">
-                        <div className="flex bg-[#f3eff7] rounded-sm p-1 gap-1 border border-[#e7dff0] justify-center">
+                        <div className="flex bg-[#F6F8FB] rounded-sm p-1 gap-1 border border-[#E1E6EE] justify-center">
                           <button
                             onClick={() => toggleStatus(student.id, 'present')}
                             className={`flex-1 py-2 text-[13px] font-extrabold rounded-sm transition-all duration-300 cursor-pointer ${status === 'present'
@@ -401,7 +401,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
                     <td colSpan={4} className="py-16 text-center">
                       <div className="flex flex-col items-center">
                         <Users size={32} className="text-[#cbd5e1] mb-3" />
-                        <p className="text-[14px] font-semibold text-[#4b3f68]">No Students Enrolled</p>
+                        <p className="text-[14px] font-semibold text-[#232529]">No Students Enrolled</p>
                         <p className="text-[13px] text-[#64748b] mt-1">There are no students in this class to take attendance for.</p>
                       </div>
                     </td>
@@ -418,8 +418,8 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
                 onClick={handleSave}
                 disabled={isSaving}
                 className={`flex-1 inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white text-[14px] font-bold tracking-wide rounded-sm transition-all shadow-md cursor-pointer uppercase ${isSaving
-                  ? 'bg-[#5b4471] opacity-70 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] hover:from-[#5b4471] hover:to-[#7a5c96] active:scale-[0.98]'
+                  ? 'bg-[#5F73F5] opacity-70 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] hover:from-[#5F73F5] hover:to-[#7a5c96] active:scale-[0.98]'
                   }`}
               >
                 {isSaving ? (

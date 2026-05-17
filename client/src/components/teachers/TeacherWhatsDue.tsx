@@ -15,9 +15,9 @@ export default function TeacherWhatsDue({ recentAssignments, isLoading }: Teache
   };
 
   return (
-    <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
-      <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
-        <h3 className="text-[16px] font-bold text-[#4b3f68]">Recent Assignments</h3>
+    <div className="bg-white rounded-sm border border-[#E1E6EE] flex flex-col w-full shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
+      <div className="p-5 border-b border-[#E1E6EE] flex items-center justify-between bg-[#F6F8FB]">
+        <h3 className="text-[16px] font-bold text-[#232529]">Recent Assignments</h3>
         <span className="text-[12px] font-semibold text-[#7c8697]">Latest added task</span>
       </div>
 
@@ -34,7 +34,7 @@ export default function TeacherWhatsDue({ recentAssignments, isLoading }: Teache
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+              <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                 <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Assignment Title</th>
                 <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Due Date</th>
                 <th className="py-3 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Type</th>
@@ -44,8 +44,8 @@ export default function TeacherWhatsDue({ recentAssignments, isLoading }: Teache
             </thead>
             <tbody>
               {recentAssignments.map(item => (
-                <tr key={item.id} className="border-b border-[#e7dff0] last:border-0 hover:bg-[#fbf8fe] transition-colors group">
-                  <td className="py-3 px-6 text-[13px] font-semibold text-[#4b3f68] whitespace-pre-wrap">{item.title}</td>
+                <tr key={item.id} className="border-b border-[#E1E6EE] last:border-0 hover:bg-[#F6F8FB] transition-colors group">
+                  <td className="py-3 px-6 text-[13px] font-semibold text-[#232529] whitespace-pre-wrap">{item.title}</td>
                   <td className="py-3 px-6 text-[13px] font-medium text-[#475569]">
                     {item.due_date ? new Date(item.due_date).toLocaleDateString() : 'No due date'}
                   </td>

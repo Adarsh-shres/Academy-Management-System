@@ -558,66 +558,66 @@ export default function TeacherClassDetailPage() {
   if (!course) return null;
 
   return (
-    <div className="flex h-screen bg-main-bg font-sans overflow-hidden">
+    <div className="app-shell flex h-screen font-sans overflow-hidden">
       <TeacherSidebar activeTab="Classes" onTabChange={handleTabChange} />
 
-      <main className="flex-1 ml-[210px] flex flex-col min-w-0 bg-[#f9f8fa] overflow-y-auto hide-scrollbar">
+      <main className="app-main flex-1 flex flex-col min-w-0 overflow-y-auto hide-scrollbar">
 
-        <header className="h-[68px] bg-white/80 backdrop-blur-md border-b border-[#e7dff0] px-6 md:px-8 flex items-center shrink-0 sticky top-0 z-40">
+        <header className="h-[68px] bg-white/80 backdrop-blur-md border-b border-[#E1E6EE] px-6 md:px-8 flex items-center shrink-0 sticky top-0 z-40">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/teacher/classes')}
-              className="text-[#64748b] hover:text-[#4b3f68] transition-colors p-1.5 rounded-sm hover:bg-[#fbf8fe]"
+              className="text-[#64748b] hover:text-[#232529] transition-colors p-1.5 rounded-sm hover:bg-[#F6F8FB]"
               title="Back to My Classes"
             >
               <ChevronLeft size={20} />
             </button>
-            <h1 className="text-[17px] font-extrabold text-[#4b3f68] tracking-tight">
+            <h1 className="text-[17px] font-extrabold text-[#232529] tracking-tight">
               Class Details
             </h1>
           </div>
 
           <div className="flex items-center gap-4 ml-auto">
             <NotificationBell />
-            <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
+            <div className="w-[1px] h-6 bg-[#E1E6EE] mx-1"></div>
             <ProfileDropdown />
           </div>
         </header>
 
         <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1200px] mx-auto w-full">
 
-          <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden mb-6">
-            <div className="bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] h-3"></div>
+          <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] overflow-hidden mb-6">
+            <div className="bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] h-3"></div>
             <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
               <div>
-                <span className="bg-[#f3eff7] text-[#6a5182] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#d8c8e9] inline-block mb-3">
+                <span className="bg-[#F6F8FB] text-[#4B5563] rounded-sm px-2.5 py-1 text-[11.5px] font-bold tracking-wide border border-[#E1E6EE] inline-block mb-3">
                   {course.course_code}
                 </span>
-                <h2 className="text-[28px] font-extrabold text-[#4b3f68] mb-1 leading-tight tracking-tight">{course.name} - {className}</h2>
+                <h2 className="text-[28px] font-extrabold text-[#232529] mb-1 leading-tight tracking-tight">{course.name} - {className}</h2>
                 <div className="flex flex-wrap items-center gap-4 text-[#64748b] text-[13.5px] font-medium mt-3">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#cbd5e1]"></div> Teacher: <strong className="text-[#4b3f68]">{teacherName || 'Assigned Teacher'}</strong></div>
+                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#cbd5e1]"></div> Teacher: <strong className="text-[#232529]">{teacherName || 'Assigned Teacher'}</strong></div>
                 </div>
               </div>
-              <div className="bg-[#fbf8fe] border border-[#e7dff0] p-4 rounded-sm flex items-center justify-between gap-6 md:w-auto w-full">
+              <div className="bg-[#F6F8FB] border border-[#E1E6EE] p-4 rounded-sm flex items-center justify-between gap-6 md:w-auto w-full">
                 <div>
                   <p className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider mb-1">Enrolled Students</p>
-                  <p className="text-[22px] font-extrabold text-[#6a5182] leading-none">{students.length}</p>
+                  <p className="text-[22px] font-extrabold text-[#4B5563] leading-none">{students.length}</p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-[#f3eff7] flex items-center justify-center text-[#6a5182]">
+                <div className="w-10 h-10 rounded-full bg-[#F6F8FB] flex items-center justify-center text-[#4B5563]">
                   <Users size={18} />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex space-x-6 border-b border-[#e7dff0] mb-6 px-2 overflow-x-auto">
+          <div className="flex space-x-6 border-b border-[#E1E6EE] mb-6 px-2 overflow-x-auto">
             {(['content', 'students', 'grades', 'notifications', 'attendance', 'quizzes'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveSubTab(tab)}
                 className={`pb-3 text-[14px] font-bold tracking-wide transition-all whitespace-nowrap ${activeSubTab === tab
-                  ? 'border-b-2 border-[#6a5182] text-[#6a5182]'
-                  : 'text-[#64748b] hover:text-[#4b3f68]'
+                  ? 'border-b-2 border-[#CCD4E0] text-[#4B5563]'
+                  : 'text-[#64748b] hover:text-[#232529]'
                   }`}
               >
                 {tab === 'content' && 'Course Content'}
@@ -635,7 +635,7 @@ export default function TeacherClassDetailPage() {
           )}
 
           {activeSubTab === 'students' && (
-            <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)] animate-fade-in">
+            <div className="bg-white rounded-md border border-[#E1E6EE] overflow-hidden shadow-[0_10px_28px_rgba(36,37,41,0.06)] animate-fade-in">
               {isLoadingStudents ? (
                 <div className="p-6 flex justify-center py-20 text-[#94a3b8]">
                   <p className="text-[14px] font-medium animate-pulse">Loading enrollments...</p>
@@ -643,17 +643,17 @@ export default function TeacherClassDetailPage() {
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                    <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                       <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[80px]">S.No</th>
                       <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student Name</th>
                       <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Institutional Email</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#e7dff0]">
+                  <tbody className="divide-y divide-[#E1E6EE]">
                     {students.map((student, idx) => (
-                      <tr key={student.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                      <tr key={student.id} className="hover:bg-[#F6F8FB]/50 transition-colors">
                         <td className="py-4 px-6 text-[13px] font-semibold text-[#64748b]">{(idx + 1).toString().padStart(2, '0')}</td>
-                        <td className="py-4 px-6 text-[14px] font-bold text-[#4b3f68]">{student.name}</td>
+                        <td className="py-4 px-6 text-[14px] font-bold text-[#232529]">{student.name}</td>
                         <td className="py-4 px-6 text-[13.5px] text-[#64748b]">{student.email}</td>
                       </tr>
                     ))}
@@ -662,7 +662,7 @@ export default function TeacherClassDetailPage() {
                         <td colSpan={3} className="py-16 text-center">
                           <div className="flex flex-col items-center">
                             <Users size={32} className="text-[#cbd5e1] mb-3" />
-                            <p className="text-[14px] font-semibold text-[#4b3f68]">No Active Enrollments</p>
+                            <p className="text-[14px] font-semibold text-[#232529]">No Active Enrollments</p>
                             <p className="text-[13px] text-[#64748b] mt-1">There are currently no students mapped to this Class ID.</p>
                           </div>
                         </td>
@@ -681,7 +681,7 @@ export default function TeacherClassDetailPage() {
               {selectedAssignment && (
                 <button
                   onClick={() => { setSelectedAssignment(null); setAssignmentSubmissions([]); }}
-                  className="self-start text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer flex items-center gap-1"
+                  className="self-start text-[#64748b] hover:text-[#232529] text-[13px] font-semibold cursor-pointer flex items-center gap-1"
                 >
                   ← Back to Assignments
                 </button>
@@ -689,7 +689,7 @@ export default function TeacherClassDetailPage() {
 
               {/* Assignment list */}
               {!selectedAssignment && (
-                <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                <div className="bg-white rounded-md border border-[#E1E6EE] overflow-hidden shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
                   {isLoadingAssignments ? (
                     <div className="flex justify-center py-20">
                       <p className="text-[14px] font-medium animate-pulse text-[#94a3b8]">Loading assignments...</p>
@@ -697,13 +697,13 @@ export default function TeacherClassDetailPage() {
                   ) : assignments.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
                       <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
-                      <p className="text-[14px] font-semibold text-[#4b3f68]">No Assignments Found</p>
+                      <p className="text-[14px] font-semibold text-[#232529]">No Assignments Found</p>
                       <p className="text-[13px] text-[#64748b] mt-1">No assignments have been created for this class yet.</p>
                     </div>
                   ) : (
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                        <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                           <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">#</th>
                           <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Assignment Title</th>
                           <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Due Date</th>
@@ -711,14 +711,14 @@ export default function TeacherClassDetailPage() {
                           <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#e7dff0]">
+                      <tbody className="divide-y divide-[#E1E6EE]">
                         {assignments.map((assignment, idx) => (
-                          <tr key={assignment.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                          <tr key={assignment.id} className="hover:bg-[#F6F8FB]/50 transition-colors">
                             <td className="py-4 px-6 text-[13px] font-semibold text-[#64748b]">
                               {(idx + 1).toString().padStart(2, '0')}
                             </td>
                             <td className="py-4 px-6">
-                              <p className="text-[14px] font-bold text-[#4b3f68]">{assignment.title}</p>
+                              <p className="text-[14px] font-bold text-[#232529]">{assignment.title}</p>
                               {assignment.description && (
                                 <p className="text-[12px] text-[#94a3b8] mt-0.5 truncate max-w-[300px]">{assignment.description}</p>
                               )}
@@ -740,7 +740,7 @@ export default function TeacherClassDetailPage() {
                             <td className="py-4 px-6 text-right">
                               <button
                                 onClick={() => loadSubmissionsForAssignment(assignment)}
-                                className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
+                                className="px-4 py-1.5 bg-white border border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
                               >
                                 View Submissions
                               </button>
@@ -756,8 +756,8 @@ export default function TeacherClassDetailPage() {
               {/* Submissions for selected assignment */}
               {selectedAssignment && (
                 <div className="flex flex-col gap-4">
-                  <div className="bg-[#fbf8fe] border border-[#e7dff0] rounded-md p-4">
-                    <p className="text-[15px] font-extrabold text-[#4b3f68]">{selectedAssignment.title}</p>
+                  <div className="bg-[#F6F8FB] border border-[#E1E6EE] rounded-md p-4">
+                    <p className="text-[15px] font-extrabold text-[#232529]">{selectedAssignment.title}</p>
                     {selectedAssignment.due_date && (
                       <p className="text-[12.5px] text-[#64748b] mt-1 font-medium">
                         Due: {new Date(selectedAssignment.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -766,14 +766,14 @@ export default function TeacherClassDetailPage() {
                   </div>
 
                   {!isLoadingSubmissions && assignmentSubmissions.length > 0 && (
-                    <div className="px-5 py-3 bg-white rounded-md border border-[#e7dff0] shadow-[0_1px_4px_rgba(57,31,86,0.02)] flex gap-6 text-[13px] font-semibold text-[#64748b]">
+                    <div className="px-5 py-3 bg-white rounded-md border border-[#E1E6EE] shadow-[0_1px_4px_rgba(36,37,41,0.02)] flex gap-6 text-[13px] font-semibold text-[#64748b]">
                       <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#94a3b8] block"></span> Total Students: <span className="text-[#1e293b]">{assignmentSubmissions.length}</span></div>
                       <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#10b981] block"></span> Submitted: <span className="text-[#1e293b]">{assignmentSubmissions.filter(s => s.status === 'submitted').length}</span></div>
                       <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#f59e0b] block"></span> Pending: <span className="text-[#1e293b]">{assignmentSubmissions.filter(s => s.status === 'pending').length}</span></div>
                     </div>
                   )}
 
-                  <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                  <div className="bg-white rounded-md border border-[#E1E6EE] overflow-hidden shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
                     {isLoadingSubmissions ? (
                       <div className="flex justify-center py-20">
                         <p className="text-[14px] font-medium animate-pulse text-[#94a3b8]">Loading submissions...</p>
@@ -781,13 +781,13 @@ export default function TeacherClassDetailPage() {
                     ) : assignmentSubmissions.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-16 text-center">
                         <ClipboardList size={32} className="text-[#cbd5e1] mb-3" />
-                        <p className="text-[14px] font-semibold text-[#4b3f68]">No Submissions Yet</p>
+                        <p className="text-[14px] font-semibold text-[#232529]">No Submissions Yet</p>
                         <p className="text-[13px] text-[#64748b] mt-1">No students have submitted this assignment yet.</p>
                       </div>
                     ) : (
                       <table className="w-full text-left border-collapse">
                         <thead>
-                          <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                          <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                             <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[60px]">#</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Submitted</th>
@@ -795,7 +795,7 @@ export default function TeacherClassDetailPage() {
                             <th className="py-4 px-6 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-right">Action</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#e7dff0]">
+                        <tbody className="divide-y divide-[#E1E6EE]">
                           {assignmentSubmissions.map((sub, idx) => {
                             const gradeStatus = sub.status === 'pending'
                               ? 'pending'
@@ -806,12 +806,12 @@ export default function TeacherClassDetailPage() {
                               : 'partial';
 
                             return (
-                              <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                              <tr key={sub.id} className="hover:bg-[#F6F8FB]/50 transition-colors">
                                 <td className="py-4 px-6 text-[13px] font-semibold text-[#64748b]">
                                   {(idx + 1).toString().padStart(2, '0')}
                                 </td>
                                 <td className="py-4 px-6">
-                                  <p className="text-[14px] font-bold text-[#4b3f68]">{sub.users?.name || 'Unknown'}</p>
+                                  <p className="text-[14px] font-bold text-[#232529]">{sub.users?.name || 'Unknown'}</p>
                                   <p className="text-[12px] text-[#94a3b8]">{sub.users?.email || ''}</p>
                                 </td>
                                 <td className="py-4 px-6 text-center text-[12.5px] text-[#64748b] font-medium">
@@ -835,7 +835,7 @@ export default function TeacherClassDetailPage() {
                                     <div className="flex items-center justify-end gap-2 mr-3 inline-flex">
                                       <button
                                         onClick={() => handleView(sub.file_url)}
-                                        className="px-3 py-1 bg-white border border-[#6a5182] text-[#6a5182] hover:bg-[#f3eff7] text-[11px] font-bold rounded-sm transition-colors cursor-pointer"
+                                        className="px-3 py-1 bg-white border border-[#CCD4E0] text-[#4B5563] hover:bg-[#F6F8FB] text-[11px] font-bold rounded-sm transition-colors cursor-pointer"
                                       >
                                         View
                                       </button>
@@ -855,7 +855,7 @@ export default function TeacherClassDetailPage() {
                                             window.open(sub.file_url, '_blank');
                                           }
                                         }}
-                                        className="px-3 py-1 bg-[#6a5182] border border-[#6a5182] text-white hover:bg-[#5b4471] text-[11px] font-bold rounded-sm transition-colors cursor-pointer"
+                                        className="px-3 py-1 bg-[#3E4FFF] border border-[#CCD4E0] text-white hover:bg-[#5F73F5] text-[11px] font-bold rounded-sm transition-colors cursor-pointer"
                                       >
                                         Download
                                       </button>
@@ -865,7 +865,7 @@ export default function TeacherClassDetailPage() {
                                   )}
                                   <button
                                     onClick={() => setSelectedSubmission(sub)}
-                                    className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
+                                    className="px-4 py-1.5 bg-white border border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
                                   >
                                     {sub.grade !== null ? 'Regrade' : 'Grade'}
                                   </button>
@@ -883,11 +883,11 @@ export default function TeacherClassDetailPage() {
           )}
 
           {activeSubTab === 'notifications' && (
-            <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-6 md:p-8 animate-fade-in">
-              <div className="mb-6 border-b border-[#e7dff0] pb-4">
-                <h3 className="text-[18px] font-extrabold text-[#4b3f68]">Push Notification to {course.name}</h3>
+            <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] p-6 md:p-8 animate-fade-in">
+              <div className="mb-6 border-b border-[#E1E6EE] pb-4">
+                <h3 className="text-[18px] font-extrabold text-[#232529]">Push Notification to {course.name}</h3>
                 <p className="text-[13px] text-[#64748b] mt-1">
-                  Sending to: <strong className="text-[#4b3f68]">{className || 'Class'}</strong> ({course.name}) — {students.length} enrolled students.
+                  Sending to: <strong className="text-[#232529]">{className || 'Class'}</strong> ({course.name}) — {students.length} enrolled students.
                 </p>
               </div>
 
@@ -899,7 +899,7 @@ export default function TeacherClassDetailPage() {
                     placeholder="E.g. Important Update Regarding Midterms"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
-                    className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium"
+                    className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium"
                   />
                 </div>
 
@@ -910,7 +910,7 @@ export default function TeacherClassDetailPage() {
                     placeholder="Write your broadcast message here..."
                     value={message}
                     onChange={e => setMessage(e.target.value)}
-                    className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none"
+                    className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] resize-none"
                   />
                 </div>
 
@@ -918,7 +918,7 @@ export default function TeacherClassDetailPage() {
                   <button
                     type="submit"
                     disabled={isSending}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-bold tracking-wide rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed uppercase"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-bold tracking-wide rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed uppercase"
                   >
                     {isSending ? <>Processing...</> : <><Send size={16} /> Broadcast Now</>}
                   </button>
@@ -945,7 +945,7 @@ export default function TeacherClassDetailPage() {
                 }`}>
                   <span className="text-[18px] mt-0.5">{toast.type === 'success' ? '✓' : '✕'}</span>
                   <div>
-                    <p className="text-[13.5px] font-bold text-[#4b3f68]">
+                    <p className="text-[13.5px] font-bold text-[#232529]">
                       {toast.type === 'success' ? 'Success' : 'Error'}
                     </p>
                     <p className="text-[12.5px] font-medium text-[#64748b] mt-0.5">{toast.message}</p>
@@ -960,7 +960,7 @@ export default function TeacherClassDetailPage() {
                   <p className="text-[13.5px] text-[#64748b] font-medium">{quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''} in this class</p>
                   <button
                     onClick={() => setShowQuizForm(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-bold rounded-sm transition-all shadow-sm uppercase tracking-wide cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-bold rounded-sm transition-all shadow-sm uppercase tracking-wide cursor-pointer"
                   >
                     + Create Quiz
                   </button>
@@ -969,12 +969,12 @@ export default function TeacherClassDetailPage() {
 
               {/* Quiz creation form */}
               {showQuizForm && (
-                <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-6 md:p-8">
-                  <div className="flex justify-between items-center mb-6 border-b border-[#e7dff0] pb-4">
-                    <h3 className="text-[18px] font-extrabold text-[#4b3f68]">
+                <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] p-6 md:p-8">
+                  <div className="flex justify-between items-center mb-6 border-b border-[#E1E6EE] pb-4">
+                    <h3 className="text-[18px] font-extrabold text-[#232529]">
                       {isEditingQuiz ? 'Edit Quiz' : 'Create New Quiz'}
                     </h3>
-                    <button onClick={resetQuizForm} className="text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer">✕ Cancel</button>
+                    <button onClick={resetQuizForm} className="text-[#64748b] hover:text-[#232529] text-[13px] font-semibold cursor-pointer">✕ Cancel</button>
                   </div>
 
                   {/* Quiz details */}
@@ -982,29 +982,29 @@ export default function TeacherClassDetailPage() {
                     <div className="flex flex-col gap-1.5 md:col-span-2">
                       <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Quiz Title *</label>
                       <input type="text" placeholder="E.g. Chapter 1 Review Quiz" value={quizTitle} onChange={e => setQuizTitle(e.target.value)}
-                        className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] font-medium" />
+                        className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] font-medium" />
                     </div>
                     <div className="flex flex-col gap-1.5 md:col-span-2">
                       <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Description (optional)</label>
                       <textarea rows={2} placeholder="Brief description of the quiz..." value={quizDescription} onChange={e => setQuizDescription(e.target.value)}
-                        className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none" />
+                        className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] resize-none" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Due Date (optional)</label>
                       <input type="datetime-local" value={quizDueDate} onChange={e => setQuizDueDate(e.target.value)}
-                        className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]" />
+                        className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Time Limit in Minutes (optional)</label>
                       <input type="number" placeholder="E.g. 30" min="1" value={quizTimeLimit} onChange={e => setQuizTimeLimit(e.target.value)}
-                        className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]" />
+                        className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">Access Code *</label>
                       <div className="flex gap-2">
                         <input type="text" placeholder="E.g. AX7K2P" value={quizAccessCode} onChange={e => setQuizAccessCode(e.target.value.toUpperCase())}
-                          className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] uppercase" />
-                        <button type="button" onClick={() => setQuizAccessCode(Math.random().toString(36).substring(2, 8).toUpperCase())} className="px-4 py-2 bg-[#f3eff7] text-[#6a5182] text-[13px] font-bold rounded-sm whitespace-nowrap hover:bg-[#e7dff0] transition-colors border border-[#d8c8e9] cursor-pointer">Generate Code</button>
+                          className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] uppercase" />
+                        <button type="button" onClick={() => setQuizAccessCode(Math.random().toString(36).substring(2, 8).toUpperCase())} className="px-4 py-2 bg-[#F6F8FB] text-[#4B5563] text-[13px] font-bold rounded-sm whitespace-nowrap hover:bg-[#E1E6EE] transition-colors border border-[#E1E6EE] cursor-pointer">Generate Code</button>
                       </div>
                     </div>
                   </div>
@@ -1012,17 +1012,17 @@ export default function TeacherClassDetailPage() {
                   {/* Questions */}
                   <div className="flex flex-col gap-5 mb-6">
                     <div className="flex justify-between items-center">
-                      <h4 className="text-[14px] font-extrabold text-[#4b3f68] uppercase tracking-wide">Questions</h4>
+                      <h4 className="text-[14px] font-extrabold text-[#232529] uppercase tracking-wide">Questions</h4>
                       <button onClick={addQuestion}
-                        className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm">
+                        className="px-4 py-1.5 bg-white border border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm">
                         + Add Question
                       </button>
                     </div>
 
                     {questions.map((q, qIdx) => (
-                      <div key={qIdx} className="bg-[#fbf8fe] border border-[#e7dff0] rounded-md p-5 flex flex-col gap-4">
+                      <div key={qIdx} className="bg-[#F6F8FB] border border-[#E1E6EE] rounded-md p-5 flex flex-col gap-4">
                         <div className="flex justify-between items-start gap-3">
-                          <span className="text-[12px] font-bold text-[#6a5182] uppercase tracking-wide">Q{qIdx + 1}</span>
+                          <span className="text-[12px] font-bold text-[#4B5563] uppercase tracking-wide">Q{qIdx + 1}</span>
                           {questions.length > 1 && (
                             <button onClick={() => removeQuestion(qIdx)} className="text-[#94a3b8] hover:text-red-500 text-[12px] font-bold cursor-pointer transition-colors">🗑 Remove</button>
                           )}
@@ -1032,14 +1032,14 @@ export default function TeacherClassDetailPage() {
                           <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Question Text *</label>
                           <textarea rows={2} placeholder="Enter your question here..." value={q.question_text}
                             onChange={e => updateQuestion(qIdx, 'question_text', e.target.value)}
-                            className="bg-white border border-[#e7dff0] rounded-sm px-4 py-2.5 text-[13.5px] w-full outline-none focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none" />
+                            className="bg-white border border-[#E1E6EE] rounded-sm px-4 py-2.5 text-[13.5px] w-full outline-none focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] resize-none" />
                         </div>
 
                         <div className="flex gap-4 items-center">
                           <div className="flex flex-col gap-1.5 flex-1">
                             <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Question Type</label>
                             <select value={q.question_type} onChange={e => updateQuestion(qIdx, 'question_type', e.target.value)}
-                              className="bg-white border border-[#e7dff0] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#6a5182] text-[#1e293b] cursor-pointer">
+                              className="bg-white border border-[#E1E6EE] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#CCD4E0] text-[#1e293b] cursor-pointer">
                               <option value="mcq">Multiple Choice (MCQ)</option>
                               <option value="true_false">True / False</option>
                             </select>
@@ -1047,7 +1047,7 @@ export default function TeacherClassDetailPage() {
                           <div className="flex flex-col gap-1.5 w-[100px]">
                             <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Marks</label>
                             <input type="number" min="1" value={q.marks} onChange={e => updateQuestion(qIdx, 'marks', parseInt(e.target.value))}
-                              className="bg-white border border-[#e7dff0] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#6a5182] text-[#1e293b]" />
+                              className="bg-white border border-[#E1E6EE] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#CCD4E0] text-[#1e293b]" />
                           </div>
                         </div>
 
@@ -1056,16 +1056,16 @@ export default function TeacherClassDetailPage() {
                             <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Options</label>
                             {['A', 'B', 'C', 'D'].map((letter, oIdx) => (
                               <div key={oIdx} className="flex items-center gap-3">
-                                <span className="text-[12px] font-bold text-[#6a5182] w-5">{letter}.</span>
+                                <span className="text-[12px] font-bold text-[#4B5563] w-5">{letter}.</span>
                                 <input type="text" placeholder={`Option ${letter}`} value={q.options[oIdx]}
                                   onChange={e => updateOption(qIdx, oIdx, e.target.value)}
-                                  className="bg-white border border-[#e7dff0] rounded-sm px-3 py-2 text-[13px] flex-1 outline-none focus:border-[#6a5182] focus:ring-[2px] focus:ring-[#6a5182]/10 text-[#1e293b]" />
+                                  className="bg-white border border-[#E1E6EE] rounded-sm px-3 py-2 text-[13px] flex-1 outline-none focus:border-[#CCD4E0] focus:ring-[2px] focus:ring-[#CCD4E0]/10 text-[#1e293b]" />
                               </div>
                             ))}
                             <div className="flex flex-col gap-1.5 mt-1">
                               <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Correct Answer</label>
                               <select value={q.correct_answer} onChange={e => updateQuestion(qIdx, 'correct_answer', e.target.value)}
-                                className="bg-white border border-[#e7dff0] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#6a5182] text-[#1e293b] cursor-pointer">
+                                className="bg-white border border-[#E1E6EE] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#CCD4E0] text-[#1e293b] cursor-pointer">
                                 <option value="0">A</option>
                                 <option value="1">B</option>
                                 <option value="2">C</option>
@@ -1079,7 +1079,7 @@ export default function TeacherClassDetailPage() {
                           <div className="flex flex-col gap-1.5">
                             <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Correct Answer</label>
                             <select value={q.correct_answer} onChange={e => updateQuestion(qIdx, 'correct_answer', e.target.value)}
-                              className="bg-white border border-[#e7dff0] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#6a5182] text-[#1e293b] cursor-pointer">
+                              className="bg-white border border-[#E1E6EE] rounded-sm px-4 py-2.5 text-[13.5px] outline-none focus:border-[#CCD4E0] text-[#1e293b] cursor-pointer">
                               <option value="true">True</option>
                               <option value="false">False</option>
                             </select>
@@ -1090,13 +1090,13 @@ export default function TeacherClassDetailPage() {
                   </div>
 
                   {/* Save buttons */}
-                  <div className="flex gap-3 pt-2 border-t border-[#e7dff0]">
+                  <div className="flex gap-3 pt-2 border-t border-[#E1E6EE]">
                     <button onClick={() => isEditingQuiz ? updateQuiz(false) : saveQuiz(false)} disabled={isSavingQuiz}
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[13px] font-bold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 uppercase tracking-wide">
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] text-[13px] font-bold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 uppercase tracking-wide">
                       {savingMode === 'draft' ? 'Saving...' : 'Save as Draft'}
                     </button>
                     <button onClick={() => isEditingQuiz ? updateQuiz(true) : saveQuiz(true)} disabled={isSavingQuiz}
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-bold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 uppercase tracking-wide">
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-bold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70 uppercase tracking-wide">
                       {savingMode === 'publish' ? 'Publishing...' : isEditingQuiz ? 'Update & Publish' : 'Publish Quiz'}
                     </button>
                   </div>
@@ -1105,11 +1105,11 @@ export default function TeacherClassDetailPage() {
 
               {/* Quiz detail view */}
               {selectedQuiz && !showQuizForm && (
-                <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-6 md:p-8">
-                  <div className="flex justify-between items-start mb-6 border-b border-[#e7dff0] pb-4">
+                <div className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] p-6 md:p-8">
+                  <div className="flex justify-between items-start mb-6 border-b border-[#E1E6EE] pb-4">
                     <div>
-                      <button onClick={() => setSelectedQuiz(null)} className="text-[#64748b] hover:text-[#4b3f68] text-[13px] font-semibold cursor-pointer mb-2">← Back to Quiz</button>
-                      <h3 className="text-[18px] font-extrabold text-[#4b3f68]">{selectedQuiz.title}</h3>
+                      <button onClick={() => setSelectedQuiz(null)} className="text-[#64748b] hover:text-[#232529] text-[13px] font-semibold cursor-pointer mb-2">← Back to Quiz</button>
+                      <h3 className="text-[18px] font-extrabold text-[#232529]">{selectedQuiz.title}</h3>
                       {selectedQuiz.description && <p className="text-[13px] text-[#64748b] mt-1">{selectedQuiz.description}</p>}
                       <div className="flex gap-4 mt-2 text-[12px] text-[#64748b] font-medium items-center">
                         {selectedQuiz.due_date && <span>Due: {new Date(selectedQuiz.due_date).toLocaleString()}</span>}
@@ -1122,7 +1122,7 @@ export default function TeacherClassDetailPage() {
                               navigator.clipboard.writeText(selectedQuiz.access_code);
                               showToast('Access code copied!');
                             }}
-                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold hover:bg-[#e7dff0] transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#F6F8FB] text-[#4B5563] border border-[#E1E6EE] font-bold hover:bg-[#E1E6EE] transition-colors cursor-pointer"
                             title="Click to copy"
                           >
                             🔑 {selectedQuiz.access_code}
@@ -1137,7 +1137,7 @@ export default function TeacherClassDetailPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => openEditQuiz(selectedQuiz)}
-                        className="px-4 py-1.5 bg-white border border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
+                        className="px-4 py-1.5 bg-white border border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] text-[12px] font-bold tracking-wider rounded-sm transition-colors uppercase cursor-pointer shadow-sm"
                       >
                         Edit
                       </button>
@@ -1154,15 +1154,15 @@ export default function TeacherClassDetailPage() {
 
                   <div className="flex flex-col gap-4">
                     {quizQuestions.map((q, idx) => (
-                      <div key={q.id} className="bg-[#fbf8fe] border border-[#e7dff0] rounded-md p-5">
+                      <div key={q.id} className="bg-[#F6F8FB] border border-[#E1E6EE] rounded-md p-5">
                         <div className="flex justify-between items-start mb-3">
-                          <p className="text-[14px] font-bold text-[#4b3f68]">Q{idx + 1}. {q.question_text}</p>
-                          <span className="text-[11px] font-bold text-[#6a5182] bg-[#f3eff7] px-2 py-0.5 rounded-sm border border-[#d8c8e9]">{q.marks} mark{q.marks !== 1 ? 's' : ''}</span>
+                          <p className="text-[14px] font-bold text-[#232529]">Q{idx + 1}. {q.question_text}</p>
+                          <span className="text-[11px] font-bold text-[#4B5563] bg-[#F6F8FB] px-2 py-0.5 rounded-sm border border-[#E1E6EE]">{q.marks} mark{q.marks !== 1 ? 's' : ''}</span>
                         </div>
                         {q.question_type === 'mcq' && q.options && (
                           <div className="flex flex-col gap-1.5 mt-2">
                             {q.options.map((opt: string, oIdx: number) => (
-                              <div key={oIdx} className={`flex items-center gap-2 px-3 py-2 rounded-sm text-[13px] ${String(oIdx) === q.correct_answer ? 'bg-[#dcfce7] text-[#16a34a] font-bold border border-[#86efac]' : 'bg-white border border-[#e7dff0] text-[#64748b]'}`}>
+                              <div key={oIdx} className={`flex items-center gap-2 px-3 py-2 rounded-sm text-[13px] ${String(oIdx) === q.correct_answer ? 'bg-[#dcfce7] text-[#16a34a] font-bold border border-[#86efac]' : 'bg-white border border-[#E1E6EE] text-[#64748b]'}`}>
                                 <span className="font-bold">{['A', 'B', 'C', 'D'][oIdx]}.</span> {opt}
                                 {String(oIdx) === q.correct_answer && <span className="ml-auto text-[11px]">✓ Correct</span>}
                               </div>
@@ -1172,7 +1172,7 @@ export default function TeacherClassDetailPage() {
                         {q.question_type === 'true_false' && (
                           <div className="flex gap-2 mt-2">
                             {['true', 'false'].map(val => (
-                              <div key={val} className={`px-4 py-2 rounded-sm text-[13px] font-bold border capitalize ${val === q.correct_answer ? 'bg-[#dcfce7] text-[#16a34a] border-[#86efac]' : 'bg-white border-[#e7dff0] text-[#64748b]'}`}>
+                              <div key={val} className={`px-4 py-2 rounded-sm text-[13px] font-bold border capitalize ${val === q.correct_answer ? 'bg-[#dcfce7] text-[#16a34a] border-[#86efac]' : 'bg-white border-[#E1E6EE] text-[#64748b]'}`}>
                                 {val} {val === q.correct_answer && '✓'}
                               </div>
                             ))}
@@ -1183,9 +1183,9 @@ export default function TeacherClassDetailPage() {
                   </div>
 
                   {/* Student Results Section */}
-                  <div className="mt-8 border-t border-[#e7dff0] pt-6">
+                  <div className="mt-8 border-t border-[#E1E6EE] pt-6">
                     <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-[15px] font-extrabold text-[#4b3f68] uppercase tracking-wide">
+                      <h4 className="text-[15px] font-extrabold text-[#232529] uppercase tracking-wide">
                         Student Results
                       </h4>
                       <div className="flex items-center gap-3">
@@ -1194,7 +1194,7 @@ export default function TeacherClassDetailPage() {
                             <span>
                               {quizSubmissions.length} Submission{quizSubmissions.length !== 1 ? 's' : ''}
                             </span>
-                            <span className="bg-[#f3eff7] text-[#6a5182] px-3 py-1 rounded-sm border border-[#d8c8e9]">
+                            <span className="bg-[#F6F8FB] text-[#4B5563] px-3 py-1 rounded-sm border border-[#E1E6EE]">
                               Avg: {(quizSubmissions.reduce((sum, s) => sum + (s.percentage || 0), 0) / quizSubmissions.length).toFixed(1)}%
                             </span>
                           </div>
@@ -1202,7 +1202,7 @@ export default function TeacherClassDetailPage() {
                         <button
                           onClick={() => loadQuizSubmissions(selectedQuiz.id)}
                           disabled={isLoadingSubmissions}
-                          className="px-3 py-1.5 rounded-sm border border-[#d8c8e9] bg-white text-[#6a5182] text-[11px] font-bold uppercase tracking-wide hover:bg-[#f6f2fb] disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 rounded-sm border border-[#E1E6EE] bg-white text-[#4B5563] text-[11px] font-bold uppercase tracking-wide hover:bg-[#F6F8FB] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Refresh
                         </button>
@@ -1218,13 +1218,13 @@ export default function TeacherClassDetailPage() {
                     ) : isLoadingSubmissions ? (
                       <div className="flex flex-col gap-3">
                         {[1, 2, 3].map(i => (
-                          <div key={i} className="animate-pulse bg-[#fbf8fe] h-[60px] rounded-md border border-[#e7dff0]" />
+                          <div key={i} className="animate-pulse bg-[#F6F8FB] h-[60px] rounded-md border border-[#E1E6EE]" />
                         ))}
                       </div>
                     ) : quizSubmissions.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#fbf8fe] border border-dashed border-[#e7dff0] rounded-md text-center">
+                      <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#F6F8FB] border border-dashed border-[#E1E6EE] rounded-md text-center">
                         <Users size={32} className="text-[#cbd5e1] mb-3" />
-                        <p className="text-[14px] font-bold text-[#4b3f68]">No Submissions Yet</p>
+                        <p className="text-[14px] font-bold text-[#232529]">No Submissions Yet</p>
                         <p className="text-[13px] text-[#64748b] mt-1">
                           {selectedQuiz.is_published
                             ? 'Students have not attempted this quiz yet.'
@@ -1232,10 +1232,10 @@ export default function TeacherClassDetailPage() {
                         </p>
                       </div>
                     ) : (
-                      <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                      <div className="bg-white rounded-md border border-[#E1E6EE] overflow-hidden shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
                         <table className="w-full text-left border-collapse">
                           <thead>
-                            <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                            <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[50px]">#</th>
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student</th>
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Score</th>
@@ -1245,24 +1245,24 @@ export default function TeacherClassDetailPage() {
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Result</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-[#e7dff0]">
+                          <tbody className="divide-y divide-[#E1E6EE]">
                             {quizSubmissions.map((sub, idx) => {
                               const passed = sub.percentage >= 50;
                               const mins = sub.time_taken_seconds ? Math.floor(sub.time_taken_seconds / 60) : null;
                               const secs = sub.time_taken_seconds ? sub.time_taken_seconds % 60 : null;
                               return (
-                                <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                                <tr key={sub.id} className="hover:bg-[#F6F8FB]/50 transition-colors">
                                   <td className="py-3 px-5 text-[13px] font-semibold text-[#64748b]">
                                     {(idx + 1).toString().padStart(2, '0')}
                                   </td>
                                   <td className="py-3 px-5">
-                                    <p className="text-[14px] font-bold text-[#4b3f68]">
+                                    <p className="text-[14px] font-bold text-[#232529]">
                                       {sub.users?.name || 'Unknown Student'}
                                     </p>
                                     <p className="text-[12px] text-[#94a3b8]">{sub.users?.email || ''}</p>
                                   </td>
                                   <td className="py-3 px-5 text-center">
-                                    <span className="text-[14px] font-extrabold text-[#4b3f68]">
+                                    <span className="text-[14px] font-extrabold text-[#232529]">
                                       {sub.score}
                                     </span>
                                     <span className="text-[12px] text-[#94a3b8] font-medium">
@@ -1295,13 +1295,13 @@ export default function TeacherClassDetailPage() {
                     {false && (isLoadingSubmissions ? (
                       <div className="flex flex-col gap-3">
                         {[1, 2, 3].map(i => (
-                          <div key={i} className="animate-pulse bg-[#fbf8fe] h-[60px] rounded-md border border-[#e7dff0]" />
+                          <div key={i} className="animate-pulse bg-[#F6F8FB] h-[60px] rounded-md border border-[#E1E6EE]" />
                         ))}
                       </div>
                     ) : quizSubmissions.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#fbf8fe] border border-dashed border-[#e7dff0] rounded-md text-center">
+                      <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#F6F8FB] border border-dashed border-[#E1E6EE] rounded-md text-center">
                         <Users size={32} className="text-[#cbd5e1] mb-3" />
-                        <p className="text-[14px] font-bold text-[#4b3f68]">No Submissions Yet</p>
+                        <p className="text-[14px] font-bold text-[#232529]">No Submissions Yet</p>
                         <p className="text-[13px] text-[#64748b] mt-1">
                           {selectedQuiz.is_published
                             ? 'Students have not attempted this quiz yet.'
@@ -1309,10 +1309,10 @@ export default function TeacherClassDetailPage() {
                         </p>
                       </div>
                     ) : (
-                      <div className="bg-white rounded-md border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+                      <div className="bg-white rounded-md border border-[#E1E6EE] overflow-hidden shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
                         <table className="w-full text-left border-collapse">
                           <thead>
-                            <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                            <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider w-[50px]">#</th>
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student</th>
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Score</th>
@@ -1322,24 +1322,24 @@ export default function TeacherClassDetailPage() {
                               <th className="py-3 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider text-center">Result</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-[#e7dff0]">
+                          <tbody className="divide-y divide-[#E1E6EE]">
                             {quizSubmissions.map((sub, idx) => {
                               const passed = sub.percentage >= 50;
                               const mins = sub.time_taken_seconds ? Math.floor(sub.time_taken_seconds / 60) : null;
                               const secs = sub.time_taken_seconds ? sub.time_taken_seconds % 60 : null;
                               return (
-                                <tr key={sub.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
+                                <tr key={sub.id} className="hover:bg-[#F6F8FB]/50 transition-colors">
                                   <td className="py-3 px-5 text-[13px] font-semibold text-[#64748b]">
                                     {(idx + 1).toString().padStart(2, '0')}
                                   </td>
                                   <td className="py-3 px-5">
-                                    <p className="text-[14px] font-bold text-[#4b3f68]">
+                                    <p className="text-[14px] font-bold text-[#232529]">
                                       {sub.users?.name || 'Unknown Student'}
                                     </p>
                                     <p className="text-[12px] text-[#94a3b8]">{sub.users?.email || ''}</p>
                                   </td>
                                   <td className="py-3 px-5 text-center">
-                                    <span className="text-[14px] font-extrabold text-[#4b3f68]">
+                                    <span className="text-[14px] font-extrabold text-[#232529]">
                                       {sub.score}
                                     </span>
                                     <span className="text-[12px] text-[#94a3b8] font-medium">
@@ -1377,21 +1377,21 @@ export default function TeacherClassDetailPage() {
               {!showQuizForm && !selectedQuiz && (
                 isLoadingQuizzes ? (
                   <div className="flex flex-col gap-4">
-                    {[1, 2].map(i => <div key={i} className="animate-pulse bg-white h-[90px] rounded-md border border-[#e7dff0]"></div>)}
+                    {[1, 2].map(i => <div key={i} className="animate-pulse bg-white h-[90px] rounded-md border border-[#E1E6EE]"></div>)}
                   </div>
                 ) : quizzes.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 px-4 bg-white border border-dashed border-[#e7dff0] rounded-md w-full text-center">
+                  <div className="flex flex-col items-center justify-center py-20 px-4 bg-white border border-dashed border-[#E1E6EE] rounded-md w-full text-center">
                     <ClipboardList size={40} className="text-[#cbd5e1] mb-3" />
-                    <p className="text-[15px] font-bold text-[#4b3f68]">No Quiz Yet</p>
+                    <p className="text-[15px] font-bold text-[#232529]">No Quiz Yet</p>
                     <p className="text-[13px] text-[#64748b] mt-1">Create your first quiz for this class.</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
                     {quizzes.map(quiz => (
                       <div key={quiz.id} onClick={() => setSelectedQuiz(quiz)}
-                        className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-5 flex justify-between items-center cursor-pointer hover:border-[#6a5182] hover:shadow-md transition-all">
+                        className="bg-white rounded-md border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] p-5 flex justify-between items-center cursor-pointer hover:border-[#CCD4E0] hover:shadow-md transition-all">
                         <div>
-                          <p className="text-[15px] font-bold text-[#4b3f68]">{quiz.title}</p>
+                          <p className="text-[15px] font-bold text-[#232529]">{quiz.title}</p>
                           <div className="flex gap-4 mt-1 text-[12px] text-[#64748b] font-medium items-center">
                             {quiz.due_date && <span>Due: {new Date(quiz.due_date).toLocaleDateString()}</span>}
                             {quiz.time_limit_minutes && <span>⏱ {quiz.time_limit_minutes} min</span>}
@@ -1403,7 +1403,7 @@ export default function TeacherClassDetailPage() {
                                   navigator.clipboard.writeText(quiz.access_code);
                                   showToast('Access code copied!');
                                 }}
-                                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold hover:bg-[#e7dff0] transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#F6F8FB] text-[#4B5563] border border-[#E1E6EE] font-bold hover:bg-[#E1E6EE] transition-colors cursor-pointer"
                                 title="Click to copy"
                               >
                                 🔑 {quiz.access_code}
@@ -1425,7 +1425,7 @@ export default function TeacherClassDetailPage() {
                                 e.stopPropagation();
                                 setSelectedQuiz(quiz);
                               }}
-                              className="px-4 py-1.5 bg-[#f3eff7] text-[#6a5182] border border-[#d8c8e9] font-bold text-[12px] uppercase tracking-wide rounded-sm hover:bg-[#e7dff0] transition-colors"
+                              className="px-4 py-1.5 bg-[#F6F8FB] text-[#4B5563] border border-[#E1E6EE] font-bold text-[12px] uppercase tracking-wide rounded-sm hover:bg-[#E1E6EE] transition-colors"
                             >
                               View Results
                             </button>

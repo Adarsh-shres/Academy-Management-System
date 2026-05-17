@@ -264,15 +264,15 @@ export default function StudentQuizzesPage() {
   if (activeQuizToTake && !showResults) {
     return (
       <div className="flex flex-col gap-6 pb-10 flex-1 min-w-0 max-w-[900px] mx-auto w-full">
-        <div className="sticky top-0 z-10 bg-white border border-[#e7dff0] rounded-[10px] p-5 shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="sticky top-0 z-10 bg-white border border-[#E1E6EE] rounded-[10px] p-5 shadow-[0_10px_28px_rgba(36,37,41,0.06)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="font-sans text-[22px] font-bold text-[#4b3f68] tracking-tight">{activeQuizToTake.title}</h1>
+            <h1 className="font-sans text-[22px] font-bold text-[#232529] tracking-tight">{activeQuizToTake.title}</h1>
             <p className="text-[13px] text-[#7c8697] mt-1">
               {sortedQuestions.length} question{sortedQuestions.length !== 1 ? 's' : ''}
             </p>
           </div>
           {(activeQuizToTake.time_limit_minutes || 0) > 0 && (
-            <div className="text-[#6a5182] font-extrabold bg-[#f6f2fb] px-4 py-2 rounded-[8px] border border-[#e7dff0]">
+            <div className="text-[#4B5563] font-extrabold bg-[#F6F8FB] px-4 py-2 rounded-[8px] border border-[#E1E6EE]">
               {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
             </div>
           )}
@@ -280,36 +280,36 @@ export default function StudentQuizzesPage() {
 
         <div className="flex flex-col gap-5">
           {sortedQuestions.map((question, index) => (
-            <div key={question.id} className="bg-white p-6 rounded-[10px] border border-[#e7dff0] shadow-sm">
-              <p className="font-bold text-[#4b3f68] mb-5 text-[16px] leading-snug">
+            <div key={question.id} className="bg-white p-6 rounded-[10px] border border-[#E1E6EE] shadow-sm">
+              <p className="font-bold text-[#232529] mb-5 text-[16px] leading-snug">
                 <span className="text-[#94a3b8] mr-2">{index + 1}.</span>
                 {question.question_text}
               </p>
               <div className="flex flex-col gap-3">
                 {question.question_type === 'mcq' && question.options?.map((option, optionIndex) => (
-                  <label key={optionIndex} className="flex items-center gap-3 cursor-pointer p-3 border border-[#e7dff0] rounded-[8px] hover:bg-[#fbf8fe] transition-colors">
+                  <label key={optionIndex} className="flex items-center gap-3 cursor-pointer p-3 border border-[#E1E6EE] rounded-[8px] hover:bg-[#F6F8FB] transition-colors">
                     <input
                       type="radio"
                       name={`q-${question.id}`}
                       value={String(optionIndex)}
                       checked={answers[question.id] === String(optionIndex)}
                       onChange={(event) => setAnswers((prev) => ({ ...prev, [question.id]: event.target.value }))}
-                      className="w-4 h-4 accent-[#6a5182]"
+                      className="w-4 h-4 accent-[#3E4FFF]"
                     />
-                    <span className="text-[#4b3f68] font-medium">{option}</span>
+                    <span className="text-[#232529] font-medium">{option}</span>
                   </label>
                 ))}
                 {question.question_type === 'true_false' && ['True', 'False'].map((option) => (
-                  <label key={option} className="flex items-center gap-3 cursor-pointer p-3 border border-[#e7dff0] rounded-[8px] hover:bg-[#fbf8fe] transition-colors">
+                  <label key={option} className="flex items-center gap-3 cursor-pointer p-3 border border-[#E1E6EE] rounded-[8px] hover:bg-[#F6F8FB] transition-colors">
                     <input
                       type="radio"
                       name={`q-${question.id}`}
                       value={option.toLowerCase()}
                       checked={answers[question.id] === option.toLowerCase()}
                       onChange={(event) => setAnswers((prev) => ({ ...prev, [question.id]: event.target.value }))}
-                      className="w-4 h-4 accent-[#6a5182]"
+                      className="w-4 h-4 accent-[#3E4FFF]"
                     />
-                    <span className="text-[#4b3f68] font-medium">{option}</span>
+                    <span className="text-[#232529] font-medium">{option}</span>
                   </label>
                 ))}
               </div>
@@ -321,7 +321,7 @@ export default function StudentQuizzesPage() {
           <button
             onClick={() => setActiveQuizToTake(null)}
             disabled={isSubmitting}
-            className="px-6 py-3 rounded-[8px] text-[13px] font-semibold text-[#4b3f68] bg-white border border-[#e2d9ed] hover:bg-[#f3eff7] transition-colors disabled:opacity-50"
+            className="px-6 py-3 rounded-[8px] text-[13px] font-semibold text-[#232529] bg-white border border-[#E1E6EE] hover:bg-[#F6F8FB] transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -342,15 +342,15 @@ export default function StudentQuizzesPage() {
 
     return (
       <div className="flex flex-col gap-6 pb-10 flex-1 min-w-0 max-w-[900px] mx-auto w-full">
-        <button onClick={() => setActiveQuizToTake(null)} className="self-start text-[#6a5182] hover:text-[#4b3f68] font-bold text-[13px] tracking-wide">
+        <button onClick={() => setActiveQuizToTake(null)} className="self-start text-[#4B5563] hover:text-[#232529] font-bold text-[13px] tracking-wide">
           Back to quizzes
         </button>
 
         {submission && (
           <>
-            <div className="bg-white p-7 rounded-[10px] border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] text-center">
-              <h1 className="font-sans text-[24px] font-bold text-[#4b3f68] tracking-tight">Results: {activeQuizToTake.title}</h1>
-              <p className="text-[48px] font-extrabold text-[#6a5182] leading-none mt-5">{submission.percentage}%</p>
+            <div className="bg-white p-7 rounded-[10px] border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] text-center">
+              <h1 className="font-sans text-[24px] font-bold text-[#232529] tracking-tight">Results: {activeQuizToTake.title}</h1>
+              <p className="text-[48px] font-extrabold text-[#4B5563] leading-none mt-5">{submission.percentage}%</p>
               <p className="text-[#64748b] font-bold uppercase tracking-widest text-[12px] mt-3">
                 Score: {submission.score} / {submission.total_marks}
               </p>
@@ -362,9 +362,9 @@ export default function StudentQuizzesPage() {
                 const isCorrect = studentAnswer === question.correct_answer;
 
                 return (
-                  <div key={question.id} className={`bg-white p-6 rounded-[10px] border border-[#e7dff0] border-l-4 shadow-sm ${isCorrect ? 'border-l-[#16a34a]' : 'border-l-[#dc2626]'}`}>
+                  <div key={question.id} className={`bg-white p-6 rounded-[10px] border border-[#E1E6EE] border-l-4 shadow-sm ${isCorrect ? 'border-l-[#16a34a]' : 'border-l-[#dc2626]'}`}>
                     <div className="flex justify-between items-start gap-4 mb-4">
-                      <p className="font-bold text-[#4b3f68] text-[16px] leading-snug">
+                      <p className="font-bold text-[#232529] text-[16px] leading-snug">
                         <span className="text-[#94a3b8] mr-1">{index + 1}.</span>
                         {question.question_text}
                       </p>
@@ -406,7 +406,7 @@ export default function StudentQuizzesPage() {
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[1100px] mx-auto w-full">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
-          <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#4b3f68] tracking-tight">Quizzes</h1>
+          <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#232529] tracking-tight">Quizzes</h1>
           <p className="text-[14px] text-[#7c8697] mt-1">{quizzes.length} published quiz{quizzes.length !== 1 ? 'zes' : ''}</p>
         </div>
       </div>
@@ -416,9 +416,9 @@ export default function StudentQuizzesPage() {
           Loading quizzes...
         </div>
       ) : error ? (
-        <div className="flex h-[240px] items-center justify-center text-[#4b3f68] font-semibold">{error}</div>
+        <div className="flex h-[240px] items-center justify-center text-[#232529] font-semibold">{error}</div>
       ) : quizzes.length === 0 ? (
-        <div className="bg-white rounded-[10px] border border-dashed border-[#e7dff0] p-12 text-center">
+        <div className="bg-white rounded-[10px] border border-dashed border-[#E1E6EE] p-12 text-center">
           <p className="text-[13px] font-semibold text-[#7c8697] uppercase tracking-wider">No quizzes available yet.</p>
         </div>
       ) : (
@@ -428,16 +428,16 @@ export default function StudentQuizzesPage() {
             const hasSubmitted = !!submissions[quiz.id];
 
             return (
-              <div key={quiz.id} className="bg-white rounded-[10px] border border-[#e7dff0] p-5 shadow-[0_2px_12px_rgba(57,31,86,0.04)] hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)] transition-all flex flex-col gap-4">
+              <div key={quiz.id} className="bg-white rounded-[10px] border border-[#E1E6EE] p-5 shadow-[0_2px_12px_rgba(36,37,41,0.04)] hover:shadow-[0_8px_24px_rgba(36,37,41,0.08)] transition-all flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="font-sans text-[16px] font-semibold text-[#4b3f68] leading-tight tracking-tight">{quiz.title}</h3>
+                    <h3 className="font-sans text-[16px] font-semibold text-[#232529] leading-tight tracking-tight">{quiz.title}</h3>
                     <p className="text-[12px] font-medium text-[#7c8697] mt-2">
                       {meta?.courseName || 'Unknown Course'} / {meta?.className || 'Unknown Class'}
                     </p>
                     <p className="text-[11px] font-semibold text-primary mt-1">{meta?.courseCode || '---'}</p>
                   </div>
-                  <span className={`text-[10px] font-semibold px-2 py-[2px] uppercase tracking-wide rounded-full border shrink-0 ${hasSubmitted ? 'text-primary bg-[#f3eff7] border-[#e7dff0]' : 'text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]'}`}>
+                  <span className={`text-[10px] font-semibold px-2 py-[2px] uppercase tracking-wide rounded-full border shrink-0 ${hasSubmitted ? 'text-primary bg-[#F6F8FB] border-[#E1E6EE]' : 'text-[#232529] bg-[#faf8fc] border-[#E1E6EE]'}`}>
                     {hasSubmitted ? 'Submitted' : 'Open'}
                   </span>
                 </div>
@@ -463,7 +463,7 @@ export default function StudentQuizzesPage() {
                 {hasSubmitted ? (
                   <button
                     onClick={() => handleViewResults(quiz)}
-                    className="w-full py-3 rounded-[8px] text-[13px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors uppercase tracking-wider"
+                    className="w-full py-3 rounded-[8px] text-[13px] font-semibold text-primary bg-[#F6F8FB] hover:bg-[#E1E6EE] transition-colors uppercase tracking-wider"
                   >
                     View Results
                   </button>

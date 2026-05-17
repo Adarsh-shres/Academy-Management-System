@@ -2,19 +2,19 @@
 
 /* Scope everything inside landing-root */
 .landing-root {
-    --primary:        #004b72;
-    --primary-mid:    #016496;
-    --primary-light:  #cce5ff;
-    --accent:         #006a6a;
-    --accent-bright:  #92f2f1;
-    --surface:        #f3faff;
-    --surface-low:    #eaf5fb;
-    --surface-high:   #d9e4ea;
-    --on-surface:     #131d21;
-    --on-surface-muted: #40484f;
-    --border:         #c0c7d0;
+    --primary:        #3E4FFF;
+    --primary-mid:    #5F73F5;
+    --primary-light:  #E1E6EE;
+    --accent:         #3E4FFF;
+    --accent-bright:  #B7C0CB;
+    --surface:        #F8FAFC;
+    --surface-low:    #FFFFFF;
+    --surface-high:   #E1E6EE;
+    --on-surface:     #232529;
+    --on-surface-muted: #667086;
+    --border:         #E1E6EE;
     --error:          #ba1a1a;
-    --white:          #ffffff;
+    --white:          #FFFFFF;
 
     --shadow-sm:  3px 3px 0px 0px var(--on-surface);
     --shadow-md:  5px 5px 0px 0px var(--on-surface);

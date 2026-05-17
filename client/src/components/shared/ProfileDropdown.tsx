@@ -58,16 +58,16 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
   };
 
   const buttonContent = useSimpleIcon ? (
-    <div className="flex items-center justify-center shrink-0 text-[#64748b] hover:text-[#4b3f68] transition-colors p-1">
+    <div className="flex items-center justify-center shrink-0 text-[#64748b] hover:text-[#232529] transition-colors p-1">
       <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     </div>
   ) : (
-    <div className="flex items-center gap-2 px-2.5 py-1.5 border-[1.5px] border-[#e7dff0] rounded-sm transition-all duration-200 hover:border-[#6a5182] bg-white">
-      <div className="w-7 h-7 rounded-sm bg-gradient-to-br from-[#6a5182] to-[#8d72ab] text-white text-[11px] font-bold flex items-center justify-center">
+    <div className="flex items-center gap-2 px-2.5 py-1.5 border-[1.5px] border-[#E1E6EE] rounded-sm transition-all duration-200 hover:border-[#CCD4E0] bg-white">
+      <div className="w-7 h-7 rounded-sm bg-gradient-to-br from-[#3E4FFF] to-[#5F73F5] text-white text-[11px] font-bold flex items-center justify-center">
         {getInitials(user?.name || '')}
       </div>
       <div className="flex flex-col text-left">
-        <span className="text-[12.5px] font-semibold text-[#4b3f68] leading-[1.2]">
+        <span className="text-[12.5px] font-semibold text-[#232529] leading-[1.2]">
           {user?.name || 'User'}
         </span>
         <span className="text-[10.5px] text-[#64748b]">
@@ -89,11 +89,11 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-[#e7dff0] rounded-md shadow-lg z-[100] py-1">
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E1E6EE] rounded-md shadow-lg z-[100] py-1">
           {canAccessSettings && (
             <button
               onClick={handleSettingsClick}
-              className="w-full text-left px-4 py-2.5 text-[13px] text-[#4b3f68] hover:bg-neutral-50 font-medium transition-colors cursor-pointer flex items-center gap-2"
+              className="w-full text-left px-4 py-2.5 text-[13px] text-[#232529] hover:bg-neutral-50 font-medium transition-colors cursor-pointer flex items-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M4.93 4.93a10 10 0 0 0 0 14.14"></path></svg>
               Settings

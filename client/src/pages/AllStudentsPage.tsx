@@ -81,7 +81,7 @@ export default function AllStudentsPage() {
                           <span className="text-[#e2e8f0]">|</span>
                           <button
                             onClick={() => setEditingStudent({ ...student })}
-                            className="text-[13px] font-semibold text-[#6a5182] hover:text-[#4b3f68] hover:underline"
+                            className="text-[13px] font-semibold text-[#4B5563] hover:text-[#232529] hover:underline"
                           >
                             Edit
                           </button>

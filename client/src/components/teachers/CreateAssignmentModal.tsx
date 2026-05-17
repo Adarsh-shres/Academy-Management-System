@@ -242,8 +242,8 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { resetForm(); onClose(); }} />
       <div className="relative z-10 bg-white rounded-md w-full max-w-[500px] shadow-2xl flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-[#e7dff0] flex justify-between items-center bg-[#fbf8fe] rounded-t-md">
-          <h3 className="text-[18px] font-bold text-[#4b3f68]">Create Assignment</h3>
+        <div className="p-5 border-b border-[#E1E6EE] flex justify-between items-center bg-[#F6F8FB] rounded-t-md">
+          <h3 className="text-[18px] font-bold text-[#232529]">Create Assignment</h3>
           <button onClick={() => { resetForm(); onClose(); }} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
@@ -256,7 +256,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
               <select
                 value={courseId}
                 onChange={e => handleCourseChange(e.target.value)}
-                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                 disabled={isLoadingData || courses.length === 0}
               >
                 {isLoadingData && <option value="" disabled>Loading courses...</option>}
@@ -272,7 +272,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
               <select
                 value={classId}
                 onChange={e => setClassId(e.target.value)}
-                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                 disabled={!courseId || isLoadingData || filteredClasses.length === 0}
               >
                 {!courseId && <option value="" disabled>Select a course first</option>}
@@ -291,7 +291,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                 placeholder="E.g. Chapter 4 Exercises"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
               />
             </div>
 
@@ -302,7 +302,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                 placeholder="Instructions..."
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b] resize-none"
+                className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] resize-none"
               />
             </div>
 
@@ -315,10 +315,10 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                     value={dueDate}
                     min={minDate}
                     onChange={e => setDueDate(e.target.value)}
-                    className={`bg-[#f6f2fb] border rounded-sm px-4 py-2.5 text-[14px] w-full outline-none transition-all text-[#1e293b] ${
+                    className={`bg-[#F6F8FB] border rounded-sm px-4 py-2.5 text-[14px] w-full outline-none transition-all text-[#1e293b] ${
                       isDateTimeInvalid() 
                         ? 'border-red-500 focus:bg-white focus:ring-[3px] focus:ring-red-500/10' 
-                        : 'border-transparent focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10'
+                        : 'border-transparent focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10'
                     }`}
                   />
                 </div>
@@ -329,10 +329,10 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                     value={dueTime}
                     min={minTime}
                     onChange={e => setDueTime(e.target.value)}
-                    className={`bg-[#f6f2fb] border rounded-sm px-4 py-2.5 text-[14px] w-full outline-none transition-all text-[#1e293b] ${
+                    className={`bg-[#F6F8FB] border rounded-sm px-4 py-2.5 text-[14px] w-full outline-none transition-all text-[#1e293b] ${
                       isDateTimeInvalid() 
                         ? 'border-red-500 focus:bg-white focus:ring-[3px] focus:ring-red-500/10' 
-                        : 'border-transparent focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10'
+                        : 'border-transparent focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10'
                     }`}
                   />
                 </div>
@@ -354,7 +354,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                   const droppedFile = e.dataTransfer.files[0];
                   if (droppedFile) setFile(droppedFile);
                 }}
-                className={`border-2 border-dashed rounded-sm p-6 text-center cursor-pointer transition-all ${isDragging ? 'border-[#6a5182] bg-[#f3eff7]' : 'border-[#d8c8e9] hover:border-[#6a5182] hover:bg-[#fbf8fe]'}`}
+                className={`border-2 border-dashed rounded-sm p-6 text-center cursor-pointer transition-all ${isDragging ? 'border-[#CCD4E0] bg-[#F6F8FB]' : 'border-[#E1E6EE] hover:border-[#CCD4E0] hover:bg-[#F6F8FB]'}`}
               >
                 <input
                   ref={fileInputRef}
@@ -367,7 +367,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
                   }}
                 />
                 {file ? (
-                  <div className="flex items-center justify-center gap-2 text-[#6a5182]">
+                  <div className="flex items-center justify-center gap-2 text-[#4B5563]">
                     <span className="text-[13px] font-semibold">{file.name}</span>
                     <button
                       type="button"
@@ -393,12 +393,12 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
           </form>
         </div>
 
-        <div className="p-5 border-t border-[#e7dff0] bg-[#fbf8fe] flex justify-end gap-3 rounded-b-md">
+        <div className="p-5 border-t border-[#E1E6EE] bg-[#F6F8FB] flex justify-end gap-3 rounded-b-md">
           <button
             type="button"
             onClick={() => { resetForm(); onClose(); }}
             disabled={isSubmitting}
-            className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-50"
+            className="px-5 py-2.5 bg-white border border-[#E1E6EE] text-[#232529] text-[13.5px] font-semibold rounded-sm hover:bg-[#F6F8FB] transition-all cursor-pointer disabled:opacity-50"
           >
             Cancel
           </button>
@@ -406,7 +406,7 @@ export default function CreateAssignmentModal({ isOpen, onClose, onCreated }: Cr
             type="submit"
             form="assignment-form"
             disabled={isSubmitting}
-            className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Saving...' : 'Save Assignment'}
           </button>

@@ -55,8 +55,8 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
 
   const getDueBadge = () => {
     if (!isPending) return null;
-    if (diffDays < 0) return { text: "Overdue", cls: "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" };
-    if (diffDays === 0) return { text: "Due Today", cls: "text-primary bg-[#f3eff7] border-[#e7dff0]" };
+    if (diffDays < 0) return { text: "Overdue", cls: "text-[#232529] bg-[#faf8fc] border-[#E1E6EE]" };
+    if (diffDays === 0) return { text: "Due Today", cls: "text-primary bg-[#F6F8FB] border-[#E1E6EE]" };
     if (diffDays <= 3) return { text: `${diffDays}d left`, cls: "text-[#64748b] bg-[#f8fafc] border-[#e2e8f0]" };
     return { text: `${diffDays}d left`, cls: "text-[#64748b] bg-[#f8fafc] border-[#f1f5f9]" };
   };
@@ -64,12 +64,12 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
   const dueBadge = getDueBadge();
 
   return (
-    <div className={`bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)] transition-all duration-200 ${compact ? "p-4" : "p-5"}`}>
+    <div className={`bg-white rounded-[10px] border border-[#E1E6EE] shadow-[0_2px_12px_rgba(36,37,41,0.04)] hover:shadow-[0_8px_24px_rgba(36,37,41,0.08)] transition-all duration-200 ${compact ? "p-4" : "p-5"}`}>
       <div className="flex items-start gap-4">
         {/* Status icon */}
-        <div className={`mt-0.5 w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 ${isPending ? "bg-[#faf8fc]" : "bg-[#f3eff7]"}`}>
+        <div className={`mt-0.5 w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 ${isPending ? "bg-[#faf8fc]" : "bg-[#F6F8FB]"}`}>
           {isPending ? (
-            <svg className="w-[18px] h-[18px] text-[#4b3f68]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[18px] h-[18px] text-[#232529]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           ) : (
@@ -82,12 +82,12 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
-            <h3 className="font-sans text-[14px] font-semibold text-[#4b3f68] leading-tight tracking-tight">{title}</h3>
+            <h3 className="font-sans text-[14px] font-semibold text-[#232529] leading-tight tracking-tight">{title}</h3>
             <span
               className={`text-[10px] font-semibold px-2 py-[2px] uppercase tracking-wide rounded-full border flex-shrink-0 ${
-                isClosed ? "text-[#94a3b8] bg-[#faf8fc] border-[#e2d9ed]" :
-                isPending ? "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" : 
-                "text-primary bg-[#f3eff7] border-[#e7dff0]"
+                isClosed ? "text-[#94a3b8] bg-[#faf8fc] border-[#E1E6EE]" :
+                isPending ? "text-[#232529] bg-[#faf8fc] border-[#E1E6EE]" : 
+                "text-primary bg-[#F6F8FB] border-[#E1E6EE]"
               }`}
             >
               {isClosed ? (assignment.isPastDue === true ? "Overdue" : "Closed") : isPending ? "Pending" : "Submitted"}
@@ -106,7 +106,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
                 {status !== "submitted" ? `Due: ${new Date(deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${new Date(deadline).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}` : (submittedOn ? `Submitted: ${new Date(submittedOn).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${new Date(submittedOn).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}` : '')}
               </span>
               {status === "submitted" && (
-                <span className="text-[11px] font-semibold text-primary bg-[#f3eff7] px-2 py-[2px] rounded-[6px]">
+                <span className="text-[11px] font-semibold text-primary bg-[#F6F8FB] px-2 py-[2px] rounded-[6px]">
                   Result: {gradeStatusLabel}{grade !== null && grade !== undefined ? ` (${grade})` : ''}
                 </span>
               )}
@@ -139,7 +139,7 @@ export default function StudentAssignmentCard({ assignment, compact = false, onS
           ) : (
             <button 
               onClick={() => navigate(`/student/assignments/${assignment.id}/submissions`)}
-              className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-primary bg-[#f3eff7] hover:bg-[#e7dff0] transition-colors cursor-pointer"
+              className="flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold text-primary bg-[#F6F8FB] hover:bg-[#E1E6EE] transition-colors cursor-pointer"
             >
               View Submissions
             </button>

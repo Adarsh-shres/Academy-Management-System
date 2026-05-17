@@ -108,12 +108,12 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
       <div className="relative z-10 bg-white rounded-md w-full max-w-[800px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
 
         {/* Header */}
-        <div className="p-6 border-b border-[#e7dff0] flex justify-between items-start bg-[#fbf8fe] relative">
+        <div className="p-6 border-b border-[#E1E6EE] flex justify-between items-start bg-[#F6F8FB] relative">
           <div className="pr-10">
-            <h2 className="text-[20px] font-bold text-[#4b3f68] mb-1">{assignment.title}</h2>
+            <h2 className="text-[20px] font-bold text-[#232529] mb-1">{assignment.title}</h2>
             <div className="flex flex-wrap gap-x-4 gap-y-2 text-[13px] text-[#64748b] font-medium">
-              <span><strong className="text-[#4b3f68]">Course:</strong> {assignment.course}</span>
-              <span><strong className="text-[#4b3f68]">Due:</strong> {formatDueDate()}</span>
+              <span><strong className="text-[#232529]">Course:</strong> {assignment.course}</span>
+              <span><strong className="text-[#232529]">Due:</strong> {formatDueDate()}</span>
             </div>
             {assignment.file_url && (
               <div className="mt-4">
@@ -121,20 +121,20 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
                   href={assignment.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#6a5182] text-[12px] font-semibold underline hover:text-[#4b3f68]"
+                  className="text-[#4B5563] text-[12px] font-semibold underline hover:text-[#232529]"
                 >
                   View File
                 </a>
               </div>
             )}
           </div>
-          <button onClick={onClose} className="absolute top-6 right-6 text-[#94a3b8] hover:text-[#0d3349] transition-colors cursor-pointer bg-white rounded-full p-1.5 shadow-sm border border-[#e2d9ed]">
+          <button onClick={onClose} className="absolute top-6 right-6 text-[#94a3b8] hover:text-[#0d3349] transition-colors cursor-pointer bg-white rounded-full p-1.5 shadow-sm border border-[#E1E6EE]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
 
         {/* Summary Bar */}
-        <div className="px-6 py-3 bg-white border-b border-[#e7dff0] flex gap-6 text-[13px] font-semibold text-[#64748b]">
+        <div className="px-6 py-3 bg-white border-b border-[#E1E6EE] flex gap-6 text-[13px] font-semibold text-[#64748b]">
           <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#94a3b8] block"></span> Total Students: <span className="text-[#1e293b]">{totalStudents}</span></div>
           <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#10b981] block"></span> Submitted: <span className="text-[#1e293b]">{submittedCount}</span></div>
           <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#f59e0b] block"></span> Pending: <span className="text-[#1e293b]">{pendingCount}</span></div>
@@ -147,17 +147,17 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
               {[1, 2, 3].map(i => <div key={i} className="h-14 bg-[#e2e8f0]/40 rounded-sm w-full"></div>)}
             </div>
           ) : (
-            <div className="bg-white rounded-sm border border-[#e7dff0] overflow-hidden shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
+            <div className="bg-white rounded-sm border border-[#E1E6EE] overflow-hidden shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#fbf8fe] border-b border-[#e7dff0]">
+                  <tr className="bg-[#F6F8FB] border-b border-[#E1E6EE]">
                     <th className="py-3.5 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Student Name</th>
                     <th className="py-3.5 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Submitted At</th>
                     <th className="py-3.5 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</th>
                     <th className="py-3.5 px-5 text-[11px] font-bold text-[#64748b] uppercase tracking-wider">File</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e7dff0]">
+                <tbody className="divide-y divide-[#E1E6EE]">
                   {students.map(student => {
                     const submission = submissions.find(s => s.student_id === student.id);
                     const formattedSubDate = submission?.submitted_at ? new Intl.DateTimeFormat('en-US', {
@@ -165,8 +165,8 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
                     }).format(new Date(submission.submitted_at)) : '—';
 
                     return (
-                      <tr key={student.id} className="hover:bg-[#fbf8fe]/50 transition-colors">
-                        <td className="py-3.5 px-5 text-[13.5px] font-bold text-[#4b3f68]">{student.name}</td>
+                      <tr key={student.id} className="hover:bg-[#F6F8FB]/50 transition-colors">
+                        <td className="py-3.5 px-5 text-[13.5px] font-bold text-[#232529]">{student.name}</td>
                         <td className="py-3.5 px-5 text-[13px] font-medium text-[#64748b]">{formattedSubDate}</td>
                         <td className="py-3.5 px-5">
                           {submission ? (
@@ -186,7 +186,7 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
                             <div className="flex items-center gap-3">
                               <button
                                 onClick={() => handleViewFile(submission.file_url)}
-                                className="text-[#6a5182] hover:text-[#5b4471] hover:underline flex items-center gap-1.5 font-semibold text-[13px] transition-colors cursor-pointer"
+                                className="text-[#4B5563] hover:text-[#5F73F5] hover:underline flex items-center gap-1.5 font-semibold text-[13px] transition-colors cursor-pointer"
                               >
                                 <FileText size={14} />
                                 View Work
@@ -194,7 +194,7 @@ export default function ViewSubmissionsModal({ isOpen, onClose, assignment }: Vi
                               <a
                                 href={submission.file_url}
                                 download
-                                className="text-[#64748b] hover:text-[#4b3f68] hover:underline font-semibold text-[13px] transition-colors"
+                                className="text-[#64748b] hover:text-[#232529] hover:underline font-semibold text-[13px] transition-colors"
                               >
                                 Download
                               </a>

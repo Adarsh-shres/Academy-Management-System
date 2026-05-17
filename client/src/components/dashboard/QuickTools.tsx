@@ -53,8 +53,8 @@ export default function QuickTools() {
   };
 
   return (
-    <div className="bg-white border border-[#e7dff0] rounded-sm p-[22px] flex flex-col shadow-[0_10px_28px_rgba(57,31,86,0.06)]">
-      <h2 className="font-sans text-[15px] font-extrabold text-[#4b3f68] mb-[18px]">Quick Tools</h2>
+    <div className="bg-white border border-[#E1E6EE] rounded-sm p-[22px] flex flex-col shadow-[0_10px_28px_rgba(36,37,41,0.06)]">
+      <h2 className="font-sans text-[15px] font-extrabold text-[#232529] mb-[18px]">Quick Tools</h2>
       <div className="grid grid-cols-2 gap-3 flex-1">
         
         {TOOLS.map((tool, idx) => (
@@ -62,12 +62,12 @@ export default function QuickTools() {
             key={idx}
             type="button"
             onClick={() => handleToolClick(tool.action)}
-            className="flex flex-col items-center justify-center gap-1.5 p-[16px_8px] border-[1.5px] border-[#e7dff0] rounded-sm cursor-pointer bg-[#fbf8fe] text-center transition-all duration-200 hover:border-primary hover:bg-[#f6f0fb] hover:-translate-y-px hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6a5182]/20"
+            className="flex flex-col items-center justify-center gap-1.5 p-[16px_8px] border-[1.5px] border-[#E1E6EE] rounded-sm cursor-pointer bg-[#F6F8FB] text-center transition-all duration-200 hover:border-primary hover:bg-[#F6F8FB] hover:-translate-y-px hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[#CCD4E0]/20"
           >
-            <div className="w-[38px] h-[38px] bg-white border border-[#e7dff0] rounded-[8px] flex items-center justify-center text-primary shadow-sm">
+            <div className="w-[38px] h-[38px] bg-white border border-[#E1E6EE] rounded-[8px] flex items-center justify-center text-primary shadow-sm">
               {tool.icon}
             </div>
-            <div className="text-[12px] font-bold text-[#4b3f68] leading-tight">{tool.label}</div>
+            <div className="text-[12px] font-bold text-[#232529] leading-tight">{tool.label}</div>
             <div className="text-[10.5px] text-[#64748b]">{tool.desc}</div>
           </button>
         ))}

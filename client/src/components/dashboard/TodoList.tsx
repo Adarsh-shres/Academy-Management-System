@@ -20,10 +20,10 @@ export default function TodoList() {
   };
 
   return (
-    <aside className="w-full rounded-[10px] border border-[#e6dfef] bg-white shadow-[0_2px_12px_rgba(57,31,86,0.06)] overflow-hidden flex flex-col sticky top-[82px]">
-      <div className="p-5 tracking-tight border-b border-[#eee8f4] flex items-center justify-between bg-[#fbf8fe] rounded-t-[10px]">
-        <h2 className="font-sans text-[15px] font-semibold text-[#4b3f68]">My Tasks</h2>
-        <span className="bg-[#f3eff7] text-primary text-[10px] font-semibold px-2 py-0.5 rounded-[6px] uppercase tracking-[0.06em]">
+    <aside className="w-full rounded-[10px] border border-[#E1E6EE] bg-white shadow-[0_2px_12px_rgba(36,37,41,0.06)] overflow-hidden flex flex-col sticky top-[82px]">
+      <div className="p-5 tracking-tight border-b border-[#E1E6EE] flex items-center justify-between bg-[#F6F8FB] rounded-t-[10px]">
+        <h2 className="font-sans text-[15px] font-semibold text-[#232529]">My Tasks</h2>
+        <span className="bg-[#F6F8FB] text-primary text-[10px] font-semibold px-2 py-0.5 rounded-[6px] uppercase tracking-[0.06em]">
           {todos.filter(t => !t.done).length} left
         </span>
       </div>
@@ -70,11 +70,11 @@ export default function TodoList() {
               onKeyDown={handleKeyDown}
               autoFocus
               placeholder="Enter task..."
-              className="flex-1 bg-[#f8fafc] border border-[#e2d9ed] rounded-[6px] px-3 py-1.5 text-[13px] outline-none focus:border-[#6a5182] focus:ring-1 focus:ring-[#6a5182]/20 transition-all text-[#1e293b]"
+              className="flex-1 bg-[#f8fafc] border border-[#E1E6EE] rounded-[6px] px-3 py-1.5 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-1 focus:ring-[#CCD4E0]/20 transition-all text-[#1e293b]"
             />
             <button
               onClick={handleAdd}
-              className="shrink-0 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[11px] font-semibold px-3 py-1.5 rounded-[6px] transition-all"
+              className="shrink-0 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[11px] font-semibold px-3 py-1.5 rounded-[6px] transition-all"
             >
               Add
             </button>
@@ -88,7 +88,7 @@ export default function TodoList() {
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="mt-5 text-[#6a5182] font-semibold text-[12px] flex items-center gap-1.5 hover:opacity-75 transition-opacity px-1"
+            className="mt-5 text-[#4B5563] font-semibold text-[12px] flex items-center gap-1.5 hover:opacity-75 transition-opacity px-1"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add New Task

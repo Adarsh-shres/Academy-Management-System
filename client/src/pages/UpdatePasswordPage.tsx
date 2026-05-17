@@ -33,7 +33,7 @@ function PasswordInput({
 }: PasswordInputProps) {
   return (
     <div>
-      <label htmlFor={id} className="block text-[13px] font-semibold text-[#4b3f68] mb-2">
+      <label htmlFor={id} className="block text-[13px] font-semibold text-[#232529] mb-2">
         {label}
       </label>
       <div className="relative">
@@ -45,14 +45,14 @@ function PasswordInput({
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          className="w-full rounded-[8px] border border-[#ded4eb] bg-white px-3.5 py-3 pr-12 text-[13px] text-[#4b3f68] outline-none transition placeholder:text-[#9aa3b2] focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/15"
+          className="w-full rounded-[8px] border border-[#E1E6EE] bg-white px-3.5 py-3 pr-12 text-[13px] text-[#232529] outline-none transition placeholder:text-[#9aa3b2] focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/15"
           disabled={disabled}
         />
         <button
           type="button"
           onClick={onToggle}
           disabled={disabled}
-          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#7c8697] transition hover:text-[#6a5182] focus:outline-none focus:text-[#6a5182] disabled:cursor-not-allowed disabled:opacity-50"
+          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#7c8697] transition hover:text-[#4B5563] focus:outline-none focus:text-[#4B5563] disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={visible ? ariaHideLabel : ariaShowLabel}
           aria-pressed={visible}
         >
@@ -149,10 +149,10 @@ const UpdatePasswordPage: React.FC = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-140px)] items-center justify-center">
-      <div className="w-full max-w-[520px] rounded-[10px] border border-[#e7dff0] bg-white shadow-[0_18px_50px_rgba(57,31,86,0.10)] overflow-hidden">
-        <div className="border-b border-[#f0e8f6] bg-[#fbf8fe] px-7 py-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8b6ca8]">Account Security</p>
-          <h1 className="mt-2 text-[24px] font-bold tracking-tight text-[#4b3f68]">Update Password</h1>
+      <div className="w-full max-w-[520px] rounded-[10px] border border-[#E1E6EE] bg-white shadow-[0_18px_50px_rgba(36,37,41,0.10)] overflow-hidden">
+        <div className="border-b border-[#E1E6EE] bg-[#F6F8FB] px-7 py-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#5F73F5]">Account Security</p>
+          <h1 className="mt-2 text-[24px] font-bold tracking-tight text-[#232529]">Update Password</h1>
           <p className="mt-1 text-[13px] leading-5 text-[#7c8697]">Use a password that is hard to guess and different from your current one.</p>
         </div>
 
@@ -217,22 +217,22 @@ const UpdatePasswordPage: React.FC = () => {
                 type="button"
                 onClick={handleBack}
                 disabled={isSubmitting}
-                className="flex-1 rounded-[8px] border border-[#ded4eb] bg-white px-4 py-3 text-[13px] font-semibold uppercase tracking-wide text-[#4b3f68] transition hover:bg-[#f9f8fa] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-[8px] border border-[#E1E6EE] bg-white px-4 py-3 text-[13px] font-semibold uppercase tracking-wide text-[#232529] transition hover:bg-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 rounded-[8px] bg-[#6a5182] px-4 py-3 text-[13px] font-semibold uppercase tracking-wide text-white shadow-[0_8px_18px_rgba(106,81,130,0.22)] transition hover:bg-[#7a6492] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-[8px] bg-[#3E4FFF] px-4 py-3 text-[13px] font-semibold uppercase tracking-wide text-white shadow-[0_8px_18px_rgba(62,79,255,0.22)] transition hover:bg-[#5F73F5] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSubmitting ? 'Updating...' : 'Update Password'}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 rounded-[8px] border border-[#f0e8f6] bg-[#fbf8fe] p-4">
-            <p className="text-[12px] font-bold uppercase tracking-wider text-[#6a5182]">Password checklist</p>
+          <div className="mt-6 rounded-[8px] border border-[#E1E6EE] bg-[#F6F8FB] p-4">
+            <p className="text-[12px] font-bold uppercase tracking-wider text-[#4B5563]">Password checklist</p>
             <ul className="mt-3 space-y-2 text-[12px] leading-5 text-[#64748b]">
               <li>- At least 6 characters long</li>
               <li>- Different from your current password</li>

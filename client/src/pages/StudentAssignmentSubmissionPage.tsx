@@ -97,7 +97,7 @@ export default function StudentAssignmentSubmissionPage() {
   if (assignmentError || !assignment) {
     return (
       <div className="flex flex-col gap-4 h-[300px] items-center justify-center text-center">
-        <p className="text-[#4b3f68] font-semibold">{assignmentError || 'Assignment not found.'}</p>
+        <p className="text-[#232529] font-semibold">{assignmentError || 'Assignment not found.'}</p>
         <button onClick={() => navigate('/student/assignments')} className="px-5 py-2.5 rounded-[8px] bg-primary text-white text-[13px] font-semibold">
           Back to Assignments
         </button>
@@ -107,14 +107,14 @@ export default function StudentAssignmentSubmissionPage() {
 
   return (
     <div className="flex flex-col gap-7 pb-10 flex-1 min-w-0 max-w-[980px] mx-auto w-full">
-      <button onClick={() => navigate('/student/assignments')} className="self-start text-[#6a5182] hover:text-[#4b3f68] font-bold text-[13px] tracking-wide">
+      <button onClick={() => navigate('/student/assignments')} className="self-start text-[#4B5563] hover:text-[#232529] font-bold text-[13px] tracking-wide">
         Back to assignments
       </button>
 
-      <div className="bg-white rounded-[10px] border border-[#e7dff0] p-6 shadow-[0_2px_12px_rgba(57,31,86,0.04)]">
+      <div className="bg-white rounded-[10px] border border-[#E1E6EE] p-6 shadow-[0_2px_12px_rgba(36,37,41,0.04)]">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
           <div>
-            <h1 className="font-sans text-[24px] md:text-[28px] font-bold text-[#4b3f68] tracking-tight">{assignment.title}</h1>
+            <h1 className="font-sans text-[24px] md:text-[28px] font-bold text-[#232529] tracking-tight">{assignment.title}</h1>
             <p className="text-[13px] font-medium text-[#7c8697] mt-2">
               {assignment.course} / <span className="text-primary font-semibold">{assignment.courseCode}</span>
             </p>
@@ -126,13 +126,13 @@ export default function StudentAssignmentSubmissionPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 min-w-[240px]">
-            <div className="bg-[#fbf8fe] rounded-[8px] border border-[#e7dff0] p-3">
+            <div className="bg-[#F6F8FB] rounded-[8px] border border-[#E1E6EE] p-3">
               <p className="text-[10px] font-bold text-[#778196] uppercase tracking-wide">Status</p>
-              <p className="text-[15px] font-bold text-[#4b3f68] mt-1">{summary.status}</p>
+              <p className="text-[15px] font-bold text-[#232529] mt-1">{summary.status}</p>
             </div>
-            <div className="bg-[#fbf8fe] rounded-[8px] border border-[#e7dff0] p-3">
+            <div className="bg-[#F6F8FB] rounded-[8px] border border-[#E1E6EE] p-3">
               <p className="text-[10px] font-bold text-[#778196] uppercase tracking-wide">Grade</p>
-              <p className="text-[15px] font-bold text-[#4b3f68] mt-1">{summary.grade ?? 'Pending'}</p>
+              <p className="text-[15px] font-bold text-[#232529] mt-1">{summary.grade ?? 'Pending'}</p>
             </div>
           </div>
         </div>
@@ -154,17 +154,17 @@ export default function StudentAssignmentSubmissionPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[10px] border border-[#e7dff0] p-6 shadow-[0_2px_12px_rgba(57,31,86,0.04)]">
-        <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#4b3f68] tracking-tight">Teacher Remarks</h2>
+      <div className="bg-white rounded-[10px] border border-[#E1E6EE] p-6 shadow-[0_2px_12px_rgba(36,37,41,0.04)]">
+        <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#232529] tracking-tight">Teacher Remarks</h2>
         <p className="mt-3 text-[14px] leading-relaxed text-[#64748b] bg-[#f8fafc] border border-[#e2e8f0] rounded-[8px] p-4">
           {summary.feedback || 'No remarks yet.'}
         </p>
       </div>
 
-      <div className="bg-white rounded-[10px] border border-[#e7dff0] p-6 shadow-[0_2px_12px_rgba(57,31,86,0.04)]">
+      <div className="bg-white rounded-[10px] border border-[#E1E6EE] p-6 shadow-[0_2px_12px_rgba(36,37,41,0.04)]">
         <div className="flex items-center justify-between gap-3 mb-5">
-          <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#4b3f68] tracking-tight">Submission History</h2>
-          <span className="text-[11px] font-semibold px-2.5 py-[3px] rounded-[6px] bg-[#fbf8fe] text-[#8b6ca8] border border-[#f3eff7] uppercase tracking-wide">
+          <h2 className="font-sans text-[19px] md:text-[21px] font-bold text-[#232529] tracking-tight">Submission History</h2>
+          <span className="text-[11px] font-semibold px-2.5 py-[3px] rounded-[6px] bg-[#F6F8FB] text-[#5F73F5] border border-[#F6F8FB] uppercase tracking-wide">
             {attempts.length}
           </span>
         </div>
@@ -172,7 +172,7 @@ export default function StudentAssignmentSubmissionPage() {
         {isHistoryLoading ? (
           <div className="py-10 text-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading history...</div>
         ) : historyError ? (
-          <div className="py-10 text-center text-[#4b3f68] font-semibold">{historyError}</div>
+          <div className="py-10 text-center text-[#232529] font-semibold">{historyError}</div>
         ) : attempts.length === 0 ? (
           <div className="py-10 text-center text-[13px] font-semibold text-[#7c8697] uppercase tracking-wider">
             No submissions yet.
@@ -182,16 +182,16 @@ export default function StudentAssignmentSubmissionPage() {
             {attempts.map((attempt, index) => {
               const status = getGradeStatusLabel(attempt.grade);
               return (
-                <div key={attempt.id} className="border border-[#e7dff0] rounded-[10px] p-4 bg-[#fbf8fe]">
+                <div key={attempt.id} className="border border-[#E1E6EE] rounded-[10px] p-4 bg-[#F6F8FB]">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div>
-                      <p className="text-[14px] font-bold text-[#4b3f68]">Attempt {attempts.length - index}</p>
+                      <p className="text-[14px] font-bold text-[#232529]">Attempt {attempts.length - index}</p>
                       <p className="text-[12px] text-[#64748b] mt-1">
                         {attempt.submitted_at ? new Date(attempt.submitted_at).toLocaleString() : 'Submission time unavailable'}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full text-primary bg-[#f3eff7] border border-[#e7dff0]">
+                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full text-primary bg-[#F6F8FB] border border-[#E1E6EE]">
                         {status}
                       </span>
                       <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full text-[#64748b] bg-white border border-[#e2e8f0]">
@@ -209,7 +209,7 @@ export default function StudentAssignmentSubmissionPage() {
                       <span className="text-[13px] font-semibold text-[#94a3b8]">No file attached</span>
                     )}
                     <div className="text-[13px] text-[#64748b] bg-white border border-[#e2e8f0] rounded-[8px] p-3">
-                      <span className="font-bold text-[#4b3f68]">Remarks: </span>
+                      <span className="font-bold text-[#232529]">Remarks: </span>
                       {attempt.feedback || 'No remarks for this attempt.'}
                     </div>
                   </div>

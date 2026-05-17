@@ -275,7 +275,7 @@ export default function CourseClassesPage() {
   if (coursesLoading || pageLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading course classes...</p>
       </div>
     );
@@ -291,7 +291,7 @@ export default function CourseClassesPage() {
         <p className="text-[13px] text-[#64748b] max-w-md text-center">{error || 'The selected course could not be found.'}</p>
         <button
           onClick={() => navigate('/courses')}
-          className="mt-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer"
+          className="mt-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer"
         >
           Back to Courses
         </button>
@@ -306,7 +306,7 @@ export default function CourseClassesPage() {
           <div>
             <button
               onClick={() => navigate('/courses')}
-              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#6a5182] hover:text-[#4b3f68] mb-3 cursor-pointer"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#4B5563] hover:text-[#232529] mb-3 cursor-pointer"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
               Back to Courses
@@ -326,7 +326,7 @@ export default function CourseClassesPage() {
             </span>
             <button
               onClick={openAddClassModal}
-              className="inline-flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14" /><path d="M5 12h14" /></svg>
               Add Class
@@ -335,9 +335,9 @@ export default function CourseClassesPage() {
         </div>
 
         <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col animate-fade-up">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-3 bg-[#fbf8fe]">
+          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-3 bg-[#F6F8FB]">
             <div>
-              <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Course Classes</h3>
+              <h3 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Course Classes</h3>
               <p className="text-[12.5px] text-[#64748b] mt-1">Department: {course.department} | Faculty lead: {course.facultyLead}</p>
             </div>
             <span className="inline-flex items-center rounded-sm bg-white px-3 py-2 text-[12px] font-semibold text-[#64748b] border border-[#e2e8f0]">
@@ -383,15 +383,15 @@ export default function CourseClassesPage() {
                             navigate(`/courses/${course.id}/classes/${courseClass.id}`);
                           }
                         }}
-                        className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#6a5182]/25 transition-colors cursor-pointer group"
+                        className="border-b border-[#e2e8f0] last:border-0 hover:bg-[#f8fafc] focus:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#CCD4E0]/25 transition-colors cursor-pointer group"
                       >
                         <td className="py-4 px-6">
-                          <p className="text-[14px] font-bold text-[#1e293b] group-hover:text-[#6a5182] group-hover:underline underline-offset-4 transition-colors">{classNameValue}</p>
+                          <p className="text-[14px] font-bold text-[#1e293b] group-hover:text-[#4B5563] group-hover:underline underline-offset-4 transition-colors">{classNameValue}</p>
                           <p className="text-[12px] text-[#64748b] mt-1">{course.courseCode}</p>
                         </td>
                         <td className="py-4 px-6 text-[13px] font-semibold text-[#475569]">{teacherName || 'Unassigned'}</td>
                         <td className="py-4 px-6">
-                          <span className="inline-flex items-center rounded-sm bg-[#f3eff7] px-2.5 py-1 text-[12px] font-bold text-[#6a5182]">
+                          <span className="inline-flex items-center rounded-sm bg-[#F6F8FB] px-2.5 py-1 text-[12px] font-bold text-[#4B5563]">
                             {studentCount}/{MAX_STUDENTS_PER_CLASS}
                           </span>
                         </td>
@@ -405,14 +405,14 @@ export default function CourseClassesPage() {
             </div>
           ) : !classesError ? (
             <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-              <div className="w-14 h-14 rounded-full bg-[#f3eff7] flex items-center justify-center text-[#6a5182] mb-4">
+              <div className="w-14 h-14 rounded-full bg-[#F6F8FB] flex items-center justify-center text-[#4B5563] mb-4">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 4h18" /><path d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4" /><path d="M12 16v4" /><path d="M8 20h8" /></svg>
               </div>
-              <h2 className="text-[18px] font-bold text-[#4b3f68] mb-1">No Classes Found</h2>
+              <h2 className="text-[18px] font-bold text-[#232529] mb-1">No Classes Found</h2>
               <p className="text-[14px] text-[#64748b] max-w-md mb-4">This course does not have any classes linked to it yet.</p>
               <button
                 onClick={openAddClassModal}
-                className="bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
+                className="bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
               >
                 Add First Class
               </button>
@@ -424,7 +424,7 @@ export default function CourseClassesPage() {
       {isAddClassOpen && (
         <AppModal onClose={() => setIsAddClassOpen(false)} widthClass="max-w-[920px]">
           <div className="bg-white rounded-md shadow-2xl overflow-hidden">
-            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-start justify-between gap-4">
+            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-[20px] font-extrabold text-[#0d3349] tracking-tight">Add Class</h3>
                 <p className="text-[13px] text-[#64748b] mt-1">Create a section, choose the assigned teacher, and enroll up to {MAX_STUDENTS_PER_CLASS} students in this course.</p>
@@ -442,7 +442,7 @@ export default function CourseClassesPage() {
               <div className="flex flex-col gap-5">
                 <div className="rounded-sm border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3">
                   <p className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider mb-1">Suggested Section</p>
-                  <p className="text-[18px] font-extrabold text-[#4b3f68] tracking-wide">{generatedSectionName}</p>
+                  <p className="text-[18px] font-extrabold text-[#232529] tracking-wide">{generatedSectionName}</p>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -451,7 +451,7 @@ export default function CourseClassesPage() {
                     type="text"
                     value={className}
                     onChange={(event) => setClassName(event.target.value)}
-                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                   />
                 </div>
 
@@ -468,7 +468,7 @@ export default function CourseClassesPage() {
                           onClick={() => toggleScheduleDay(day)}
                           className={`rounded-sm border px-3 py-2 text-[12px] font-bold transition-colors cursor-pointer ${
                             isSelected
-                              ? 'border-[#6a5182] bg-[#f3eff7] text-[#6a5182]'
+                              ? 'border-[#CCD4E0] bg-[#F6F8FB] text-[#4B5563]'
                               : 'border-[#cbd5e1] bg-white text-[#64748b] hover:bg-[#f8fafc]'
                           }`}
                         >
@@ -486,7 +486,7 @@ export default function CourseClassesPage() {
                     value={scheduleTime}
                     onChange={(event) => setScheduleTime(event.target.value)}
                     placeholder="e.g. 10:00 AM - 11:30 AM"
-                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                   />
                 </div>
 
@@ -496,7 +496,7 @@ export default function CourseClassesPage() {
                     value={selectedTeacherId}
                     onChange={(event) => setSelectedTeacherId(event.target.value)}
                     disabled={usersLoading || teachers.length === 0}
-                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b] disabled:opacity-70"
+                    className="bg-[#f8fafc] border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b] disabled:opacity-70"
                   >
                     <option value="">{usersLoading ? 'Loading teachers...' : 'Select one teacher'}</option>
                     {teachers.map((teacher) => (
@@ -504,8 +504,8 @@ export default function CourseClassesPage() {
                     ))}
                   </select>
                   {selectedTeacher && (
-                    <div className="mt-2 rounded-sm border border-[#d8c8e9] bg-[#fbf8fe] px-3 py-2">
-                      <p className="text-[13px] font-bold text-[#4b3f68]">{selectedTeacher.name}</p>
+                    <div className="mt-2 rounded-sm border border-[#E1E6EE] bg-[#F6F8FB] px-3 py-2">
+                      <p className="text-[13px] font-bold text-[#232529]">{selectedTeacher.name}</p>
                       <p className="text-[12px] text-[#64748b] mt-0.5">{selectedTeacher.email}</p>
                     </div>
                   )}
@@ -513,10 +513,10 @@ export default function CourseClassesPage() {
               </div>
 
               <div className="flex flex-col min-h-0 rounded-sm border border-[#e2e8f0] overflow-hidden">
-                <div className="p-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
+                <div className="p-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-[13px] font-extrabold text-[#4b3f68] uppercase tracking-wide">Student Assignment</p>
+                      <p className="text-[13px] font-extrabold text-[#232529] uppercase tracking-wide">Student Assignment</p>
                       <p className="text-[12px] text-[#64748b] mt-1">Saved into this class row's student_ids list.</p>
                     </div>
                     <span className="rounded-sm bg-white border border-[#e2e8f0] px-3 py-2 text-[12px] font-bold text-[#64748b]">
@@ -525,7 +525,7 @@ export default function CourseClassesPage() {
                   </div>
                   <div className="mt-3 h-2 bg-[#e2e8f0] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#6a5182] rounded-full transition-all"
+                      className="h-full bg-[#3E4FFF] rounded-full transition-all"
                       style={{ width: `${Math.min(100, (selectedStudentIds.length / MAX_STUDENTS_PER_CLASS) * 100)}%` }}
                     />
                   </div>
@@ -534,7 +534,7 @@ export default function CourseClassesPage() {
                     value={studentSearch}
                     onChange={(event) => setStudentSearch(event.target.value)}
                     placeholder="Search students by name or email"
-                    className="mt-4 bg-white border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                    className="mt-4 bg-white border border-[#cbd5e1] rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                   />
                 </div>
 
@@ -556,9 +556,9 @@ export default function CourseClassesPage() {
                             checked={isSelected}
                             disabled={isDisabled}
                             onChange={() => toggleStudent(student.id)}
-                            className="w-4 h-4 accent-[#6a5182]"
+                            className="w-4 h-4 accent-[#3E4FFF]"
                           />
-                          <span className="w-9 h-9 rounded-full bg-[#f3eff7] text-[#6a5182] flex items-center justify-center text-[12px] font-extrabold shrink-0">
+                          <span className="w-9 h-9 rounded-full bg-[#F6F8FB] text-[#4B5563] flex items-center justify-center text-[12px] font-extrabold shrink-0">
                             {student.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
                           </span>
                           <span className="min-w-0">
@@ -580,7 +580,7 @@ export default function CourseClassesPage() {
                       <button
                         type="button"
                         onClick={() => setSelectedStudentIds([])}
-                        className="text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer"
+                        className="text-[12px] font-bold text-[#4B5563] hover:text-[#232529] cursor-pointer"
                       >
                         Clear
                       </button>
@@ -591,7 +591,7 @@ export default function CourseClassesPage() {
                           key={student.id}
                           type="button"
                           onClick={() => toggleStudent(student.id)}
-                          className="inline-flex items-center gap-1.5 rounded-sm border border-[#d8c8e9] bg-white px-2.5 py-1 text-[12px] font-semibold text-[#4b3f68] hover:bg-[#f3eff7] cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-sm border border-[#E1E6EE] bg-white px-2.5 py-1 text-[12px] font-semibold text-[#232529] hover:bg-[#F6F8FB] cursor-pointer"
                         >
                           {student.name}
                           <span aria-hidden="true">x</span>
@@ -609,12 +609,12 @@ export default function CourseClassesPage() {
               </div>
             )}
 
-            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#fbf8fe] flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#F6F8FB] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setIsAddClassOpen(false)}
                 disabled={isSavingClass}
-                className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 bg-white border border-[#E1E6EE] text-[#232529] text-[13.5px] font-semibold rounded-sm hover:bg-[#F6F8FB] transition-all cursor-pointer disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -622,7 +622,7 @@ export default function CourseClassesPage() {
                 type="button"
                 onClick={handleCreateClass}
                 disabled={isSavingClass || usersLoading}
-                className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSavingClass && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {isSavingClass ? 'Creating...' : 'Create Class'}

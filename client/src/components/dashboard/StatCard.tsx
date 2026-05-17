@@ -23,11 +23,11 @@ export default function StatCard({
   compact = false,
   showProgress = true,
 }: StatCardProps) {
-  const sharedClassName = `group relative w-full overflow-hidden rounded-[10px] border border-[#e7dff0] bg-white ${
+  const sharedClassName = `group relative w-full overflow-hidden rounded-[10px] border border-[#E1E6EE] bg-white ${
     compact ? 'p-[14px_16px]' : 'p-5'
-  } shadow-[0_10px_28px_rgba(57,31,86,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(57,31,86,0.1)] text-left ${
+  } shadow-[0_10px_28px_rgba(36,37,41,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(36,37,41,0.1)] text-left ${
     isAccent ? 'ring-1 ring-[#e0d6ef]' : ''
-  } ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#6a5182]/20' : 'cursor-default'}`;
+  } ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#CCD4E0]/20' : 'cursor-default'}`;
 
   const content = (
     <>
@@ -35,7 +35,7 @@ export default function StatCard({
 
       {compact ? (
         <div className="relative flex min-h-[58px] items-center gap-4">
-          <div className="h-[40px] w-[40px] shrink-0 rounded-[10px] bg-[#f3eff7] text-primary flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+          <div className="h-[40px] w-[40px] shrink-0 rounded-[10px] bg-[#F6F8FB] text-primary flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
             {icon}
           </div>
 
@@ -46,9 +46,9 @@ export default function StatCard({
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-3">
-            <div className="h-9 w-px bg-[#ece4f4]" />
+            <div className="h-9 w-px bg-[#E1E6EE]" />
             <div className="text-right">
-              <div className="font-sans text-[30px] font-extrabold leading-none tracking-tight text-[#4b3f68]">
+              <div className="font-sans text-[30px] font-extrabold leading-none tracking-tight text-[#232529]">
                 {value}
               </div>
               <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#9aa4b5]">
@@ -56,7 +56,7 @@ export default function StatCard({
               </div>
             </div>
             {onClick ? (
-              <div className="text-[#cdbfdd] transition-colors group-hover:text-[#6a5182]">
+              <div className="text-[#cdbfdd] transition-colors group-hover:text-[#4B5563]">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
@@ -66,7 +66,7 @@ export default function StatCard({
         </div>
       ) : (
         <>
-          <div className="relative mb-3.5 flex h-[36px] w-[36px] items-center justify-center rounded-[8px] bg-[#f3eff7] text-primary">
+          <div className="relative mb-3.5 flex h-[36px] w-[36px] items-center justify-center rounded-[8px] bg-[#F6F8FB] text-primary">
             {icon}
           </div>
 
@@ -74,7 +74,7 @@ export default function StatCard({
             {label}
           </div>
 
-          <div className={`relative font-sans text-[30px] font-bold leading-none tracking-tight text-[#4b3f68] ${subContent ? 'mb-2' : 'mb-4'}`}>
+          <div className={`relative font-sans text-[30px] font-bold leading-none tracking-tight text-[#232529] ${subContent ? 'mb-2' : 'mb-4'}`}>
             {value}
           </div>
         </>
@@ -94,7 +94,7 @@ export default function StatCard({
 
       {showProgress ? (
         <div className={`relative overflow-hidden rounded-full bg-[#efe8f5] ${compact ? 'mt-2 h-[4px]' : 'mt-1 h-[3px]'}`}>
-          <div className={`h-full rounded-full bg-gradient-to-r from-[#6a5182] to-[#8b6ca8] ${isAccent ? 'w-[72%]' : 'w-[58%]'}`} />
+          <div className={`h-full rounded-full bg-gradient-to-r from-[#3E4FFF] to-[#5F73F5] ${isAccent ? 'w-[72%]' : 'w-[58%]'}`} />
         </div>
       ) : null}
     </>

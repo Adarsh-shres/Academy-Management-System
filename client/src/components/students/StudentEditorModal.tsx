@@ -24,7 +24,7 @@ function FieldLabel({ children }: { children: string }) {
 }
 
 function inputClassName() {
-  return 'w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10';
+  return 'w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#CCD4E0] focus:ring-4 focus:ring-[#CCD4E0]/10';
 }
 
 export default function StudentEditorModal({ student, onClose, onSave }: StudentEditorModalProps) {
@@ -36,15 +36,15 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
 
   return (
     <AppModal onClose={onClose} widthClass="max-w-5xl">
-      <div className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_32px_80px_rgba(57,31,86,0.18)]">
-        <div className="border-b border-[#ece4f4] bg-[linear-gradient(135deg,#f8f4fd_0%,#edf6fb_100%)] px-6 py-6 md:px-8">
+      <div className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_32px_80px_rgba(36,37,41,0.18)]">
+        <div className="border-b border-[#E1E6EE] bg-[linear-gradient(135deg,#f8f4fd_0%,#edf6fb_100%)] px-6 py-6 md:px-8">
           <div className="flex items-start justify-between gap-4">
             <SectionTitle
               eyebrow="Student Editor"
               title={`${draft.firstName || 'Student'} ${draft.lastName || ''}`.trim()}
               description="Update identity, enrollment details, and profile fields in one place."
             />
-            <button onClick={onClose} className="rounded-full border border-[#ddd2ea] bg-white p-2 text-[#6a5182] transition-colors hover:bg-[#f4ecfb]">
+            <button onClick={onClose} className="rounded-full border border-[#E1E6EE] bg-white p-2 text-[#4B5563] transition-colors hover:bg-[#F6F8FB]">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
@@ -52,7 +52,7 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a5182] shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#4B5563] shadow-sm">
               {draft.isActive ? 'Active Student' : 'Inactive Student'}
             </span>
             <span className="rounded-full bg-[#eef6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#006496] shadow-sm">
@@ -162,17 +162,17 @@ export default function StudentEditorModal({ student, onClose, onSave }: Student
             </section>
           </div>
 
-          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#ece4f4] pt-5 sm:flex-row sm:justify-end">
+          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#E1E6EE] pt-5 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-2xl border border-[#e2d9ed] bg-[#f7f2fb] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#eadff4]"
+              className="rounded-2xl border border-[#E1E6EE] bg-[#F6F8FB] px-5 py-3 text-[14px] font-bold text-[#4B5563] transition-all hover:bg-[#F6F8FB]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-2xl bg-[#6a5182] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.22)] transition-all hover:bg-[#5b4471]"
+              className="rounded-2xl bg-[#3E4FFF] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(62,79,255,0.22)] transition-all hover:bg-[#5F73F5]"
             >
               Save Student Changes
             </button>

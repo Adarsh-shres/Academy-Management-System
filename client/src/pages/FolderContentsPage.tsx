@@ -110,7 +110,7 @@ export default function FolderContentsPage() {
   }
 
   if (error) {
-    return <div className="flex h-[300px] items-center justify-center text-[#4b3f68] font-semibold">{error}</div>;
+    return <div className="flex h-[300px] items-center justify-center text-[#232529] font-semibold">{error}</div>;
   }
 
   return (
@@ -118,7 +118,7 @@ export default function FolderContentsPage() {
       <div className="flex flex-col gap-4">
         <Link
           to={`/student/courses/${courseId}/folders`}
-          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#7c8697] hover:text-[#4b3f68] transition-colors w-fit"
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#7c8697] hover:text-[#232529] transition-colors w-fit"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -127,7 +127,7 @@ export default function FolderContentsPage() {
         </Link>
 
         <div>
-          <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#4b3f68] tracking-tight flex items-center gap-3">
+          <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#232529] tracking-tight flex items-center gap-3">
             <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
@@ -137,28 +137,28 @@ export default function FolderContentsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] overflow-hidden">
+      <div className="bg-white rounded-[10px] border border-[#E1E6EE] shadow-[0_2px_12px_rgba(36,37,41,0.04)] overflow-hidden">
         {materials.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center">
-            <svg className="w-16 h-16 text-[#e2d9ed] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-16 h-16 text-[#E1E6EE] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <h3 className="text-[16px] font-bold text-[#4b3f68] mb-1">This folder is empty</h3>
+            <h3 className="text-[16px] font-bold text-[#232529] mb-1">This folder is empty</h3>
             <p className="text-[#7c8697] font-medium text-[13px]">No study materials have been uploaded here yet.</p>
           </div>
         ) : (
-          <div className="divide-y divide-[#f3eff7]">
+          <div className="divide-y divide-[#F6F8FB]">
             {materials.map((material) => (
               <div key={material.id} className="px-6 py-5 hover:bg-[#fcfbfc] transition-colors">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div className="flex items-start gap-4 min-w-0">
-                    <div className="p-2 bg-white rounded-[8px] border border-[#e7dff0] shadow-sm shrink-0">
+                    <div className="p-2 bg-white rounded-[8px] border border-[#E1E6EE] shadow-sm shrink-0">
                       {getFileIcon(material.fileName)}
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-[14px] font-semibold text-[#4b3f68]">{material.title}</h3>
-                        <span className="text-[10px] font-bold uppercase tracking-wider border rounded-[6px] px-2 py-0.5 bg-[#f3eff7] text-primary border-[#e7dff0]">{material.type}</span>
+                        <h3 className="text-[14px] font-semibold text-[#232529]">{material.title}</h3>
+                        <span className="text-[10px] font-bold uppercase tracking-wider border rounded-[6px] px-2 py-0.5 bg-[#F6F8FB] text-primary border-[#E1E6EE]">{material.type}</span>
                       </div>
                       {material.description && <p className="text-[13px] text-[#64748b] mt-2 leading-relaxed">{material.description}</p>}
                       {material.fileName && <p className="text-[12px] text-[#0284c7] font-semibold mt-2 break-all">{material.fileName}</p>}

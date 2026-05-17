@@ -223,7 +223,7 @@ export default function StudentDetailsPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e2d9ed] bg-[#f3eff7] text-[#6a5182] transition-colors hover:bg-[#6a5182] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#E1E6EE] bg-[#F6F8FB] text-[#4B5563] transition-colors hover:bg-[#3E4FFF] hover:text-white"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="19" y1="12" x2="5" y2="12" />
@@ -242,7 +242,7 @@ export default function StudentDetailsPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e2d9ed] bg-[#f3eff7] text-[#6a5182] transition-colors hover:bg-[#6a5182] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#E1E6EE] bg-[#F6F8FB] text-[#4B5563] transition-colors hover:bg-[#3E4FFF] hover:text-white"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12" />
@@ -260,7 +260,7 @@ export default function StudentDetailsPage() {
         <div className="mt-2 flex shrink-0 items-center gap-2 sm:mt-0">
           <button
             onClick={() => setEditingStudent({ ...student })}
-            className="flex items-center gap-2 rounded-sm bg-[#6a5182] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm transition-all hover:-translate-y-px hover:bg-[#5b4471] hover:shadow"
+            className="flex items-center gap-2 rounded-sm bg-[#3E4FFF] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm transition-all hover:-translate-y-px hover:bg-[#5F73F5] hover:shadow"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -292,8 +292,8 @@ export default function StudentDetailsPage() {
             type="button"
             onClick={() => setActiveTab(tab.id as StudentDetailTab)}
             className={`px-5 py-3 text-[13.5px] font-bold transition-colors border-b-2 cursor-pointer ${activeTab === tab.id
-              ? 'border-[#6a5182] text-[#6a5182]'
-              : 'border-transparent text-[#64748b] hover:text-[#4b3f68]'
+              ? 'border-[#CCD4E0] text-[#4B5563]'
+              : 'border-transparent text-[#64748b] hover:text-[#232529]'
               }`}
           >
             {tab.label}
@@ -353,9 +353,9 @@ export default function StudentDetailsPage() {
 
       {activeTab === 'assignments' && (
         <div className="rounded-sm border border-[#e2e8f0] bg-white shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
+          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <h2 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Assignments</h2>
+              <h2 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Assignments</h2>
               <p className="text-[12.5px] text-[#64748b] mt-1">Submitted and pending assignment records for this student.</p>
             </div>
             <span className="rounded-sm bg-white border border-[#e2e8f0] px-3 py-2 text-[12px] font-bold text-[#64748b]">
@@ -385,7 +385,7 @@ export default function StudentDetailsPage() {
                       <td className="py-4 px-6 text-[13px] text-[#64748b]">{assignment.courseName}</td>
                       <td className="py-4 px-6 text-[13px] text-[#64748b]">{assignment.dueDate}</td>
                       <td className="py-4 px-6">
-                        <span className="rounded-sm bg-[#f3eff7] px-2.5 py-1 text-[11px] font-bold uppercase text-[#6a5182]">
+                        <span className="rounded-sm bg-[#F6F8FB] px-2.5 py-1 text-[11px] font-bold uppercase text-[#4B5563]">
                           {assignment.status}
                         </span>
                       </td>
@@ -410,7 +410,7 @@ export default function StudentDetailsPage() {
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
-              className="bg-white border border-[#e2e8f0] rounded-sm px-4 py-2.5 text-[13px] font-semibold text-[#4b3f68] outline-none focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all cursor-pointer min-w-[220px]"
+              className="bg-white border border-[#e2e8f0] rounded-sm px-4 py-2.5 text-[13px] font-semibold text-[#232529] outline-none focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all cursor-pointer min-w-[220px]"
             >
               <option value="all">All Subjects</option>
               {courseOptions.map((name) => (
@@ -427,9 +427,9 @@ export default function StudentDetailsPage() {
           </div>
 
           <div className="rounded-sm border border-[#e2e8f0] bg-white shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
+            <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h2 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Attendance</h2>
+                <h2 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Attendance</h2>
                 <p className="text-[12.5px] text-[#64748b] mt-1">Attendance records across this student's courses.</p>
               </div>
               <span className="rounded-sm bg-white border border-[#e2e8f0] px-3 py-2 text-[12px] font-bold text-[#64748b]">
@@ -530,7 +530,7 @@ function SummaryPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-sm border border-[#e2e8f0] bg-white px-5 py-4 shadow-sm">
       <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">{label}</p>
-      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#6a5182]">{value}</p>
+      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#4B5563]">{value}</p>
     </div>
   );
 }
@@ -538,7 +538,7 @@ function SummaryPill({ label, value }: { label: string; value: string }) {
 function EmptyTab({ title, message }: { title: string; message: string }) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#f3eff7] text-[#6a5182]">
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#F6F8FB] text-[#4B5563]">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
           <path d="M14 2v6h6" />
@@ -546,7 +546,7 @@ function EmptyTab({ title, message }: { title: string; message: string }) {
           <path d="M16 17H8" />
         </svg>
       </div>
-      <h3 className="mb-1 text-[18px] font-bold text-[#4b3f68]">{title}</h3>
+      <h3 className="mb-1 text-[18px] font-bold text-[#232529]">{title}</h3>
       <p className="max-w-md text-[14px] text-[#64748b]">{message}</p>
     </div>
   );

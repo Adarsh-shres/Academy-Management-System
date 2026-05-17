@@ -106,7 +106,7 @@ export default function BatchClassesPage() {
   if (loading || isLoadingClasses) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading batch classes...</p>
       </div>
     );
@@ -116,7 +116,7 @@ export default function BatchClassesPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <p className="text-[14px] text-[#ef4444] font-semibold">Batch not found</p>
-        <button onClick={() => navigate('/classes')} className="mt-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer">
+        <button onClick={() => navigate('/classes')} className="mt-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer">
           Back to Classes
         </button>
       </div>
@@ -127,14 +127,14 @@ export default function BatchClassesPage() {
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
         <div>
-          <button onClick={() => navigate('/classes')} className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#6a5182] hover:text-[#4b3f68] mb-3 cursor-pointer">
+          <button onClick={() => navigate('/classes')} className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#4B5563] hover:text-[#232529] mb-3 cursor-pointer">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
             Back to Classes
           </button>
           <h1 className="text-[28px] font-extrabold text-[#0d3349] tracking-tight">{batch.name}</h1>
           <p className="text-[14px] text-[#64748b] mt-1">{batch.code} | {batchStudents.length} students in this batch roster</p>
         </div>
-        <button onClick={() => navigate(`/classes/${batch.id}/new`)} className="inline-flex items-center justify-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-bold px-5 py-2.5 rounded-sm transition-all cursor-pointer">
+        <button onClick={() => navigate(`/classes/${batch.id}/new`)} className="inline-flex items-center justify-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-bold px-5 py-2.5 rounded-sm transition-all cursor-pointer">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14" /><path d="M5 12h14" /></svg>
           Create Class
         </button>
@@ -148,8 +148,8 @@ export default function BatchClassesPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-[380px_1fr] gap-6">
         <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe]">
-            <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Students In Batch</h2>
+          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB]">
+            <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Students In Batch</h2>
           </div>
           <div className="max-h-[560px] overflow-y-auto divide-y divide-[#edf2f7]">
             {batchStudents.length > 0 ? (
@@ -169,9 +169,9 @@ export default function BatchClassesPage() {
         </section>
 
         <section className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
+          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <h2 className="text-[#4b3f68] font-bold text-[13px] uppercase tracking-wide">Classes For This Batch</h2>
+              <h2 className="text-[#232529] font-bold text-[13px] uppercase tracking-wide">Classes For This Batch</h2>
               <p className="text-[12.5px] text-[#64748b] mt-1">Class rosters are selected from this batch.</p>
             </div>
             <span className="rounded-sm bg-white border border-[#e2e8f0] px-3 py-2 text-[12px] font-bold text-[#64748b]">
@@ -203,11 +203,11 @@ export default function BatchClassesPage() {
                         <td className="py-4 px-6 text-[13px] text-[#64748b]">{batchCourses.length} inherited</td>
                         <td className="py-4 px-6 text-[13px] text-[#64748b]">{assignedTeacherNames.length > 0 ? assignedTeacherNames.join(', ') : 'Unassigned'}</td>
                         <td className="py-4 px-6">
-                          <span className="inline-flex rounded-sm bg-[#f3eff7] px-2.5 py-1 text-[12px] font-bold text-[#6a5182]">{classRow.student_ids?.length ?? 0}</span>
+                          <span className="inline-flex rounded-sm bg-[#F6F8FB] px-2.5 py-1 text-[12px] font-bold text-[#4B5563]">{classRow.student_ids?.length ?? 0}</span>
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-3">
-                            <button type="button" onClick={() => navigate(`/classes/${batch.id}/${classRow.id}/edit`)} className="text-[13px] font-bold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer">
+                            <button type="button" onClick={() => navigate(`/classes/${batch.id}/${classRow.id}/edit`)} className="text-[13px] font-bold text-[#4B5563] hover:text-[#232529] cursor-pointer">
                               Edit
                             </button>
                             <button type="button" onClick={() => void handleDeleteClass(classRow)} className="text-[13px] font-bold text-[#dc2626] hover:text-[#991b1b] cursor-pointer">
@@ -223,9 +223,9 @@ export default function BatchClassesPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-              <h3 className="text-[18px] font-bold text-[#4b3f68] mb-1">No Classes Created</h3>
+              <h3 className="text-[18px] font-bold text-[#232529] mb-1">No Classes Created</h3>
               <p className="text-[14px] text-[#64748b] max-w-md mb-4">Create the first class for this batch using selected students from its roster.</p>
-              <button onClick={() => navigate(`/classes/${batch.id}/new`)} className="bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
+              <button onClick={() => navigate(`/classes/${batch.id}/new`)} className="bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer">
                 Create First Class
               </button>
             </div>

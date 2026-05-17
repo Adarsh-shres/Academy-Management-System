@@ -69,7 +69,7 @@ export default function ConfirmActionModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-2xl border border-[#e6d9e2] bg-[#f8f3f8] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#efe6f4]"
+              className="rounded-2xl border border-[#e6d9e2] bg-[#f8f3f8] px-5 py-3 text-[14px] font-bold text-[#4B5563] transition-all hover:bg-[#efe6f4]"
             >
               Cancel
             </button>

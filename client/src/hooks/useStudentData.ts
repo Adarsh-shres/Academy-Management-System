@@ -93,7 +93,7 @@ export function useStudentData() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const uiColors = ['#6a5182', '#8b6ca8', '#4b3f68', '#b096cc', '#778196'];
+  const uiColors = ['#3E4FFF', '#5F73F5', '#232529', '#B7C0CB', '#778196'];
 
   const fetchData = async () => {
     if (!user) {

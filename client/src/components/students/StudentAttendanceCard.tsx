@@ -18,32 +18,32 @@ export default function StudentAttendanceCard({ course, classData }: StudentAtte
   const absentClasses = classData ? classData.absentCount : (totalClasses - attendedClasses);
 
   const getStatusLabel = (pct: number) => {
-    if (pct >= 90) return { label: "Good Standing", cls: "text-primary bg-[#f3eff7] border-[#e7dff0]" };
-    if (pct >= 80) return { label: "Satisfactory", cls: "text-[#4b3f68] bg-[#faf8fc] border-[#e2d9ed]" };
+    if (pct >= 90) return { label: "Good Standing", cls: "text-primary bg-[#F6F8FB] border-[#E1E6EE]" };
+    if (pct >= 80) return { label: "Satisfactory", cls: "text-[#232529] bg-[#faf8fc] border-[#E1E6EE]" };
     return { label: "At Risk", cls: "text-[#64748b] bg-[#f8fafc] border-[#cbd5e1]" };
   };
 
   const status = getStatusLabel(attendance);
 
   const getBarColor = (pct: number) => {
-    if (pct >= 90) return "#6a5182";
-    if (pct >= 80) return "#8b6ca8";
-    return "#4b3f68";
+    if (pct >= 90) return "#3E4FFF";
+    if (pct >= 80) return "#5F73F5";
+    return "#232529";
   };
 
   return (
-    <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] p-5 hover:shadow-[0_8px_24px_rgba(57,31,86,0.08)] transition-all duration-200">
+    <div className="bg-white rounded-[10px] border border-[#E1E6EE] shadow-[0_2px_12px_rgba(36,37,41,0.04)] p-5 hover:shadow-[0_8px_24px_rgba(36,37,41,0.08)] transition-all duration-200">
       <div className="flex items-start justify-between mb-6">
         <div className="flex-1 pr-3">
-          <span className="inline-block text-[10.5px] font-semibold px-2 py-0.5 rounded-[6px] text-primary bg-[#f3eff7] uppercase tracking-wide mb-1.5">{code}</span>
-          <h3 className="font-sans text-[16px] font-semibold text-[#4b3f68] leading-tight tracking-tight mb-1">{name}</h3>
+          <span className="inline-block text-[10.5px] font-semibold px-2 py-0.5 rounded-[6px] text-primary bg-[#F6F8FB] uppercase tracking-wide mb-1.5">{code}</span>
+          <h3 className="font-sans text-[16px] font-semibold text-[#232529] leading-tight tracking-tight mb-1">{name}</h3>
           <p className="text-[13px] text-[#7c8697] font-medium">{instructor}</p>
           {classData && (
-            <p className="text-[12px] text-[#b096cc] font-medium mt-0.5">{classData.className}</p>
+            <p className="text-[12px] text-[#B7C0CB] font-medium mt-0.5">{classData.className}</p>
           )}
         </div>
         <div className="text-right flex flex-col items-end">
-          <div className="font-sans text-[24px] font-bold text-[#4b3f68] leading-none mb-2 mt-1">
+          <div className="font-sans text-[24px] font-bold text-[#232529] leading-none mb-2 mt-1">
             {attendance}<span className="text-[13px] font-medium text-[#778196] ml-[2px]">%</span>
           </div>
           <span className={`text-[10px] font-semibold px-2 py-[3px] rounded-full uppercase border tracking-wide ${status.cls}`}>
@@ -64,13 +64,13 @@ export default function StudentAttendanceCard({ course, classData }: StudentAtte
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="text-center py-3 bg-[#faf8fc] rounded-[8px] border border-[#e7dff0]">
-          <p className="font-sans text-[18px] font-bold text-[#4b3f68] leading-none mb-1.5">{totalClasses}</p>
+        <div className="text-center py-3 bg-[#faf8fc] rounded-[8px] border border-[#E1E6EE]">
+          <p className="font-sans text-[18px] font-bold text-[#232529] leading-none mb-1.5">{totalClasses}</p>
           <p className="text-[11px] font-semibold text-[#778196] uppercase tracking-wider">Total</p>
         </div>
-        <div className="text-center py-3 bg-[#fbf8fe] rounded-[8px] border border-[#e2d9ed]">
+        <div className="text-center py-3 bg-[#F6F8FB] rounded-[8px] border border-[#E1E6EE]">
           <p className="font-sans text-[18px] font-bold text-primary leading-none mb-1.5">{attendedClasses}</p>
-          <p className="text-[11px] font-semibold text-[#6a5182] uppercase tracking-wider">Present</p>
+          <p className="text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Present</p>
         </div>
         <div className="text-center py-3 bg-[#f8fafc] rounded-[8px] border border-[#cbd5e1]">
           <p className="font-sans text-[18px] font-bold text-[#475569] leading-none mb-1.5">{absentClasses}</p>

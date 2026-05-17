@@ -17,11 +17,11 @@ const STATUS_STYLES: Record<TeacherStatus, { bg: string; text: string }> = {
 const DEPARTMENT_OPTIONS = ['CSE', 'IT', 'ECE', 'Civil', 'Mech'] as const;
 
 const AVATAR_TILES = [
-  'bg-[#6a5182]',
-  'bg-[#8b6ca8]',
-  'bg-[#4b3f68]',
+  'bg-[#3E4FFF]',
+  'bg-[#5F73F5]',
+  'bg-[#232529]',
   'bg-[#7b6591]',
-  'bg-[#5b4471]',
+  'bg-[#5F73F5]',
   'bg-[#8f77a9]',
 ];
 
@@ -197,7 +197,7 @@ export default function TeachersPage() {
           <div className="flex items-center gap-4 animate-fade-up" style={{ animationDelay: '0ms' }}>
             <button
               onClick={() => setSelectedTeacher(null)}
-              className="w-10 h-10 flex items-center justify-center bg-[#f3eff7] border border-[#e2d9ed] rounded-sm hover:bg-[#6a5182] hover:text-white transition-colors text-[#6a5182] cursor-pointer shadow-sm"
+              className="w-10 h-10 flex items-center justify-center bg-[#F6F8FB] border border-[#E1E6EE] rounded-sm hover:bg-[#3E4FFF] hover:text-white transition-colors text-[#4B5563] cursor-pointer shadow-sm"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12" />
@@ -230,7 +230,7 @@ export default function TeachersPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={openEditModal}
-                      className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
+                      className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -290,7 +290,7 @@ export default function TeachersPage() {
             </div>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
+              className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm hover:shadow hover:-translate-y-px cursor-pointer shrink-0"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -301,12 +301,12 @@ export default function TeachersPage() {
           </div>
 
           <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden animate-fade-up">
-            <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#fbf8fe]">
-              <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Faculty Members</h3>
+            <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#F6F8FB]">
+              <h3 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Faculty Members</h3>
 
               <div className="flex items-center gap-3 ml-auto flex-wrap">
                 <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6a5182] opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#4B5563] opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.3-4.3" />
                   </svg>
@@ -314,7 +314,7 @@ export default function TeachersPage() {
                     value={teacherSearch}
                     onChange={(event) => setTeacherSearch(event.target.value)}
                     placeholder="Search faculty..."
-                    className="pl-9 pr-4 py-2 border border-[#e2d9ed] rounded-sm text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-[#6a5182]/15 bg-[#f3eff7] w-[220px] transition-all placeholder:text-[#8b7aa0] text-[#4b3f68]"
+                    className="pl-9 pr-4 py-2 border border-[#E1E6EE] rounded-sm text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-[#CCD4E0]/15 bg-[#F6F8FB] w-[220px] transition-all placeholder:text-[#667086] text-[#232529]"
                   />
                 </div>
 
@@ -342,7 +342,7 @@ export default function TeachersPage() {
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-[14px] font-bold text-[#0d3349] leading-tight truncate tracking-tight">{teacher.name}</span>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider bg-[#efe7f8] text-[#6a5182]">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider bg-[#F6F8FB] text-[#4B5563]">
                           teacher
                         </span>
                       </div>
@@ -350,7 +350,7 @@ export default function TeachersPage() {
                     </div>
 
                     <div className="ml-auto hidden md:block">
-                      <div className="px-3.5 py-1.5 rounded-sm bg-[#f3eff7] text-[#6a5182] text-[11.5px] font-bold tracking-tight border border-[#e2d9ed]">
+                      <div className="px-3.5 py-1.5 rounded-sm bg-[#F6F8FB] text-[#4B5563] text-[11.5px] font-bold tracking-tight border border-[#E1E6EE]">
                         {teacher.department}
                       </div>
                     </div>
@@ -361,7 +361,7 @@ export default function TeachersPage() {
                       </div>
                     </div>
 
-                    <div className="ml-6 flex items-center justify-end w-12 flex-shrink-0 text-[#c4b6d4] group-hover:text-[#6a5182] transition-colors">
+                    <div className="ml-6 flex items-center justify-end w-12 flex-shrink-0 text-[#B7C0CB] group-hover:text-[#4B5563] transition-colors">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <polyline points="9 18 15 12 9 6" />
                       </svg>
@@ -377,14 +377,14 @@ export default function TeachersPage() {
       {isAddModalOpen && (
         <AppModal onClose={() => { setIsAddModalOpen(false); resetAddForm(); }} widthClass="max-w-4xl">
           <div className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-[0_28px_70px_rgba(15,23,42,0.14)]">
-            <div className="border-b border-[#e7dff0] bg-[#fbf8fe] px-6 py-6 md:px-8">
+            <div className="border-b border-[#E1E6EE] bg-[#F6F8FB] px-6 py-6 md:px-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Faculty Provisioning</p>
                   <h3 className="mt-2 text-[24px] font-extrabold tracking-tight text-[#0d3349]">Create Teacher Account</h3>
                   <p className="mt-1 text-[13px] text-[#64748b]">Provision a faculty login and capture the teaching identity details in one clean flow.</p>
                 </div>
-                <button onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="rounded-sm border border-[#ddd2ea] bg-white p-2 text-[#6a5182] transition-colors hover:bg-[#f4ecfb]">
+                <button onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="rounded-sm border border-[#E1E6EE] bg-white p-2 text-[#4B5563] transition-colors hover:bg-[#F6F8FB]">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                     <path d="M18 6 6 18M6 6l12 12" />
                   </svg>
@@ -444,11 +444,11 @@ export default function TeachersPage() {
                 </section>
               </div>
 
-              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#ece4f4] pt-5 sm:flex-row sm:justify-end">
-                <button type="button" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="rounded-2xl border border-[#e2d9ed] bg-[#f7f2fb] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#eadff4]">
+              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#E1E6EE] pt-5 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => { setIsAddModalOpen(false); resetAddForm(); }} className="rounded-2xl border border-[#E1E6EE] bg-[#F6F8FB] px-5 py-3 text-[14px] font-bold text-[#4B5563] transition-all hover:bg-[#F6F8FB]">
                   Cancel
                 </button>
-                <button type="submit" disabled={isCreatingTeacher} className="rounded-2xl bg-[#6a5182] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.22)] transition-all hover:bg-[#5b4471] disabled:cursor-not-allowed disabled:opacity-60">
+                <button type="submit" disabled={isCreatingTeacher} className="rounded-2xl bg-[#3E4FFF] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(62,79,255,0.22)] transition-all hover:bg-[#5F73F5] disabled:cursor-not-allowed disabled:opacity-60">
                   {isCreatingTeacher ? 'Creating...' : 'Create Teacher Account'}
                 </button>
               </div>
@@ -460,21 +460,21 @@ export default function TeachersPage() {
       {isEditModalOpen && (
         <AppModal onClose={() => setIsEditModalOpen(false)} widthClass="max-w-3xl">
           <div className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-[0_28px_70px_rgba(15,23,42,0.14)]">
-            <div className="border-b border-[#ece4f4] bg-[#fbf8fe] px-6 py-6 md:px-8">
+            <div className="border-b border-[#E1E6EE] bg-[#F6F8FB] px-6 py-6 md:px-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#7b6591]">Faculty Editor</p>
                   <h3 className="mt-2 text-[24px] font-extrabold tracking-tight text-[#0d3349]">Edit Teacher Profile</h3>
                   <p className="mt-1 text-[13px] text-[#64748b]">Adjust the visible faculty card details for this teacher profile.</p>
                 </div>
-                <button onClick={() => setIsEditModalOpen(false)} className="rounded-sm border border-[#ddd2ea] bg-white p-2 text-[#6a5182] transition-colors hover:bg-[#f4ecfb]">
+                <button onClick={() => setIsEditModalOpen(false)} className="rounded-sm border border-[#E1E6EE] bg-white p-2 text-[#4B5563] transition-colors hover:bg-[#F6F8FB]">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                     <path d="M18 6 6 18M6 6l12 12" />
                   </svg>
                 </button>
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
-                <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a5182] shadow-sm">
+                <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#4B5563] shadow-sm">
                   {editStatus}
                 </span>
                 <span className="rounded-full bg-[#eef6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#006496] shadow-sm">
@@ -500,11 +500,11 @@ export default function TeachersPage() {
                 </TeacherField>
               </div>
 
-              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#ece4f4] pt-5 sm:flex-row sm:justify-end">
-                <button type="button" onClick={() => setIsEditModalOpen(false)} className="rounded-2xl border border-[#e2d9ed] bg-[#f7f2fb] px-5 py-3 text-[14px] font-bold text-[#6a5182] transition-all hover:bg-[#eadff4]">
+              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#E1E6EE] pt-5 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="rounded-2xl border border-[#E1E6EE] bg-[#F6F8FB] px-5 py-3 text-[14px] font-bold text-[#4B5563] transition-all hover:bg-[#F6F8FB]">
                   Cancel
                 </button>
-                <button type="submit" className="rounded-2xl bg-[#6a5182] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(106,81,130,0.22)] transition-all hover:bg-[#5b4471]">
+                <button type="submit" className="rounded-2xl bg-[#3E4FFF] px-6 py-3 text-[14px] font-bold text-white shadow-[0_16px_30px_rgba(62,79,255,0.22)] transition-all hover:bg-[#5F73F5]">
                   Save Teacher Changes
                 </button>
               </div>
@@ -570,7 +570,7 @@ function TeacherInput({
       placeholder={placeholder}
       required={required}
       minLength={minLength}
-      className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10"
+      className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#CCD4E0] focus:ring-4 focus:ring-[#CCD4E0]/10"
     />
   );
 }
@@ -581,7 +581,7 @@ function TeacherDepartmentSelect({ value, onChange }: { value: string; onChange:
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#6a5182] focus:ring-4 focus:ring-[#6a5182]/10"
+      className="w-full rounded-2xl border border-[#dbe4f0] bg-[#fbfdff] px-4 py-3 text-[14px] text-[#1e293b] outline-none transition-all focus:border-[#CCD4E0] focus:ring-4 focus:ring-[#CCD4E0]/10"
     >
       {DEPARTMENT_OPTIONS.map((department) => (
         <option key={department} value={department}>
@@ -614,7 +614,7 @@ function TeacherStatusPicker({
             onClick={() => onChange(status)}
             className={`rounded-2xl border px-4 py-3 text-[13px] font-bold transition-all ${
               isSelected
-                ? 'border-[#6a5182] bg-[#f6f0fb] text-[#6a5182] shadow-sm'
+                ? 'border-[#CCD4E0] bg-[#F6F8FB] text-[#4B5563] shadow-sm'
                 : 'border-[#dbe4f0] bg-[#fbfdff] text-[#475569] hover:border-[#c7b5db] hover:bg-[#faf7fd]'
             }`}
           >

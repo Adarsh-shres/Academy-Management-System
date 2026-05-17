@@ -156,7 +156,7 @@ export default function CoursesPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading courses...</p>
       </div>
     );
@@ -181,7 +181,7 @@ export default function CoursesPage() {
           </div>
           <button
             onClick={() => setIsNewCourseModalOpen(true)}
-            className="flex items-center gap-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
+            className="flex items-center gap-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-sm transition-all shadow-sm cursor-pointer"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
             New Course
@@ -210,18 +210,18 @@ export default function CoursesPage() {
         </div>
 
         <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden flex flex-col animate-fade-up">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#fbf8fe]">
-            <h3 className="text-[#4b3f68] font-bold text-[14px] uppercase tracking-wide">Course Directory</h3>
+          <div className="px-5 py-4 border-b border-[#e2e8f0] flex items-center justify-between flex-wrap gap-4 bg-[#F6F8FB]">
+            <h3 className="text-[#232529] font-bold text-[14px] uppercase tracking-wide">Course Directory</h3>
             <div className="flex items-center gap-3 ml-auto flex-wrap">
               <button
                 onClick={() => setFilterStatus(filterStatus === 'All' ? 'Active' : 'All')}
-                className="bg-[#f3eff7] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]"
+                className="bg-[#F6F8FB] hover:bg-[#3E4FFF] hover:text-white text-[#4B5563] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#E1E6EE]"
               >
                 {filterStatus === 'All' ? 'Show Active' : 'Show All'}
               </button>
               <button
                 onClick={handleExportCSV}
-                className="bg-[#f3eff7] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#e2d9ed]"
+                className="bg-[#F6F8FB] hover:bg-[#3E4FFF] hover:text-white text-[#4B5563] text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer border border-[#E1E6EE]"
               >
                 Export CSV
               </button>
@@ -258,7 +258,7 @@ export default function CoursesPage() {
                       </td>
                       <td className="py-3 px-6 text-right">
                         <div className="flex items-center justify-end gap-3 text-[#94a3b8]">
-                          <button onClick={() => setEditingCourse({ ...course })} className="hover:text-[#6a5182] transition-colors cursor-pointer" title="Edit">
+                          <button onClick={() => setEditingCourse({ ...course })} className="hover:text-[#4B5563] transition-colors cursor-pointer" title="Edit">
                             Edit
                           </button>
                           <button onClick={() => handleDelete(course.id)} className="hover:text-[#ef4444] transition-colors cursor-pointer" title="Delete">
@@ -289,10 +289,10 @@ export default function CoursesPage() {
             <form className="flex flex-col gap-4" onSubmit={(event) => { event.preventDefault(); handleSaveEdit(); }}>
               <CourseFields course={editingCourse} onChange={setEditingCourse} teachers={teachers} readOnlyCode />
               <div className="flex gap-3 mt-4">
-                <button type="button" onClick={() => setEditingCourse(null)} className="flex-1 py-2.5 rounded-sm text-[13.5px] font-bold text-[#6a5182] bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white transition-all cursor-pointer">
+                <button type="button" onClick={() => setEditingCourse(null)} className="flex-1 py-2.5 rounded-sm text-[13.5px] font-bold text-[#4B5563] bg-[#F6F8FB] border border-[#E1E6EE] hover:bg-[#3E4FFF] hover:text-white transition-all cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="flex-[2] py-2.5 rounded-sm text-[13.5px] font-bold bg-[#6a5182] text-white hover:bg-[#5b4471] shadow-md transition-all cursor-pointer disabled:opacity-60">
+                <button type="submit" disabled={saving} className="flex-[2] py-2.5 rounded-sm text-[13.5px] font-bold bg-[#3E4FFF] text-white hover:bg-[#5F73F5] shadow-md transition-all cursor-pointer disabled:opacity-60">
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
@@ -316,11 +316,11 @@ export default function CoursesPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Course Name</label>
-                <input value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="e.g. Advanced Machine Learning" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 text-[#1e293b]" />
+                <input value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="e.g. Advanced Machine Learning" className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#CCD4E0]/20 text-[#1e293b]" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Department</label>
-                <select value={newDepartment} onChange={(event) => setNewDepartment(event.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 text-[#1e293b]">
+                <select value={newDepartment} onChange={(event) => setNewDepartment(event.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#CCD4E0]/20 text-[#1e293b]">
                   <option value="">Select department</option>
                   {DEPARTMENT_OPTIONS.map((department) => (
                     <option key={department} value={department}>{department}</option>
@@ -329,17 +329,17 @@ export default function CoursesPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Faculty Lead</label>
-                <TeacherSelect value={newFaculty} onChange={setNewFaculty} teachers={teachers} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 text-[#1e293b]" />
+                <TeacherSelect value={newFaculty} onChange={setNewFaculty} teachers={teachers} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#CCD4E0]/20 text-[#1e293b]" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Description</label>
-                <textarea rows={4} value={newDescription} onChange={(event) => setNewDescription(event.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#6a5182]/20 text-[#1e293b] resize-none" />
+                <textarea rows={4} value={newDescription} onChange={(event) => setNewDescription(event.target.value)} className="bg-[#e2e8f0]/40 border-0 rounded-sm px-4 py-3 text-[14px] w-full outline-none focus:ring-2 focus:ring-[#CCD4E0]/20 text-[#1e293b] resize-none" />
               </div>
               <div className="flex gap-3 mt-4">
-                <button type="button" onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }} className="flex-1 bg-[#f3eff7] border border-[#e2d9ed] hover:bg-[#6a5182] hover:text-white text-[#6a5182] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all w-full cursor-pointer">
+                <button type="button" onClick={() => { setIsNewCourseModalOpen(false); resetNewCourseForm(); }} className="flex-1 bg-[#F6F8FB] border border-[#E1E6EE] hover:bg-[#3E4FFF] hover:text-white text-[#4B5563] text-[14px] font-semibold px-6 py-3 rounded-sm transition-all w-full cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="flex-[2] bg-[#6a5182] hover:bg-[#5b4471] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm w-full cursor-pointer disabled:opacity-60">
+                <button type="submit" disabled={saving} className="flex-[2] bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[14px] font-semibold px-6 py-3 rounded-sm transition-all shadow-sm w-full cursor-pointer disabled:opacity-60">
                   {saving ? 'Creating...' : 'Create Course'}
                 </button>
               </div>
@@ -379,10 +379,10 @@ function CourseFields({
       <div className="flex flex-col gap-1.5">
         <label className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider">Status</label>
         <div className="flex bg-[#f8fafc] rounded-lg p-1 gap-1 border border-[#cbd5e1] w-full">
-          <button type="button" onClick={() => onChange({ ...course, status: 'Active' })} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${course.status === 'Active' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68]'}`}>
+          <button type="button" onClick={() => onChange({ ...course, status: 'Active' })} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${course.status === 'Active' ? 'bg-white font-semibold text-[#4B5563] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#232529]'}`}>
             Active
           </button>
-          <button type="button" onClick={() => onChange({ ...course, status: 'Inactive' })} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${course.status === 'Inactive' ? 'bg-white font-semibold text-[#6a5182] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#4b3f68]'}`}>
+          <button type="button" onClick={() => onChange({ ...course, status: 'Inactive' })} className={`flex-1 rounded-sm py-1.5 text-[13px] transition-all cursor-pointer ${course.status === 'Inactive' ? 'bg-white font-semibold text-[#4B5563] shadow-sm border border-[#e2e8f0]' : 'font-medium text-[#64748b] hover:text-[#232529]'}`}>
             Inactive
           </button>
         </div>

@@ -497,7 +497,7 @@ export default function ScheduleClassDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#E1E6EE] border-t-[#3E4FFF] rounded-full animate-spin"></div>
         <p className="text-[14px] text-[#64748b] font-medium">Loading schedule...</p>
       </div>
     );
@@ -510,7 +510,7 @@ export default function ScheduleClassDetailPage() {
         <p className="text-[13px] text-[#64748b] max-w-md text-center">{error || 'The selected class could not be found.'}</p>
         <button
           onClick={() => navigate('/schedule')}
-          className="mt-2 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer"
+          className="mt-2 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13px] font-semibold px-4 py-2 rounded-sm transition-all cursor-pointer"
         >
           Back to Schedule
         </button>
@@ -532,7 +532,7 @@ export default function ScheduleClassDetailPage() {
   };
 
   const renderScheduleCard = (entry: ScheduleEntry) => (
-    <div key={entry.id} className="rounded-sm border border-[#e2d9ed] bg-white p-4">
+    <div key={entry.id} className="rounded-sm border border-[#E1E6EE] bg-white p-4">
       <div className="flex justify-between items-start gap-3">
         <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider bg-[#e0f2fe] text-[#0284c7]">
           {formatEntry(entry)}
@@ -541,7 +541,7 @@ export default function ScheduleClassDetailPage() {
           {courseClass.batches?.code || 'Batch'}
         </span>
       </div>
-      <h4 className="text-[15px] font-bold text-[#4b3f68] mt-3">{courseNameForEntry(entry)}</h4>
+      <h4 className="text-[15px] font-bold text-[#232529] mt-3">{courseNameForEntry(entry)}</h4>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-[#475569] mt-3">
         <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#94a3b8]" /> {entry.room || courseClass.room || 'Room not set'}</span>
         <span className="flex items-center gap-1.5"><Users size={14} className="text-[#94a3b8]" /> {teacherNameForEntry(entry)}</span>
@@ -568,7 +568,7 @@ export default function ScheduleClassDetailPage() {
           <div>
             <button
               onClick={() => navigate('/schedule')}
-              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#6a5182] hover:text-[#4b3f68] mb-3 cursor-pointer"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#4B5563] hover:text-[#232529] mb-3 cursor-pointer"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
               Back to Schedule
@@ -579,17 +579,17 @@ export default function ScheduleClassDetailPage() {
         </div>
 
         <div className="bg-white rounded-sm border border-[#e2e8f0] shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-center justify-between gap-3 flex-wrap">
+          <div className="px-5 py-4 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-center justify-between gap-3 flex-wrap">
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveTab('weekly')}
-                className={`px-4 py-2 rounded-sm text-[13px] font-bold border transition-colors cursor-pointer ${activeTab === 'weekly' ? 'bg-[#6a5182] border-[#6a5182] text-white' : 'bg-white border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7]'}`}
+                className={`px-4 py-2 rounded-sm text-[13px] font-bold border transition-colors cursor-pointer ${activeTab === 'weekly' ? 'bg-[#3E4FFF] border-[#CCD4E0] text-white' : 'bg-white border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB]'}`}
               >
                 Weekly Schedule
               </button>
               <button
                 onClick={() => setActiveTab('today')}
-                className={`px-4 py-2 rounded-sm text-[13px] font-bold border transition-colors cursor-pointer ${activeTab === 'today' ? 'bg-[#6a5182] border-[#6a5182] text-white' : 'bg-white border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7]'}`}
+                className={`px-4 py-2 rounded-sm text-[13px] font-bold border transition-colors cursor-pointer ${activeTab === 'today' ? 'bg-[#3E4FFF] border-[#CCD4E0] text-white' : 'bg-white border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB]'}`}
               >
                 Today Schedule
               </button>
@@ -597,7 +597,7 @@ export default function ScheduleClassDetailPage() {
             {activeTab === 'today' && (
               <button
                 onClick={openTodayEditor}
-                className="inline-flex items-center justify-center gap-2 bg-white border border-[#d8c8e9] hover:bg-[#f3eff7] text-[#6a5182] text-[13px] font-bold px-4 py-2 rounded-sm transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 bg-white border border-[#E1E6EE] hover:bg-[#F6F8FB] text-[#4B5563] text-[13px] font-bold px-4 py-2 rounded-sm transition-all cursor-pointer"
               >
                 Edit Today
               </button>
@@ -605,7 +605,7 @@ export default function ScheduleClassDetailPage() {
             {activeTab === 'weekly' && (
               <button
                 onClick={openWeeklyEditor}
-                className="inline-flex items-center justify-center gap-2 bg-white border border-[#d8c8e9] hover:bg-[#f3eff7] text-[#6a5182] text-[13px] font-bold px-4 py-2 rounded-sm transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 bg-white border border-[#E1E6EE] hover:bg-[#F6F8FB] text-[#4B5563] text-[13px] font-bold px-4 py-2 rounded-sm transition-all cursor-pointer"
               >
                 Edit Weekly
               </button>
@@ -624,13 +624,13 @@ export default function ScheduleClassDetailPage() {
                 const isToday = day === todayDay;
 
                 return (
-                  <div key={day} className={`grid grid-cols-1 lg:grid-cols-[170px_1fr] ${isToday ? 'bg-[#fbf8fe]' : 'bg-white'}`}>
+                  <div key={day} className={`grid grid-cols-1 lg:grid-cols-[170px_1fr] ${isToday ? 'bg-[#F6F8FB]' : 'bg-white'}`}>
                     <div className="p-5 border-b lg:border-b-0 lg:border-r border-[#edf2f7] flex lg:flex-col items-center lg:items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-[15px] font-extrabold text-[#4b3f68]">{day}</h3>
-                        {isToday && <p className="text-[11px] font-bold text-[#6a5182] mt-1 uppercase tracking-wide">Today</p>}
+                        <h3 className="text-[15px] font-extrabold text-[#232529]">{day}</h3>
+                        {isToday && <p className="text-[11px] font-bold text-[#4B5563] mt-1 uppercase tracking-wide">Today</p>}
                       </div>
-                      <span className="rounded-sm bg-white border border-[#e2d9ed] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
+                      <span className="rounded-sm bg-white border border-[#E1E6EE] px-2.5 py-1 text-[11px] font-bold text-[#64748b]">
                         {dayEntries.length}
                       </span>
                     </div>
@@ -658,7 +658,7 @@ export default function ScheduleClassDetailPage() {
               )}
               <div className="mb-5 rounded-sm border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                  <p className="text-[13px] font-extrabold text-[#4b3f68]">{todayDay} | {new Date(`${todayDate}T00:00:00`).toLocaleDateString()}</p>
+                  <p className="text-[13px] font-extrabold text-[#232529]">{todayDay} | {new Date(`${todayDate}T00:00:00`).toLocaleDateString()}</p>
                   <p className="text-[12px] text-[#64748b] mt-1">
                     {todayUsesOverride ? 'Today has an edited schedule override.' : 'Today is currently using the weekly schedule for this day.'}
                   </p>
@@ -681,7 +681,7 @@ export default function ScheduleClassDetailPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-16 px-4 bg-[#f8fafc] border border-dashed border-[#cbd5e1] rounded-sm text-center">
                   <Calendar size={42} className="text-[#cbd5e1] mb-4" />
-                  <h2 className="text-[18px] font-bold text-[#4b3f68] mb-1">No Schedule Today</h2>
+                  <h2 className="text-[18px] font-bold text-[#232529] mb-1">No Schedule Today</h2>
                   <p className="text-[14px] text-[#64748b] max-w-md">There is no weekly schedule for today. Use Edit Today to add a temporary schedule for today.</p>
                 </div>
               )}
@@ -693,7 +693,7 @@ export default function ScheduleClassDetailPage() {
       {isWeeklyEditorOpen && (
         <AppModal onClose={() => setIsWeeklyEditorOpen(false)} widthClass="max-w-[960px]">
           <div className="bg-white rounded-md shadow-2xl overflow-hidden">
-            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-start justify-between gap-4">
+            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-[20px] font-extrabold text-[#0d3349] tracking-tight">Edit Weekly Schedule</h3>
                 <p className="text-[13px] text-[#64748b] mt-1">This is the base timetable. Today will follow this unless admin edits today.</p>
@@ -713,7 +713,7 @@ export default function ScheduleClassDetailPage() {
                   <select
                     value={draft.course_id}
                     onChange={(event) => updateWeeklyDraft(index, 'course_id', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   >
                     <option value="">Select course</option>
                     {batchCourseOptions.map((course) => <option key={course.id} value={course.id}>{course.name}</option>)}
@@ -721,7 +721,7 @@ export default function ScheduleClassDetailPage() {
                   <select
                     value={draft.teacher_id}
                     onChange={(event) => updateWeeklyDraft(index, 'teacher_id', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   >
                     <option value="">Select teacher</option>
                     {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
@@ -729,7 +729,7 @@ export default function ScheduleClassDetailPage() {
                   <select
                     value={draft.day_of_week || todayDay}
                     onChange={(event) => updateWeeklyDraft(index, 'day_of_week', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   >
                     {DAYS_OF_WEEK.map((day) => <option key={day} value={day}>{day}</option>)}
                   </select>
@@ -737,27 +737,27 @@ export default function ScheduleClassDetailPage() {
                     type="time"
                     value={draft.start_time}
                     onChange={(event) => updateWeeklyDraft(index, 'start_time', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <input
                     type="time"
                     value={draft.end_time}
                     onChange={(event) => updateWeeklyDraft(index, 'end_time', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <input
                     type="text"
                     value={draft.room}
                     onChange={(event) => updateWeeklyDraft(index, 'room', event.target.value)}
                     placeholder="Room"
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <input
                     type="text"
                     value={draft.notes}
                     onChange={(event) => updateWeeklyDraft(index, 'notes', event.target.value)}
                     placeholder="Lecture, lab, etc."
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <button
                     type="button"
@@ -778,7 +778,7 @@ export default function ScheduleClassDetailPage() {
               <button
                 type="button"
                 onClick={addWeeklyDraft}
-                className="self-start px-4 py-2 bg-white border border-[#d8c8e9] text-[#6a5182] text-[13px] font-bold rounded-sm hover:bg-[#f3eff7] cursor-pointer"
+                className="self-start px-4 py-2 bg-white border border-[#E1E6EE] text-[#4B5563] text-[13px] font-bold rounded-sm hover:bg-[#F6F8FB] cursor-pointer"
               >
                 Add Weekly Row
               </button>
@@ -790,12 +790,12 @@ export default function ScheduleClassDetailPage() {
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#fbf8fe] flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#F6F8FB] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setIsWeeklyEditorOpen(false)}
                 disabled={isSavingWeekly}
-                className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 bg-white border border-[#E1E6EE] text-[#232529] text-[13.5px] font-semibold rounded-sm hover:bg-[#F6F8FB] transition-all cursor-pointer disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -803,7 +803,7 @@ export default function ScheduleClassDetailPage() {
                 type="button"
                 onClick={saveWeeklySchedule}
                 disabled={isSavingWeekly}
-                className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSavingWeekly && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {isSavingWeekly ? 'Saving...' : 'Save Weekly'}
@@ -816,7 +816,7 @@ export default function ScheduleClassDetailPage() {
       {isTodayEditorOpen && (
         <AppModal onClose={() => setIsTodayEditorOpen(false)} widthClass="max-w-[900px]">
           <div className="bg-white rounded-md shadow-2xl overflow-hidden">
-            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#fbf8fe] flex items-start justify-between gap-4">
+            <div className="px-6 py-5 border-b border-[#e2e8f0] bg-[#F6F8FB] flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-[20px] font-extrabold text-[#0d3349] tracking-tight">Edit Today Schedule</h3>
                 <p className="text-[13px] text-[#64748b] mt-1">Starts from today&apos;s weekly schedule, then saves changes only for today.</p>
@@ -836,7 +836,7 @@ export default function ScheduleClassDetailPage() {
                   <select
                     value={draft.course_id}
                     onChange={(event) => updateTodayDraft(index, 'course_id', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   >
                     <option value="">Select course</option>
                     {batchCourseOptions.map((course) => <option key={course.id} value={course.id}>{course.name}</option>)}
@@ -844,7 +844,7 @@ export default function ScheduleClassDetailPage() {
                   <select
                     value={draft.teacher_id}
                     onChange={(event) => updateTodayDraft(index, 'teacher_id', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   >
                     <option value="">Select teacher</option>
                     {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
@@ -853,27 +853,27 @@ export default function ScheduleClassDetailPage() {
                     type="time"
                     value={draft.start_time}
                     onChange={(event) => updateTodayDraft(index, 'start_time', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <input
                     type="time"
                     value={draft.end_time}
                     onChange={(event) => updateTodayDraft(index, 'end_time', event.target.value)}
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <input
                     type="text"
                     value={draft.room}
                     onChange={(event) => updateTodayDraft(index, 'room', event.target.value)}
                     placeholder="Room"
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <input
                     type="text"
                     value={draft.notes}
                     onChange={(event) => updateTodayDraft(index, 'notes', event.target.value)}
                     placeholder="Reason or note"
-                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#6a5182] focus:ring-2 focus:ring-[#6a5182]/10 text-[#1e293b]"
+                    className="bg-white border border-[#cbd5e1] rounded-sm px-3 py-2 text-[13px] outline-none focus:border-[#CCD4E0] focus:ring-2 focus:ring-[#CCD4E0]/10 text-[#1e293b]"
                   />
                   <button
                     type="button"
@@ -888,7 +888,7 @@ export default function ScheduleClassDetailPage() {
               <button
                 type="button"
                 onClick={addTodayDraft}
-                className="self-start px-4 py-2 bg-white border border-[#d8c8e9] text-[#6a5182] text-[13px] font-bold rounded-sm hover:bg-[#f3eff7] cursor-pointer"
+                className="self-start px-4 py-2 bg-white border border-[#E1E6EE] text-[#4B5563] text-[13px] font-bold rounded-sm hover:bg-[#F6F8FB] cursor-pointer"
               >
                 Add Row
               </button>
@@ -900,12 +900,12 @@ export default function ScheduleClassDetailPage() {
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#fbf8fe] flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#F6F8FB] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setIsTodayEditorOpen(false)}
                 disabled={isSavingToday}
-                className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 bg-white border border-[#E1E6EE] text-[#232529] text-[13.5px] font-semibold rounded-sm hover:bg-[#F6F8FB] transition-all cursor-pointer disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -913,7 +913,7 @@ export default function ScheduleClassDetailPage() {
                 type="button"
                 onClick={saveTodayOverride}
                 disabled={isSavingToday}
-                className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSavingToday && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {isSavingToday ? 'Saving...' : 'Save Today'}

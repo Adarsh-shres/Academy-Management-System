@@ -179,11 +179,11 @@ export default function AssignmentCard({
 
   return (
     <>
-      <div className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col hover:border-[#d8c8e9] transition-colors">
+      <div className="bg-white rounded-sm border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] flex flex-col hover:border-[#E1E6EE] transition-colors">
         <div className="p-5 flex-1">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1 min-w-0 pr-3">
-              <h3 className="text-[15px] font-bold text-[#4b3f68] truncate" title={assignment.title}>
+              <h3 className="text-[15px] font-bold text-[#232529] truncate" title={assignment.title}>
                 {assignment.title}
               </h3>
               <p className="text-[12px] font-semibold text-[#64748b] mt-1 whitespace-nowrap overflow-hidden text-ellipsis">
@@ -228,13 +228,13 @@ export default function AssignmentCard({
           </div>
         </div>
 
-        <div className="p-4 border-t border-[#e7dff0] bg-[#fbf8fe]/50 flex gap-2">
+        <div className="p-4 border-t border-[#E1E6EE] bg-[#F6F8FB]/50 flex gap-2">
           <button
             onClick={handleTogglePortal}
             disabled={togglingPortal}
             className={`flex-1 border rounded-sm text-[12px] font-bold py-2.5 transition-colors shadow-sm active:scale-[0.99] cursor-pointer ${assignment.portal_open
                 ? 'bg-white border-[#fca5a5] text-[#dc2626] hover:bg-[#fef2f2] hover:border-[#dc2626]'
-                : 'bg-white border-[#d8c8e9] text-[#6a5182] hover:bg-[#f3eff7] hover:border-[#6a5182]'
+                : 'bg-white border-[#E1E6EE] text-[#4B5563] hover:bg-[#F6F8FB] hover:border-[#CCD4E0]'
               }`}
           >
             {togglingPortal
@@ -244,7 +244,7 @@ export default function AssignmentCard({
           </button>
           <button
             onClick={() => onViewSubmissions(assignment)}
-            className="flex-1 bg-[#6a5182] hover:bg-[#5b4471] text-white rounded-sm text-[12px] font-bold py-2.5 transition-colors shadow-sm active:scale-[0.99] cursor-pointer"
+            className="flex-1 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white rounded-sm text-[12px] font-bold py-2.5 transition-colors shadow-sm active:scale-[0.99] cursor-pointer"
           >
             VIEW SUBMISSIONS
           </button>
@@ -255,15 +255,15 @@ export default function AssignmentCard({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowReopenModal(false)} />
           <div className="relative z-10 bg-white rounded-md w-full max-w-[380px] shadow-2xl flex flex-col">
-            <div className="p-5 border-b border-[#e7dff0] flex justify-between items-center bg-[#fbf8fe] rounded-t-md">
-              <h3 className="text-[16px] font-bold text-[#4b3f68]">Reopen Assignment</h3>
+            <div className="p-5 border-b border-[#E1E6EE] flex justify-between items-center bg-[#F6F8FB] rounded-t-md">
+              <h3 className="text-[16px] font-bold text-[#232529]">Reopen Assignment</h3>
               <button onClick={() => setShowReopenModal(false)} className="text-[#64748b] hover:text-[#0d3349] transition-colors cursor-pointer">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
               </button>
             </div>
             <div className="p-5 flex flex-col gap-4">
               <p className="text-[13px] text-[#475569]">
-                Set a new due date and time for <span className="font-semibold text-[#4b3f68]">{assignment.title}</span>
+                Set a new due date and time for <span className="font-semibold text-[#232529]">{assignment.title}</span>
               </p>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[12px] font-bold text-[#64748b] uppercase tracking-wider">New Due Date *</label>
@@ -271,7 +271,7 @@ export default function AssignmentCard({
                   type="date"
                   value={newDueDate}
                   onChange={e => setNewDueDate(e.target.value)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                  className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -280,15 +280,15 @@ export default function AssignmentCard({
                   type="time"
                   value={newDueTime}
                   onChange={e => setNewDueTime(e.target.value)}
-                  className="bg-[#f6f2fb] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#6a5182] focus:ring-[3px] focus:ring-[#6a5182]/10 transition-all text-[#1e293b]"
+                  className="bg-[#F6F8FB] border border-transparent rounded-sm px-4 py-2.5 text-[14px] w-full outline-none focus:bg-white focus:border-[#CCD4E0] focus:ring-[3px] focus:ring-[#CCD4E0]/10 transition-all text-[#1e293b]"
                 />
               </div>
             </div>
-            <div className="p-5 border-t border-[#e7dff0] bg-[#fbf8fe] flex justify-end gap-3 rounded-b-md">
+            <div className="p-5 border-t border-[#E1E6EE] bg-[#F6F8FB] flex justify-end gap-3 rounded-b-md">
               <button
                 type="button"
                 onClick={() => setShowReopenModal(false)}
-                className="px-5 py-2.5 bg-white border border-[#e2d9ed] text-[#4b3f68] text-[13.5px] font-semibold rounded-sm hover:bg-[#f3eff7] transition-all cursor-pointer"
+                className="px-5 py-2.5 bg-white border border-[#E1E6EE] text-[#232529] text-[13.5px] font-semibold rounded-sm hover:bg-[#F6F8FB] transition-all cursor-pointer"
               >
                 Cancel
               </button>
@@ -296,7 +296,7 @@ export default function AssignmentCard({
                 type="button"
                 onClick={handleReopenWithNewDate}
                 disabled={togglingPortal}
-                className="px-6 py-2.5 bg-[#6a5182] hover:bg-[#5b4471] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70"
+                className="px-6 py-2.5 bg-[#3E4FFF] hover:bg-[#5F73F5] text-white text-[13.5px] font-semibold rounded-sm transition-all shadow-sm cursor-pointer disabled:opacity-70"
               >
                 {togglingPortal ? 'Reopening...' : 'Reopen Portal'}
               </button>

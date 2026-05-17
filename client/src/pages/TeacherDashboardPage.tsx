@@ -67,7 +67,7 @@ const TeacherNotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative text-[#64748b] hover:text-[#6a5182] transition-colors cursor-pointer flex items-center justify-center p-2 rounded-full hover:bg-[#f6f2fb]"
+        className="relative text-[#64748b] hover:text-[#4B5563] transition-colors cursor-pointer flex items-center justify-center p-2 rounded-full hover:bg-[#F6F8FB]"
       >
         <Bell size={18} />
         {unreadCount > 0 && (
@@ -76,11 +76,11 @@ const TeacherNotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.1)] overflow-hidden z-[100]">
-          <div className="p-4 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
-            <h3 className="font-bold text-[#4b3f68] text-[15px]">Notifications</h3>
+        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.1)] overflow-hidden z-[100]">
+          <div className="p-4 border-b border-[#E1E6EE] flex items-center justify-between bg-[#F6F8FB]">
+            <h3 className="font-bold text-[#232529] text-[15px]">Notifications</h3>
             {unreadCount > 0 && (
-              <button onClick={markAllAsRead} className="text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68] cursor-pointer">
+              <button onClick={markAllAsRead} className="text-[12px] font-bold text-[#4B5563] hover:text-[#232529] cursor-pointer">
                 Mark all as read
               </button>
             )}
@@ -95,9 +95,9 @@ const TeacherNotificationBell = () => {
                 <div 
                   key={n.id} 
                   onClick={() => markAsRead(n.id)}
-                  className={`p-4 border-b border-[#e7dff0] last:border-0 cursor-pointer transition-colors ${(!n.read && !n.is_read) ? 'bg-[#f6f2fb]' : 'bg-white hover:bg-[#fbf8fe]'}`}
+                  className={`p-4 border-b border-[#E1E6EE] last:border-0 cursor-pointer transition-colors ${(!n.read && !n.is_read) ? 'bg-[#F6F8FB]' : 'bg-white hover:bg-[#F6F8FB]'}`}
                 >
-                  <p className={`text-[13px] text-[#475569] mb-1.5 ${(!n.read && !n.is_read) ? 'font-semibold text-[#4b3f68]' : ''}`}>
+                  <p className={`text-[13px] text-[#475569] mb-1.5 ${(!n.read && !n.is_read) ? 'font-semibold text-[#232529]' : ''}`}>
                     {n.message || n.title || 'New Notification'}
                   </p>
                   <span className="text-[11px] font-medium text-[#94a3b8]">{formatTime(n.created_at)}</span>
@@ -157,8 +157,8 @@ const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDat
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col w-full overflow-hidden">
-      <div className="bg-[#6a5182] text-white p-5 flex items-center justify-between">
+    <div className="bg-white rounded-2xl border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] flex flex-col w-full overflow-hidden">
+      <div className="bg-[#3E4FFF] text-white p-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           <span className="font-bold text-[15px]">Academy Calendar</span>
@@ -173,7 +173,7 @@ const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDat
       <div className="p-5">
         <div className="grid grid-cols-7 gap-1 mb-3 text-center">
           {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => (
-            <div key={d} className="text-[10px] font-bold text-[#6a5182]/60">{d}</div>
+            <div key={d} className="text-[10px] font-bold text-[#4B5563]/60">{d}</div>
           ))}
         </div>
         
@@ -181,9 +181,9 @@ const TeacherAcademyCalendar = ({ selectedDate, setSelectedDate }: { selectedDat
           {days.map((day, idx) => {
             if (!day) return <div key={idx} className="w-[34px] h-[34px]" />;
             
-            const todayStyle = isToday(day) ? 'bg-[#6a5182] text-white shadow-sm' : '';
-            const selectedStyle = isSelected(day) && !isToday(day) ? 'border border-[#6a5182] bg-white text-[#4b3f68] shadow-sm' : '';
-            const normalStyle = !isToday(day) && !isSelected(day) ? 'text-[#475569] hover:bg-[#f6f2fb]' : '';
+            const todayStyle = isToday(day) ? 'bg-[#3E4FFF] text-white shadow-sm' : '';
+            const selectedStyle = isSelected(day) && !isToday(day) ? 'border border-[#CCD4E0] bg-white text-[#232529] shadow-sm' : '';
+            const normalStyle = !isToday(day) && !isSelected(day) ? 'text-[#475569] hover:bg-[#F6F8FB]' : '';
             const hasEvent = hasNotes(day);
 
             return (
@@ -250,9 +250,9 @@ const AllNotesModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
   return (
     <div className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-[600px] max-h-[80vh] flex flex-col shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-5 border-b border-[#e7dff0] bg-[#fbf8fe]">
-          <h2 className="text-[18px] font-bold text-[#4b3f68]">All Notes</h2>
-          <button onClick={onClose} className="text-[#64748b] hover:text-[#4b3f68] transition-colors cursor-pointer bg-white border border-[#e7dff0] rounded-full p-1.5 shadow-sm">
+        <div className="flex items-center justify-between p-5 border-b border-[#E1E6EE] bg-[#F6F8FB]">
+          <h2 className="text-[18px] font-bold text-[#232529]">All Notes</h2>
+          <button onClick={onClose} className="text-[#64748b] hover:text-[#232529] transition-colors cursor-pointer bg-white border border-[#E1E6EE] rounded-full p-1.5 shadow-sm">
              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
@@ -262,10 +262,10 @@ const AllNotesModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
           ) : (
             allNotes.map(group => (
               <div key={group.date}>
-                <h3 className="text-[14px] font-extrabold text-[#6a5182] mb-3">{group.date}</h3>
+                <h3 className="text-[14px] font-extrabold text-[#4B5563] mb-3">{group.date}</h3>
                 <div className="flex flex-col gap-3">
                   {group.notes.map(note => (
-                    <div key={note.id} className="p-4 rounded-xl border border-[#e7dff0] bg-[#fbf8fe] relative group shadow-[0_2px_12px_rgba(57,31,86,0.04)]">
+                    <div key={note.id} className="p-4 rounded-xl border border-[#E1E6EE] bg-[#F6F8FB] relative group shadow-[0_2px_12px_rgba(36,37,41,0.04)]">
                       <p className="text-[13px] font-medium text-[#475569] pr-6 mb-2 whitespace-pre-wrap leading-relaxed">{note.text}</p>
                       <div className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide">{note.timestamp}</div>
                       <button 
@@ -345,12 +345,12 @@ const TeacherNotesWidget = ({ selectedDate }: { selectedDate: Date }) => {
 
   return (
     <>
-      <div className="bg-white rounded-2xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col w-full h-full">
-        <div className="p-5 border-b border-[#e7dff0] flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#f6f2fb] flex items-center justify-center text-[#6a5182]">
+      <div className="bg-white rounded-2xl border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] flex flex-col w-full h-full">
+        <div className="p-5 border-b border-[#E1E6EE] flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#F6F8FB] flex items-center justify-center text-[#4B5563]">
              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
           </div>
-          <h3 className="text-[16px] font-bold text-[#4b3f68]">Notes for {displayDate}</h3>
+          <h3 className="text-[16px] font-bold text-[#232529]">Notes for {displayDate}</h3>
         </div>
         <div className="p-5 flex flex-col gap-4 flex-1">
           <div className="flex flex-col gap-2">
@@ -358,12 +358,12 @@ const TeacherNotesWidget = ({ selectedDate }: { selectedDate: Date }) => {
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               placeholder="Write a note..."
-              className="w-full bg-[#f6f2fb] border border-[#e7dff0] rounded-xl p-3 text-[13px] text-[#475569] resize-none focus:outline-none focus:border-[#6a5182] transition-colors"
+              className="w-full bg-[#F6F8FB] border border-[#E1E6EE] rounded-xl p-3 text-[13px] text-[#475569] resize-none focus:outline-none focus:border-[#CCD4E0] transition-colors"
               rows={3}
             />
             <button 
               onClick={addNote}
-              className="self-end bg-[#6a5182] hover:bg-[#5b4671] text-white px-4 py-1.5 rounded-lg text-[13px] font-bold transition-colors cursor-pointer"
+              className="self-end bg-[#3E4FFF] hover:bg-[#5F73F5] text-white px-4 py-1.5 rounded-lg text-[13px] font-bold transition-colors cursor-pointer"
             >
               Add Note
             </button>
@@ -376,7 +376,7 @@ const TeacherNotesWidget = ({ selectedDate }: { selectedDate: Date }) => {
               </div>
             ) : (
               notes.map(note => (
-                <div key={note.id} className="p-4 rounded-xl border border-[#e7dff0] bg-white relative group shadow-[0_2px_12px_rgba(57,31,86,0.04)]">
+                <div key={note.id} className="p-4 rounded-xl border border-[#E1E6EE] bg-white relative group shadow-[0_2px_12px_rgba(36,37,41,0.04)]">
                   <p className="text-[13px] font-medium text-[#475569] pr-6 mb-2 whitespace-pre-wrap leading-relaxed">{note.text}</p>
                   <div className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide">{note.timestamp}</div>
                   <button 
@@ -391,7 +391,7 @@ const TeacherNotesWidget = ({ selectedDate }: { selectedDate: Date }) => {
           </div>
           <button 
             onClick={() => setShowAllNotes(true)}
-            className="self-end mt-auto pt-3 text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68] flex items-center gap-1 transition-colors cursor-pointer"
+            className="self-end mt-auto pt-3 text-[12px] font-bold text-[#4B5563] hover:text-[#232529] flex items-center gap-1 transition-colors cursor-pointer"
           >
             See All Notes
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -511,16 +511,16 @@ const TeachingScheduleToday = () => {
   }, [todayDate, todayDay]);
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col w-full">
-      <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-start justify-between gap-3">
+    <div className="bg-white rounded-2xl border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] flex flex-col w-full">
+      <div className="p-5 border-b border-[#E1E6EE] bg-[#F6F8FB] flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <CalendarCheck2 size={18} className="text-[#6a5182]" />
-            <h3 className="text-[16px] font-extrabold text-[#4b3f68]">Teaching Schedule Today</h3>
+            <CalendarCheck2 size={18} className="text-[#4B5563]" />
+            <h3 className="text-[16px] font-extrabold text-[#232529]">Teaching Schedule Today</h3>
           </div>
           <p className="text-[12.5px] text-[#64748b] font-medium mt-1">{todayDay}</p>
         </div>
-        <span className="rounded-md bg-white border border-[#e2d9ed] px-2.5 py-1 text-[12px] font-bold text-[#64748b] h-fit">
+        <span className="rounded-md bg-white border border-[#E1E6EE] px-2.5 py-1 text-[12px] font-bold text-[#64748b] h-fit">
           {entries.length}
         </span>
       </div>
@@ -537,7 +537,7 @@ const TeachingScheduleToday = () => {
            </div>
         ) : (
            entries.map((entry) => (
-             <div key={entry.id} className="border-l-[4px] border-l-[#6a5182] bg-white rounded-xl shadow-[0_10px_28px_rgba(57,31,86,0.06)] p-4 relative overflow-hidden">
+             <div key={entry.id} className="border-l-[4px] border-l-[#3E4FFF] bg-white rounded-xl shadow-[0_10px_28px_rgba(36,37,41,0.06)] p-4 relative overflow-hidden">
                 <div className="flex justify-between items-start gap-3 mb-3">
                   <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#e0f2fe] text-[#0369a1]">
                     {trimTime(entry.start_time)}{entry.end_time ? ` - ${trimTime(entry.end_time)}` : ''}
@@ -590,14 +590,14 @@ const ActiveCoursesWidget = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] flex flex-col w-full">
-      <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between">
-         <h3 className="text-[16px] font-bold text-[#4b3f68]">Active Classes</h3>
+    <div className="bg-white rounded-2xl border border-[#E1E6EE] shadow-[0_10px_28px_rgba(36,37,41,0.06)] flex flex-col w-full">
+      <div className="p-5 border-b border-[#E1E6EE] flex items-center justify-between">
+         <h3 className="text-[16px] font-bold text-[#232529]">Active Classes</h3>
       </div>
       <div className="p-5 flex flex-col gap-3">
         {loading ? (
            <div className="flex justify-center py-6">
-              <div className="w-6 h-6 border-2 border-[#6a5182] border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-[#CCD4E0] border-t-transparent rounded-full animate-spin"></div>
            </div>
         ) : courses.length === 0 ? (
            <div className="text-center py-6 text-[#94a3b8] text-[13px] font-medium">
@@ -606,20 +606,20 @@ const ActiveCoursesWidget = () => {
         ) : (
            <>
              {courses.slice(0, 4).map((c, idx) => (
-               <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-[#e7dff0] hover:bg-[#fbf8fe] transition-colors">
+               <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-[#E1E6EE] hover:bg-[#F6F8FB] transition-colors">
                   <div>
-                    <h4 className="text-[13px] font-bold text-[#4b3f68]">{c.name || c.course || 'Unnamed'}</h4>
+                    <h4 className="text-[13px] font-bold text-[#232529]">{c.name || c.course || 'Unnamed'}</h4>
                     <p className="text-[11px] text-[#64748b] font-medium">
                       {c.student_ids ? c.student_ids.length : 0} Students
                     </p>
                   </div>
-                  <Link to={`/teacher/classes/${c.id}`} className="text-[12px] font-bold text-[#6a5182] hover:text-[#4b3f68]">
+                  <Link to={`/teacher/classes/${c.id}`} className="text-[12px] font-bold text-[#4B5563] hover:text-[#232529]">
                     View
                   </Link>
                </div>
              ))}
              {courses.length > 4 && (
-               <Link to="/teacher/classes" className="text-center text-[13px] font-bold text-[#6a5182] hover:text-[#4b3f68] mt-2 block">
+               <Link to="/teacher/classes" className="text-center text-[13px] font-bold text-[#4B5563] hover:text-[#232529] mt-2 block">
                  View All ({courses.length})
                </Link>
              )}
@@ -840,20 +840,20 @@ export default function TeacherDashboardPage() {
   const renderDashboardContent = () => (
     <div className="flex-1 p-6 md:p-8 flex flex-col lg:flex-row gap-8 w-full">
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="bg-white rounded-sm border border-[#e7dff0] flex flex-col w-full shadow-[0_10px_28px_rgba(57,31,86,0.06)] mb-8">
-          <div className="p-5 border-b border-[#e7dff0] flex items-center justify-between bg-[#fbf8fe]">
-            <h3 className="text-[16px] font-bold text-[#4b3f68]">Announcements</h3>
+        <div className="bg-white rounded-sm border border-[#E1E6EE] flex flex-col w-full shadow-[0_10px_28px_rgba(36,37,41,0.06)] mb-8">
+          <div className="p-5 border-b border-[#E1E6EE] flex items-center justify-between bg-[#F6F8FB]">
+            <h3 className="text-[16px] font-bold text-[#232529]">Announcements</h3>
           </div>
           <div className="p-5 flex flex-col gap-4">
             {announcements.map(a => (
-              <div key={a.id} className="flex gap-4 p-4 rounded-sm border border-[#e7dff0] bg-[#fbf8fe] hover:shadow-sm transition-all border-l-[3px] border-l-primary">
+              <div key={a.id} className="flex gap-4 p-4 rounded-sm border border-[#E1E6EE] bg-[#F6F8FB] hover:shadow-sm transition-all border-l-[3px] border-l-primary">
                 <div className="w-10 h-10 rounded-sm bg-primary shrink-0 text-white flex items-center justify-center font-bold text-[14px]">
                   {a.initials}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-1">
                     <div>
-                      <h4 className="text-[14px] font-bold text-[#4b3f68]">{a.author}</h4>
+                      <h4 className="text-[14px] font-bold text-[#232529]">{a.author}</h4>
                       <span className="text-[11px] text-[#64748b] font-medium">{a.time}</span>
                     </div>
                   </div>
@@ -866,7 +866,7 @@ export default function TeacherDashboardPage() {
 
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[18px] font-extrabold text-[#4b3f68] tracking-tight">Overview</h2>
+            <h2 className="text-[18px] font-extrabold text-[#232529] tracking-tight">Overview</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -874,16 +874,16 @@ export default function TeacherDashboardPage() {
             {/* Card 1 — Total Assignments */}
             <div
               onClick={goToAssignments}
-              className="cursor-pointer bg-white rounded-2xl p-6 border border-[#e7dff0] flex flex-col items-center text-center shadow-[0_10px_28px_rgba(57,31,86,0.06)] hover:shadow-md transition-shadow"
+              className="cursor-pointer bg-white rounded-2xl p-6 border border-[#E1E6EE] flex flex-col items-center text-center shadow-[0_10px_28px_rgba(36,37,41,0.06)] hover:shadow-md transition-shadow"
             >
-              <div className="w-12 h-12 rounded-full bg-[#ede9f5] flex items-center justify-center mx-auto mb-3 text-[#6a5182]">
+              <div className="w-12 h-12 rounded-full bg-[#F6F8FB] flex items-center justify-center mx-auto mb-3 text-[#4B5563]">
                 <FileText size={22} />
               </div>
               <h4 className="text-3xl font-bold text-gray-800">{isLoadingCounters ? '...' : overviewStats.assignments}</h4>
               <p className="text-sm text-gray-500 mt-1">Total Assignments</p>
               <span
                 onClick={(e) => { e.stopPropagation(); goToAssignments(); }}
-                className="text-xs font-semibold text-[#6a5182] mt-3 cursor-pointer hover:underline"
+                className="text-xs font-semibold text-[#4B5563] mt-3 cursor-pointer hover:underline"
               >
                 View all →
               </span>
@@ -892,7 +892,7 @@ export default function TeacherDashboardPage() {
             {/* Card 2 — Draft Quizzes */}
             <div
               onClick={() => setShowDraftModal(true)}
-              className="cursor-pointer bg-white rounded-2xl p-6 border border-[#e7dff0] flex flex-col items-center text-center shadow-[0_10px_28px_rgba(57,31,86,0.06)] hover:shadow-md transition-shadow"
+              className="cursor-pointer bg-white rounded-2xl p-6 border border-[#E1E6EE] flex flex-col items-center text-center shadow-[0_10px_28px_rgba(36,37,41,0.06)] hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 rounded-full bg-[#fef9c3] flex items-center justify-center mx-auto mb-3 text-[#ca8a04]">
                 <PenLine size={22} />
@@ -901,7 +901,7 @@ export default function TeacherDashboardPage() {
               <p className="text-sm text-gray-500 mt-1">Draft Quizzes</p>
               <span
                 onClick={(e) => { e.stopPropagation(); setShowDraftModal(true); }}
-                className="text-xs font-semibold text-[#6a5182] mt-3 cursor-pointer hover:underline"
+                className="text-xs font-semibold text-[#4B5563] mt-3 cursor-pointer hover:underline"
               >
                 View all →
               </span>
@@ -910,7 +910,7 @@ export default function TeacherDashboardPage() {
             {/* Card 3 — Total Students */}
             <div
               onClick={() => setShowStudentsModal(true)}
-              className="cursor-pointer bg-white rounded-2xl p-6 border border-[#e7dff0] flex flex-col items-center text-center shadow-[0_10px_28px_rgba(57,31,86,0.06)] hover:shadow-md transition-shadow"
+              className="cursor-pointer bg-white rounded-2xl p-6 border border-[#E1E6EE] flex flex-col items-center text-center shadow-[0_10px_28px_rgba(36,37,41,0.06)] hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 rounded-full bg-[#e0f2fe] flex items-center justify-center mx-auto mb-3 text-[#0369a1]">
                 <Users size={22} />
@@ -919,7 +919,7 @@ export default function TeacherDashboardPage() {
               <p className="text-sm text-gray-500 mt-1">Total Students</p>
               <span
                 onClick={(e) => { e.stopPropagation(); setShowStudentsModal(true); }}
-                className="text-xs font-semibold text-[#6a5182] mt-3 cursor-pointer hover:underline"
+                className="text-xs font-semibold text-[#4B5563] mt-3 cursor-pointer hover:underline"
               >
                 View all →
               </span>
@@ -932,12 +932,12 @@ export default function TeacherDashboardPage() {
         {showDraftModal && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowDraftModal(false)}>
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-5 border-b border-[#e7dff0] bg-[#fbf8fe]">
+              <div className="flex items-center justify-between p-5 border-b border-[#E1E6EE] bg-[#F6F8FB]">
                 <div className="flex items-center gap-2">
                   <PenLine size={18} className="text-[#ca8a04]" />
-                  <h2 className="text-[17px] font-bold text-[#4b3f68]">Draft Quizzes</h2>
+                  <h2 className="text-[17px] font-bold text-[#232529]">Draft Quizzes</h2>
                 </div>
-                <button onClick={() => setShowDraftModal(false)} className="text-[#64748b] hover:text-[#4b3f68] cursor-pointer bg-white border border-[#e7dff0] rounded-full p-1.5 shadow-sm">
+                <button onClick={() => setShowDraftModal(false)} className="text-[#64748b] hover:text-[#232529] cursor-pointer bg-white border border-[#E1E6EE] rounded-full p-1.5 shadow-sm">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
@@ -949,7 +949,7 @@ export default function TeacherDashboardPage() {
                     const className = teacherClassesCache.find((c: any) => c.id === quiz.class_id)?.name || 'Unknown Class';
                     const dueDate = quiz.due_date ? new Date(quiz.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'No due date';
                     return (
-                      <div key={quiz.id} className="bg-[#f6f2fb] rounded-xl p-4 flex items-center justify-between gap-3">
+                      <div key={quiz.id} className="bg-[#F6F8FB] rounded-xl p-4 flex items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-gray-800 text-[14px] truncate">{quiz.title || 'Untitled Quiz'}</p>
                           <p className="text-[12px] text-[#64748b] mt-0.5">Class: {className} · Due: {dueDate}</p>
@@ -979,13 +979,13 @@ export default function TeacherDashboardPage() {
         {showStudentsModal && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => { setShowStudentsModal(false); setStudentSearch(''); setStudentClassFilter('All'); }}>
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-5 border-b border-[#e7dff0] bg-[#fbf8fe]">
+              <div className="flex items-center justify-between p-5 border-b border-[#E1E6EE] bg-[#F6F8FB]">
                 <div className="flex items-center gap-2">
                   <Users size={18} className="text-[#0369a1]" />
-                  <h2 className="text-[17px] font-bold text-[#4b3f68]">All Students</h2>
+                  <h2 className="text-[17px] font-bold text-[#232529]">All Students</h2>
                   <span className="bg-[#e0f2fe] text-[#0369a1] text-[11px] font-bold px-2 py-0.5 rounded-full">{studentsList.length} students</span>
                 </div>
-                <button onClick={() => { setShowStudentsModal(false); setStudentSearch(''); setStudentClassFilter('All'); }} className="text-[#64748b] hover:text-[#4b3f68] cursor-pointer bg-white border border-[#e7dff0] rounded-full p-1.5 shadow-sm">
+                <button onClick={() => { setShowStudentsModal(false); setStudentSearch(''); setStudentClassFilter('All'); }} className="text-[#64748b] hover:text-[#232529] cursor-pointer bg-white border border-[#E1E6EE] rounded-full p-1.5 shadow-sm">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
@@ -995,7 +995,7 @@ export default function TeacherDashboardPage() {
                   placeholder="Search student..."
                   value={studentSearch}
                   onChange={e => setStudentSearch(e.target.value)}
-                  className="w-full border border-[#e7dff0] rounded-xl px-4 py-2 bg-[#f6f2fb] text-sm focus:outline-none focus:border-[#6a5182] transition-colors"
+                  className="w-full border border-[#E1E6EE] rounded-xl px-4 py-2 bg-[#F6F8FB] text-sm focus:outline-none focus:border-[#CCD4E0] transition-colors"
                 />
               </div>
               {/* Class filter */}
@@ -1003,7 +1003,7 @@ export default function TeacherDashboardPage() {
                 <select
                   value={studentClassFilter}
                   onChange={e => setStudentClassFilter(e.target.value)}
-                  className="text-xs border border-[#e7dff0] rounded-lg px-2 py-1 bg-[#f6f2fb] text-[#6a5182] cursor-pointer"
+                  className="text-xs border border-[#E1E6EE] rounded-lg px-2 py-1 bg-[#F6F8FB] text-[#4B5563] cursor-pointer"
                 >
                   <option value="All">All Classes</option>
                   {teacherClassesCache.map((cls: any) => (
@@ -1032,8 +1032,8 @@ export default function TeacherDashboardPage() {
                     const initials = (student.full_name || 'S').split(' ').map((w: string) => w[0]).join('').substring(0, 2).toUpperCase();
                     const studentClasses = teacherClassesCache.filter((c: any) => (c.student_ids || []).includes(student.id));
                     return (
-                      <div key={student.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#f6f2fb] transition">
-                        <div className="w-9 h-9 rounded-full bg-[#6a5182] text-white flex items-center justify-center text-sm font-bold shrink-0">
+                      <div key={student.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F6F8FB] transition">
+                        <div className="w-9 h-9 rounded-full bg-[#3E4FFF] text-white flex items-center justify-center text-sm font-bold shrink-0">
                           {initials}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1042,7 +1042,7 @@ export default function TeacherDashboardPage() {
                         </div>
                         <div className="flex flex-wrap gap-1 justify-end">
                           {studentClasses.map((c: any) => (
-                            <span key={c.id} className="bg-[#ede9f5] text-[#6a5182] text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">{c.name}</span>
+                            <span key={c.id} className="bg-[#F6F8FB] text-[#4B5563] text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">{c.name}</span>
                           ))}
                         </div>
                       </div>
@@ -1069,7 +1069,7 @@ export default function TeacherDashboardPage() {
           <TeachingScheduleToday />
         </div>
         
-        <div className="h-[1px] w-[80%] mx-auto bg-gradient-to-r from-transparent via-[#e7dff0] to-transparent"></div>
+        <div className="h-[1px] w-[80%] mx-auto bg-gradient-to-r from-transparent via-[#E1E6EE] to-transparent"></div>
         
         <div className="h-auto">
           <ActiveCoursesWidget />
@@ -1090,17 +1090,17 @@ export default function TeacherDashboardPage() {
   };
 
   return (
-    <div className="flex w-full min-h-screen text-[#1e293b] bg-main-bg font-sans antialiased">
+    <div className="app-shell flex w-full font-sans antialiased">
       <TeacherSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="flex-1 ml-[210px] flex flex-col min-h-screen max-w-full overflow-x-hidden">
+      <main className="app-main flex-1 flex flex-col max-w-full overflow-x-hidden">
         
-        <header className="h-[58px] bg-white border-b border-[#e7dff0] px-7 flex items-center gap-3.5 sticky top-0 z-50 shrink-0">
+        <header className="h-[58px] bg-white border-b border-[#E1E6EE] px-7 flex items-center gap-3.5 sticky top-0 z-50 shrink-0">
 
           <div className="flex items-center gap-4 ml-auto">
             <TeacherNotificationBell />
             
-            <div className="w-[1px] h-6 bg-[#e7dff0] mx-1"></div>
+            <div className="w-[1px] h-6 bg-[#E1E6EE] mx-1"></div>
             
             <ProfileDropdown />
           </div>

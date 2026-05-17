@@ -60,13 +60,13 @@ export default function SendNotificationPage() {
   return (
     <div className="flex flex-col gap-8 pb-10 flex-1 min-w-0 max-w-[800px] mx-auto w-full animate-in fade-in duration-200">
       <div className="flex flex-col">
-        <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#4b3f68] tracking-tight">
+        <h1 className="font-sans text-[26px] md:text-[28px] font-bold text-[#232529] tracking-tight">
           Send Notification
         </h1>
         <p className="text-[14px] text-[#7c8697] mt-1">Broadcast messages or target specific groups</p>
       </div>
 
-      <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] overflow-hidden">
+      <div className="bg-white rounded-[10px] border border-[#E1E6EE] shadow-[0_2px_12px_rgba(36,37,41,0.04)] overflow-hidden">
         <div className="p-6 md:p-8">
           {status.type && (
             <div className={`mb-6 p-4 rounded-[8px] text-[13px] font-medium flex items-center gap-3 ${
@@ -96,7 +96,7 @@ export default function SendNotificationPage() {
                 id="recipient"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
-                className="w-full bg-[#faf8fc] border border-[#e2d9ed] rounded-[8px] px-4 py-2.5 text-[14px] text-[#4b3f68] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                className="w-full bg-[#faf8fc] border border-[#E1E6EE] rounded-[8px] px-4 py-2.5 text-[14px] text-[#232529] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
               >
                 <option value="general">All Users</option>
                 <option value="student">Students</option>
@@ -120,7 +120,7 @@ export default function SendNotificationPage() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g., Upcoming Assignment Deadline"
-                className="w-full bg-[#faf8fc] border border-[#e2d9ed] rounded-[8px] px-4 py-2.5 text-[14px] text-[#4b3f68] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-[#a0a8b5]"
+                className="w-full bg-[#faf8fc] border border-[#E1E6EE] rounded-[8px] px-4 py-2.5 text-[14px] text-[#232529] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-[#a0a8b5]"
                 required
               />
             </div>
@@ -135,7 +135,7 @@ export default function SendNotificationPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message here..."
                 rows={6}
-                className="w-full bg-[#faf8fc] border border-[#e2d9ed] rounded-[8px] px-4 py-3 text-[14px] text-[#4b3f68] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-[#a0a8b5] resize-y"
+                className="w-full bg-[#faf8fc] border border-[#E1E6EE] rounded-[8px] px-4 py-3 text-[14px] text-[#232529] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-[#a0a8b5] resize-y"
                 required
               />
             </div>
