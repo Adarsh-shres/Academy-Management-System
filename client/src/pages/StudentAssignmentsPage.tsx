@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useStudentData } from "../hooks/useStudentData";
 import StudentAssignmentCard from "../components/students/StudentAssignmentCard";
 import type { Assignment } from "../components/students/StudentAssignmentCard";
+import { CardGridPageSkeleton } from "../components/skeletons/PageSkeletons";
 
 export default function StudentAssignmentsPage() {
   const { assignments, isLoading, error, refetch } = useStudentData();
@@ -60,9 +61,7 @@ export default function StudentAssignmentsPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex h-[200px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">
-          Loading assignments...
-        </div>
+        <CardGridPageSkeleton cards={4} />
       ) : error ? (
         <div className="flex h-[200px] items-center justify-center text-[#4b3f68] font-semibold">
           {error}

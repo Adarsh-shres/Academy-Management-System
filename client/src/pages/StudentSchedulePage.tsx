@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CalendarCheck2, MapPin, Users } from '../components/shared/icons';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+import { SchedulePageSkeleton } from '../components/skeletons/PageSkeletons';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -220,6 +221,10 @@ export default function StudentSchedulePage() {
     );
   };
 
+  if (isLoading) {
+    return <SchedulePageSkeleton />;
+  }
+
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10">
       <div>
@@ -233,13 +238,7 @@ export default function StudentSchedulePage() {
         </div>
       )}
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-6">
-          <div className="h-[220px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
-          <div className="h-[780px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
-        </div>
-      ) : (
-        <>
+      <>
           <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
             <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-start justify-between gap-3">
               <div>
@@ -325,8 +324,7 @@ export default function StudentSchedulePage() {
               })}
             </div>
           </section>
-        </>
-      )}
+      </>
     </div>
   );
 }

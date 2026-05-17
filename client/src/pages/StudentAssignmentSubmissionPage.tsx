@@ -5,6 +5,8 @@ import type { Assignment } from '../components/students/StudentAssignmentCard';
 import { useAuth } from '../context/AuthContext';
 import { useStudentData } from '../hooks/useStudentData';
 import { supabase } from '../lib/supabase';
+import { DetailPageSkeleton } from '../components/skeletons/PageSkeletons';
+import { SkeletonBlock } from '../components/shared/Skeleton';
 
 interface SubmissionAttempt {
   id: string;
@@ -91,7 +93,7 @@ export default function StudentAssignmentSubmissionPage() {
   }, [assignmentId, user?.id]);
 
   if (isAssignmentLoading) {
-    return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading submission...</div>;
+    return <DetailPageSkeleton />;
   }
 
   if (assignmentError || !assignment) {
@@ -170,7 +172,11 @@ export default function StudentAssignmentSubmissionPage() {
         </div>
 
         {isHistoryLoading ? (
-          <div className="py-10 text-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading history...</div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <SkeletonBlock key={index} className="h-16 w-full" />
+            ))}
+          </div>
         ) : historyError ? (
           <div className="py-10 text-center text-[#4b3f68] font-semibold">{historyError}</div>
         ) : attempts.length === 0 ? (

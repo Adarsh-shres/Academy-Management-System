@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Users, Presentation, ChevronLeft } from '../components/shared/icons';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
+import { SkeletonCard } from '../components/shared/Skeleton';
 
 export default function TeacherCourseClassesPage() {
   const { user } = useAuth();
@@ -76,7 +77,7 @@ export default function TeacherCourseClassesPage() {
       {/* Classes Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => <div key={i} className="animate-pulse bg-white h-[200px] rounded-sm border border-[#e7dff0]"></div>)}
+          {[1, 2, 3].map(i => <SkeletonCard key={i} className="h-[200px] rounded-sm" />)}
         </div>
       ) : classes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -8,6 +8,7 @@ import { useStudents } from '../context/StudentContext';
 import { CLASS_STUDENT_DEPARTMENTS, filterAvailableClassStudents } from '../lib/classStudentFilters';
 import { supabase } from '../lib/supabase';
 import type { StudentDepartmentFilter } from '../lib/classStudentFilters';
+import { FormPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 type BatchClass = {
   id: string;
@@ -196,12 +197,7 @@ export default function ClassFormPage() {
   };
 
   if (batchesLoading || isLoadingForm) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading class form...</p>
-      </div>
-    );
+    return <FormPageSkeleton />;
   }
 
   if (!batch) {

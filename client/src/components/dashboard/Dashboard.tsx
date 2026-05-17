@@ -1,16 +1,28 @@
+import { useEffect, useState } from 'react';
 import StatCard from './StatCard';
-import Calendar from './Calendar';
+import NoticeBoard from './NoticeBoard';
 import QuickTools from './QuickTools';
 import { useCourses } from '../../context/CourseContext';
 import { useStudents } from '../../context/StudentContext';
 import { useTeachers } from '../../context/TeacherContext';
 import { useNavigate } from 'react-router-dom';
+import AdminDashboardSkeleton from '../skeletons/AdminDashboardSkeleton';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { courses } = useCourses();
   const { students } = useStudents();
   const { teachers } = useTeachers();
+  const [isPageSettling, setIsPageSettling] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsPageSettling(false), 250);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (isPageSettling) {
+    return <AdminDashboardSkeleton />;
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 pb-10 flex-1 min-w-0">
@@ -62,7 +74,7 @@ export default function Dashboard() {
 
       {/* BOTTOM GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
-        <Calendar />
+        <NoticeBoard />
         <QuickTools />
       </div>
     </div>

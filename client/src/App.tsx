@@ -26,6 +26,7 @@ import ScheduleClassDetailPage from './pages/ScheduleClassDetailPage.tsx';
 import AdminTeacherSchedulePage from './pages/AdminTeacherSchedulePage.tsx';
 import TeachersPage from './pages/TeachersPage.tsx';
 import AdminUsersPage from './pages/AdminUsersPage.tsx';
+import AdminSettingsPage from './pages/AdminSettingsPage.tsx';
 import TeacherDashboardPage from './pages/TeacherDashboardPage.tsx';
 import TeacherCourseClassesPage from './pages/TeacherCourseClassesPage.tsx';
 import TeacherClassDetailPage from './pages/TeacherClassDetailPage.tsx';
@@ -40,6 +41,7 @@ import StudentQuizzesPage from './pages/StudentQuizzesPage.tsx';
 import StudentAttendancePage from './pages/StudentAttendancePage.tsx';
 import StudentAttendanceDetailPage from './pages/StudentAttendanceDetailPage.tsx';
 import StudentProfilePage from './pages/StudentProfilePage.tsx';
+import StudentSettingsPage from './pages/StudentSettingsPage.tsx';
 import StudentSchedulePage from './pages/StudentSchedulePage.tsx';
 import UpdatePasswordPage from './pages/UpdatePasswordPage.tsx';
 import StudentFoldersPage from './pages/StudentFoldersPage.tsx';
@@ -98,6 +100,7 @@ function App() {
         <Route path="/user-management" element={<AdminUsersPage />} />
         <Route path="/send-notification" element={<SendNotificationPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/settings" element={<AdminSettingsPage />} />
         <Route path="/under-development" element={<UnderDevelopment />} />
         <Route path="*" element={<UnderDevelopment />} />
       </Route>
@@ -172,6 +175,7 @@ function App() {
         <Route path="/student/attendance" element={<StudentAttendancePage />} />
         <Route path="/student/attendance/:classId" element={<StudentAttendanceDetailPage />} />
         <Route path="/student/profile" element={<StudentProfilePage />} />
+        <Route path="/student/settings" element={<StudentSettingsPage />} />
         <Route path="/student/update-password" element={<UpdatePasswordPage />} />
         <Route path="/student/notifications" element={<NotificationsPage />} />
         <Route path="/student/courses/:courseId/folders" element={<StudentFoldersPage />} />

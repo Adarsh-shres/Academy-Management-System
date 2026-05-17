@@ -18,6 +18,167 @@
     @apply font-sans bg-main-bg text-slate-900 antialiased;
     background-image: linear-gradient(180deg, #f7f4fb 0%, #f4f1f8 34%, #f5f7fb 100%);
   }
+
+  html.a11y-reduce-motion *,
+  html.a11y-reduce-motion *::before,
+  html.a11y-reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html.a11y-enhanced-focus :focus-visible {
+    outline: 3px solid #111827 !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 6px rgba(106, 81, 130, 0.22) !important;
+  }
+}
+
+html.a11y-readable-font body,
+html.a11y-readable-font body * {
+  font-family: Verdana, Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+html.a11y-high-contrast body {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+}
+
+html.a11y-high-contrast main,
+html.a11y-high-contrast aside,
+html.a11y-high-contrast header,
+html.a11y-high-contrast section,
+html.a11y-high-contrast [class*="bg-white"],
+html.a11y-high-contrast [class*="bg-[#f"],
+html.a11y-high-contrast [class*="bg-main-bg"] {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+html.a11y-high-contrast [class*="text-[#"],
+html.a11y-high-contrast [class*="text-slate"],
+html.a11y-high-contrast [class*="text-primary"] {
+  color: #111827 !important;
+}
+
+html.a11y-high-contrast [class*="border-"] {
+  border-color: #111827 !important;
+}
+
+html.a11y-high-contrast button,
+html.a11y-high-contrast input,
+html.a11y-high-contrast select,
+html.a11y-high-contrast textarea {
+  border-color: #111827 !important;
+}
+
+html.a11y-comfortable-layout main {
+  line-height: 1.7 !important;
+}
+
+html.a11y-comfortable-layout button,
+html.a11y-comfortable-layout input,
+html.a11y-comfortable-layout select,
+html.a11y-comfortable-layout textarea {
+  min-height: 44px !important;
+}
+
+html.a11y-comfortable-layout [class*="gap-2"] {
+  gap: 0.75rem !important;
+}
+
+html.a11y-comfortable-layout [class*="gap-3"] {
+  gap: 1rem !important;
+}
+
+html.a11y-comfortable-layout [class*="p-4"] {
+  padding: 1.25rem !important;
+}
+
+html.a11y-color-vision-support button[aria-pressed="true"],
+html.a11y-color-vision-support button[aria-checked="true"],
+html.a11y-color-vision-support [role="switch"][aria-checked="true"] {
+  outline: 2px solid #111827 !important;
+  outline-offset: 2px !important;
+}
+
+html.a11y-large-text [class*="text-[10"] {
+  font-size: 12px !important;
+}
+
+html.a11y-large-text [class*="text-[11"] {
+  font-size: 13px !important;
+}
+
+html.a11y-large-text [class*="text-[12"] {
+  font-size: 14px !important;
+}
+
+html.a11y-large-text [class*="text-[13"] {
+  font-size: 15px !important;
+}
+
+html.a11y-large-text [class*="text-[14"] {
+  font-size: 16px !important;
+}
+
+html.a11y-large-text [class*="text-[19"] {
+  font-size: 21px !important;
+}
+
+html.a11y-large-text [class*="text-[24"] {
+  font-size: 26px !important;
+}
+
+html.a11y-large-text [class*="text-[26"],
+html.a11y-large-text [class*="text-[28"] {
+  font-size: 30px !important;
+}
+
+html.a11y-large-text .text-2xl {
+  font-size: 1.65rem !important;
+  line-height: 2rem !important;
+}
+
+html.a11y-extra-large-text [class*="text-[10"] {
+  font-size: 13px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[11"] {
+  font-size: 14px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[12"] {
+  font-size: 15px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[13"] {
+  font-size: 16px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[14"] {
+  font-size: 18px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[19"] {
+  font-size: 23px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[24"] {
+  font-size: 29px !important;
+}
+
+html.a11y-extra-large-text [class*="text-[26"],
+html.a11y-extra-large-text [class*="text-[28"] {
+  font-size: 34px !important;
+}
+
+html.a11y-extra-large-text .text-2xl {
+  font-size: 1.85rem !important;
+  line-height: 2.2rem !important;
 }
 
 @layer utilities {

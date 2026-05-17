@@ -5,6 +5,7 @@ import StatCard from '../components/dashboard/StatCard';
 import { useBatches } from '../context/BatchContext';
 import { useCourses } from '../context/CourseContext';
 import type { Course } from '../types/course';
+import { CardGridPageSkeleton } from '../components/skeletons/PageSkeletons';
 
 function buildBatchCode(batchesCount: number) {
   const year = new Date().getFullYear();
@@ -87,12 +88,7 @@ export default function BatchesPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading batches...</p>
-      </div>
-    );
+    return <CardGridPageSkeleton cards={6} />;
   }
 
   return (

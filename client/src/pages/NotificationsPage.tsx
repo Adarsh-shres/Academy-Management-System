@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNotificationContext } from "../context/NotificationContext";
 import type { Notification } from "../context/NotificationContext";
+import { NotificationPageSkeleton } from "../components/skeletons/PageSkeletons";
 
 export default function NotificationsPage() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } = useNotificationContext();
@@ -50,10 +51,7 @@ export default function NotificationsPage() {
       {/* Notifications List */}
       <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.04)] overflow-hidden">
         {isLoading ? (
-          <div className="p-10 text-center flex flex-col items-center">
-             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-             <p className="text-[#7c8697] font-medium text-[14px]">Loading notifications...</p>
-          </div>
+          <NotificationPageSkeleton />
         ) : notifications.length === 0 ? (
           <div className="p-10 text-center flex flex-col items-center">
             <svg className="w-12 h-12 text-[#e2d9ed] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

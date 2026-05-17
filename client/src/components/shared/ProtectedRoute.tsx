@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import type { UserRole } from '../../context/AuthContext';
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_ROUTE_MAP } from '../../lib/routes';
+import { SkeletonBlock, SkeletonCard } from './Skeleton';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -15,40 +16,15 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          width: '100%',
-          background: '#f8fafc',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '16px',
-          }}
-        >
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              border: '4px solid #e2e8f0',
-              borderTopColor: '#3b82f6',
-              borderRadius: '50%',
-              animation: 'spin 0.8s linear infinite',
-            }}
-          />
-          <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>
-            Loading...
-          </span>
-
-          {/* Keep the loading animation self-contained. */}
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div className="min-h-screen w-full bg-main-bg p-6">
+        <div className="mx-auto flex max-w-[1100px] flex-col gap-6">
+          <SkeletonBlock className="h-16 w-full" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <SkeletonCard className="h-28" />
+            <SkeletonCard className="h-28" />
+            <SkeletonCard className="h-28" />
+          </div>
+          <SkeletonCard className="h-[420px]" />
         </div>
       </div>
     );

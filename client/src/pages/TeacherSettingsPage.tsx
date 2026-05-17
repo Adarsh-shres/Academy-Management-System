@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import AccessibilitySettingsPanel from '../components/shared/AccessibilitySettingsPanel';
 import NotificationBell from '../components/shared/NotificationBell';
 import ProfileDropdown from '../components/shared/ProfileDropdown';
 import TeacherSidebar from '../components/teachers/TeacherSidebar';
@@ -66,7 +67,7 @@ export default function TeacherSettingsPage() {
           </div>
 
           {/* Security Card */}
-          <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.02)] p-8">
+          <div className="bg-white rounded-[10px] border border-[#e7dff0] shadow-[0_2px_12px_rgba(57,31,86,0.02)] p-8 mb-6">
             <h2 className="font-sans text-[19px] font-bold text-[#4b3f68] tracking-tight mb-6">Security</h2>
 
             <div className="flex items-center justify-between p-4 bg-[#f9f8fa] rounded-[8px] border border-[#e7dff0]">
@@ -82,6 +83,8 @@ export default function TeacherSettingsPage() {
               </button>
             </div>
           </div>
+
+          <AccessibilitySettingsPanel />
         </div>
       </main>
     </div>

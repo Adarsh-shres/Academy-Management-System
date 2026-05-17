@@ -33,6 +33,8 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
     setIsOpen(false);
     if (user?.role === 'teacher') {
       navigate('/teacher/settings');
+    } else if (user?.role === 'student') {
+      navigate('/student/settings');
     } else {
       navigate('/settings');
     }
@@ -77,7 +79,7 @@ export default function ProfileDropdown({ className = '', useSimpleIcon = false 
     </div>
   );
 
-  const canAccessSettings = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'teacher';
+  const canAccessSettings = !!user;
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>

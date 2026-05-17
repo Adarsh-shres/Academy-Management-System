@@ -34,11 +34,10 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 // ─── Helper: filter rows that belong to this user ─────────────────────────────
 
 function isNotificationForUser(row: any, currentUserId: string): boolean {
-  // The notifications table has user_id (recipient) and teacher_id (sender).
-  // A teacher sees notifications where they are the recipient (user_id) OR
-  // where teacher_id matches (notifications they sent — useful for tracking).
-  // Most importantly, user_id is the actual recipient column.
-  return row.user_id === currentUserId || row.teacher_id === currentUserId;
+  // user_id is the recipient. teacher_id is used by existing send helpers as
+  // the sender id, so treating it as ownership makes broadcasts appear once per
+  // recipient in the sender's notification bell.
+  return row.user_id === currentUserId;
 }
 
 function mapRow(n: any): Notification {
@@ -89,19 +88,17 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        // Fetch all notifications, no .or() filter — avoids 400 from non-existent columns
         const { data, error } = await supabase
           .from('notifications')
           .select('*')
+          .eq('user_id', userId)
           .order('created_at', { ascending: false });
 
         console.log('notifications schema:', data?.slice(0, 2), error);
 
         if (error) throw error;
 
-        // Client-side filter: only keep rows where user_id or teacher_id matches
-        const filtered = (data || []).filter((n: any) => isNotificationForUser(n, userId));
-        setNotifications(filtered.map(mapRow));
+        setNotifications((data || []).map(mapRow));
       } catch (error) {
         console.error('Error fetching notifications:', error);
       } finally {

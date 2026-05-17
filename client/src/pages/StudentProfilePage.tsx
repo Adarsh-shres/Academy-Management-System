@@ -1,13 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useStudentData } from "../hooks/useStudentData";
 import type { StudentProfileData } from "../hooks/useStudentData";
+import { ProfilePageSkeleton } from "../components/skeletons/PageSkeletons";
 
 export default function StudentProfilePage() {
   const navigate = useNavigate();
   const { profile: studentProfile, isLoading, error } = useStudentData();
 
   if (isLoading) {
-    return <div className="flex h-[300px] items-center justify-center text-[#7c8697] text-[13px] font-semibold animate-pulse uppercase tracking-wider">Loading Profile...</div>;
+    return <ProfilePageSkeleton />;
   }
 
   if (error || !studentProfile) {

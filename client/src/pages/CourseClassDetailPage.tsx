@@ -6,6 +6,8 @@ import { useCourses } from '../context/CourseContext';
 import { supabase } from '../lib/supabase';
 import type { Course, CourseRow } from '../types/course';
 import { rowToCourse } from '../types/course';
+import { DetailPageSkeleton } from '../components/skeletons/PageSkeletons';
+import { SkeletonBlock } from '../components/shared/Skeleton';
 
 const MAX_STUDENTS_PER_CLASS = 35;
 const DAY_OPTIONS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -511,12 +513,7 @@ export default function CourseClassDetailPage() {
   };
 
   if (coursesLoading || isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-10 h-10 border-4 border-[#e2d9ed] border-t-[#6a5182] rounded-full animate-spin"></div>
-        <p className="text-[14px] text-[#64748b] font-medium">Loading class details...</p>
-      </div>
-    );
+    return <DetailPageSkeleton />;
   }
 
   if (error || !course || !courseClass) {
@@ -1053,7 +1050,11 @@ export default function CourseClassDetailPage() {
 
               <div className="max-h-[390px] overflow-y-auto divide-y divide-[#edf2f7]">
                 {usersLoading ? (
-                  <div className="py-12 text-center text-[13px] text-[#64748b] font-semibold animate-pulse">Loading users...</div>
+                  <div className="py-4 px-4 space-y-3">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <SkeletonBlock key={index} className="h-10 w-full" />
+                    ))}
+                  </div>
                 ) : filteredStudents.length > 0 ? (
                   filteredStudents.map((studentOption) => {
                     const isSelected = selectedStudentIds.includes(studentOption.id);

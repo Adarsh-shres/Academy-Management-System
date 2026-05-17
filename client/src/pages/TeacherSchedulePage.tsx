@@ -3,6 +3,7 @@ import { CalendarCheck2, MapPin, Users } from '../components/shared/icons';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { isMissingTeacherSchedulesTable } from '../lib/supabaseErrors';
+import { SchedulePageSkeleton } from '../components/skeletons/PageSkeletons';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -239,6 +240,10 @@ export default function TeacherSchedulePage() {
     </div>
   );
 
+  if (isLoading) {
+    return <SchedulePageSkeleton />;
+  }
+
   return (
     <div className="flex-1 p-6 md:p-8 flex flex-col min-w-0 max-w-[1400px] mx-auto w-full">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
@@ -254,13 +259,7 @@ export default function TeacherSchedulePage() {
         </div>
       )}
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-6">
-          <div className="h-[220px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
-          <div className="h-[780px] animate-pulse rounded-sm bg-white border border-[#e7dff0]" />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
           <section className="bg-white rounded-sm border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
             <div className="p-5 border-b border-[#e7dff0] bg-[#fbf8fe] flex items-start justify-between gap-3">
               <div>
@@ -346,8 +345,7 @@ export default function TeacherSchedulePage() {
               })}
             </div>
           </section>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
