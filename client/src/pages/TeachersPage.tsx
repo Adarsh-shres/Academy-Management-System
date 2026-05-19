@@ -116,7 +116,7 @@ export default function TeachersPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleEditTeacher = () => {
+  const handleEditTeacher = async () => {
     if (!selectedTeacher) {
       return;
     }
@@ -136,7 +136,7 @@ export default function TeachersPage() {
       initials,
     };
 
-    updateTeacher(selectedTeacher.id, updates);
+    await updateTeacher(selectedTeacher.id, updates);
     setSelectedTeacher({ ...selectedTeacher, ...updates });
     setIsEditModalOpen(false);
   };
