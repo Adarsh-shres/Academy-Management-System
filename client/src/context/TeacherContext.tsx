@@ -2,12 +2,18 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Teacher } from '../types/teacher';
+import {
+  buildTeacherProfileUpsert,
+  normalizeTeacherStatus,
+  TEACHER_PROFILE_SELECT,
+  type TeacherProfileRow,
+} from '../lib/teacherProfiles';
 
 interface TeacherContextValue {
   teachers: Teacher[];
   getTeacherById: (id: string) => Teacher | undefined;
   addTeacher: (data: Omit<Teacher, 'id'>) => Teacher;
-  updateTeacher: (id: string, data: Partial<Teacher>) => void;
+  updateTeacher: (id: string, data: Partial<Teacher>) => Promise<void>;
   deleteTeacher: (id: string) => void;
   refreshTeachers: () => Promise<void>;
 }
@@ -42,7 +48,7 @@ function gradientForId(id: string) {
   return GRADIENTS[charCode % GRADIENTS.length];
 }
 
-function mapTeacher(row: SupabaseUserRow): Teacher | null {
+function mapTeacher(row: SupabaseUserRow, profile?: TeacherProfileRow | null): Teacher | null {
   if (row.role !== 'teacher') {
     return null;
   }
@@ -53,10 +59,10 @@ function mapTeacher(row: SupabaseUserRow): Teacher | null {
     id: row.id,
     name,
     initials: getInitials(name),
-    subject: 'Not assigned yet',
-    department: 'Not set',
+    subject: profile?.subject?.trim() || 'Not assigned yet',
+    department: profile?.department?.trim() || 'Not set',
     employeeId: `FAC-${row.id.slice(0, 6).toUpperCase()}`,
-    status: 'Active',
+    status: normalizeTeacherStatus(profile?.status),
     avatarGradient: gradientForId(row.id),
     totalClasses: 0,
     totalStudents: 0,
@@ -83,8 +89,30 @@ export function TeacherProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const mapped = (data as SupabaseUserRow[])
-      .map(mapTeacher)
+    const teacherRows = (data as SupabaseUserRow[]) ?? [];
+    let profileMap = new Map<string, TeacherProfileRow>();
+
+    if (teacherRows.length > 0) {
+      const { data: profileRows, error: profileError } = await supabase
+        .from('teacher_profiles')
+        .select(TEACHER_PROFILE_SELECT)
+        .in(
+          'teacher_id',
+          teacherRows.map((t) => t.id),
+        );
+
+      if (profileError) {
+        // Table may not exist yet — that's OK, we just use defaults
+        if (profileError.code !== '42P01') {
+          console.error('[TeacherContext] Failed to load teacher profiles:', profileError.message);
+        }
+      } else {
+        profileMap = new Map((profileRows as TeacherProfileRow[]).map((p) => [p.teacher_id, p]));
+      }
+    }
+
+    const mapped = teacherRows
+      .map((row) => mapTeacher(row, profileMap.get(row.id)))
       .filter((teacher): teacher is Teacher => Boolean(teacher));
 
     setTeachers(mapped);
@@ -108,9 +136,41 @@ export function TeacherProvider({ children }: { children: ReactNode }) {
     return newTeacher;
   }, []);
 
-  const updateTeacher = useCallback((id: string, data: Partial<Teacher>) => {
+  const updateTeacher = useCallback(async (id: string, data: Partial<Teacher>) => {
+    // Optimistically update local state first
     setTeachers((prev) => prev.map((teacher) => (teacher.id === id ? { ...teacher, ...data } : teacher)));
-  }, []);
+
+    // Persist name change to the users table
+    if (data.name !== undefined) {
+      const { error: userError } = await supabase
+        .from('users')
+        .update({ name: data.name })
+        .eq('id', id);
+
+      if (userError) {
+        console.error('[TeacherContext] Failed to update user name:', userError.message);
+      }
+    }
+
+    // Persist profile fields (subject, department, status) to teacher_profiles
+    const currentTeacher = teachers.find((t) => t.id === id);
+    const merged = { ...currentTeacher, ...data, id };
+
+    const profilePayload = buildTeacherProfileUpsert({
+      id,
+      subject: merged.subject ?? 'Not assigned yet',
+      department: merged.department ?? 'Not set',
+      status: merged.status ?? 'Active',
+    });
+
+    const { error: profileError } = await supabase
+      .from('teacher_profiles')
+      .upsert(profilePayload, { onConflict: 'teacher_id' });
+
+    if (profileError) {
+      console.error('[TeacherContext] Failed to update teacher profile:', profileError.message);
+    }
+  }, [teachers]);
 
   const deleteTeacher = useCallback((id: string) => {
     setTeachers((prev) => prev.filter((teacher) => teacher.id !== id));
