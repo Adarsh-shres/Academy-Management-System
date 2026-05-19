@@ -43,6 +43,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
   const [isExporting, setIsExporting] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
+  const [isScheduledDay, setIsScheduledDay] = useState(true);
 
   // Stats
   const presentCount = Object.values(attendance).filter(s => s === 'present').length;
@@ -59,8 +60,44 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
     if (!classId) return;
     setIsLoading(true);
     setSaveMessage(null);
+    setIsScheduledDay(true);
 
     try {
+      // Check if a class is scheduled on the selected date
+      const selectedDayName = new Date(selectedDate + 'T00:00:00')
+        .toLocaleDateString('en-US', { weekday: 'long' });
+
+      const { data: oneTimeEntries, error: oneTimeError } = await supabase
+        .from('class_schedules')
+        .select('id')
+        .eq('class_id', classId)
+        .eq('schedule_type', 'one_time')
+        .eq('schedule_date', selectedDate);
+
+      if (oneTimeError) throw oneTimeError;
+
+      if (!oneTimeEntries || oneTimeEntries.length === 0) {
+        const { data: weeklyEntries, error: weeklyError } = await supabase
+          .from('class_schedules')
+          .select('id')
+          .eq('class_id', classId)
+          .eq('schedule_type', 'weekly')
+          .eq('day_of_week', selectedDayName);
+
+        if (weeklyError) throw weeklyError;
+
+        if (!weeklyEntries || weeklyEntries.length === 0) {
+          setIsScheduledDay(false);
+          setSessionLoaded(false);
+          setSaveMessage({
+            type: 'error',
+            text: `No class is scheduled on ${selectedDayName} (${selectedDate}). Attendance can only be recorded on days when a class is scheduled.`,
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase
         .from('attendance')
         .select('student_id, status, time')
@@ -119,6 +156,41 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
     setSaveMessage(null);
 
     try {
+      // Validate that a class is scheduled on the selected date
+      const selectedDayName = new Date(selectedDate + 'T00:00:00')
+        .toLocaleDateString('en-US', { weekday: 'long' });
+
+      // Check for one_time override schedule on this exact date
+      const { data: oneTimeEntries, error: oneTimeError } = await supabase
+        .from('class_schedules')
+        .select('id')
+        .eq('class_id', classId)
+        .eq('schedule_type', 'one_time')
+        .eq('schedule_date', selectedDate);
+
+      if (oneTimeError) throw oneTimeError;
+
+      // If no one_time override exists, check for a weekly schedule on this day
+      if (!oneTimeEntries || oneTimeEntries.length === 0) {
+        const { data: weeklyEntries, error: weeklyError } = await supabase
+          .from('class_schedules')
+          .select('id')
+          .eq('class_id', classId)
+          .eq('schedule_type', 'weekly')
+          .eq('day_of_week', selectedDayName);
+
+        if (weeklyError) throw weeklyError;
+
+        if (!weeklyEntries || weeklyEntries.length === 0) {
+          setSaveMessage({
+            type: 'error',
+            text: `No class is scheduled on ${selectedDayName} (${selectedDate}). Attendance can only be recorded on days when a class is scheduled.`,
+          });
+          setIsSaving(false);
+          return;
+        }
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not logged in');
 
@@ -302,7 +374,7 @@ export default function TeacherAttendanceTab({ classId, students, courseName, cl
       )}
 
       {/* Attendance Table */}
-      {sessionLoaded && (
+      {sessionLoaded && isScheduledDay && (
         <>
           {/* Summary Bar */}
           <div className="bg-white rounded-md border border-[#e7dff0] shadow-[0_10px_28px_rgba(57,31,86,0.06)] overflow-hidden">
